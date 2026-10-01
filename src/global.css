@@ -1,0 +1,20 @@
+* { box-sizing: border-box; }
+:root { font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #18332f; background: #f6f5ef; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+body { margin: 0; }
+button, input, textarea { font: inherit; }
+button, a, input, textarea, summary { -webkit-tap-highlight-color: transparent; }
+button, summary { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .58; }
+a { color: inherit; text-underline-offset: 4px; }
+p { line-height: 1.65; }
+h1, h2, h3, h4, p { margin-top: 0; }
+h1:focus { outline: none; }
+:focus-visible { outline: 3px solid #bb6c29; outline-offset: 4px; }
+textarea { resize: vertical; }
+fieldset { padding: 0; border: 0; margin: 0; min-width: 0; }
+legend { padding: 0; font-weight: 650; }
+ul { padding-left: 1.3rem; }
+li { line-height: 1.65; }
+svg { display: block; }
+::selection { background: #d5e5d5; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
