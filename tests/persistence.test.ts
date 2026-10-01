@@ -1,6 +1,6 @@
 import { beforeEach, describe, it, expect } from 'vitest';
 import { RunStore } from '../src/persistence';
-import { beforeCase, completedBattery, config, validDraft } from './helpers';
+import { beforeCase, completedBattery, config, previousConfig, validDraft } from './helpers';
 const a = config.assessments[0]; const s = a.stages[0];
 beforeEach(() => localStorage.clear());
 function seeded(index: number) { const store = new RunStore(config, 'learner'); localStorage.setItem(store.key, JSON.stringify(beforeCase(index))); return new RunStore(config, 'learner'); }
@@ -53,6 +53,28 @@ describe('local persistence', () => {
     const store = new RunStore(config, 'learner'); const run = completedBattery(); run.sessions[config.assessments[3].id].contentVersion = 'old'; localStorage.setItem(store.key, JSON.stringify(run));
     const restored = new RunStore(config, 'learner'); expect(restored.getSnapshot().fatal).toBe(false); expect(restored.getSnapshot().run.sessions[a.id]).toEqual(run.sessions[a.id]);
     expect(localStorage.getItem(`${store.key}:backup:${run.runId}`)).toBe(JSON.stringify(run));
+  });
+  it('migrates the four-stage A2 release, backs it up and resumes A2 without dependent progress', async () => {
+    const key = new RunStore(config, 'learner').key; const run = completedBattery(previousConfig);
+    run.reflection = { draft: 'Previous reflection', submitted: 'Previous reflection', submittedAt: new Date().toISOString() };
+    const original = JSON.stringify(run); localStorage.setItem(key, original);
+    // Journals from reset cases and the final reflection must not revive old state.
+    for (const assessment of previousConfig.assessments.slice(1)) localStorage.setItem(`${key}:draft:${run.runId}:${assessment.id}`, JSON.stringify(validDraft(assessment, assessment.stages[0])));
+    localStorage.setItem(`${key}:reflection:${run.runId}`, JSON.stringify('Old reflection journal'));
+    const store = new RunStore(config, 'learner'); const restored = store.getSnapshot();
+    expect(restored.fatal).toBe(false); expect(restored.notice).toContain('updated');
+    expect(restored.run.sessions[a.id]).toEqual(run.sessions[a.id]);
+    for (const assessment of config.assessments.slice(1)) expect(restored.run.sessions[assessment.id]).toEqual({ contentVersion: assessment.contentVersion, startedAt: null, draft: null, submitted: {} });
+    expect(restored.run.intermission).toEqual({ seenAt: null, continuedAt: null });
+    expect(restored.run.reflection).toEqual({ draft: '', submitted: null, submittedAt: null });
+    expect(localStorage.getItem(`${key}:backup:${run.runId}`)).toBe(original);
+    const a2 = config.assessments[1]; await store.begin(a2.id);
+    const reloaded = new RunStore(config, 'learner').getSnapshot();
+    expect(reloaded.fatal).toBe(false); expect(reloaded.notice).toBeNull();
+    expect(reloaded.run.sessions[a2.id].draft!.answers).toEqual({});
+    for (const stage of a2.stages) await store.submit(a2.id, stage.id, validDraft(a2, stage));
+    expect(new RunStore(config, 'learner').getSnapshot().run.sessions[a2.id].submitted.A2_check.answers).toEqual({ A2_check: 'A' });
+    expect(localStorage.getItem(`${key}:backup:${run.runId}`)).toBe(original);
   });
   it('does not resurrect submissions after a reset in another tab', async () => {
     const store = new RunStore(config, 'learner'); await store.begin(a.id); const stale = new RunStore(config, 'learner'); await store.reset();

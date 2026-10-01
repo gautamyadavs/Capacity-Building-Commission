@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { config } from '../helpers';
+import { completedBattery, config, previousConfig } from '../helpers';
 import { fieldsFor, type Assessment, type Stage } from '../../src/model';
 const root = '/bharat-kalp/';
 const go = async (page: Page, path: string) => { await page.goto(`${root}#${path}`); await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible(); };
@@ -55,7 +55,34 @@ test('complete ordered battery: locks, reloads, intermission, deferred feedback 
         for (const q of a.stages[4].selectedResponses) await expect(page.getByText(q.prompt, { exact: true })).toHaveCount(0);
         await go(page, `/learner/assessment/${a.id}/stage/${stage.id}`);
       }
+      if (stage.id === 'A2_update' || stage.id === 'A2_challenge') {
+        const check = a.stages[4];
+        await expect(page.getByText(check.selectedResponses[0].prompt, { exact: true })).toHaveCount(0);
+        for (const option of check.selectedResponses[0].options) await expect(page.getByText(`${option.id}. ${option.label}`, { exact: true })).toHaveCount(0);
+        await expect(page.getByRole('form', { name: 'Stage response' }).getByRole('textbox')).toHaveCount(1);
+        await expect(page.getByRole('radio')).toHaveCount(stage.id === 'A2_update' ? 0 : 3);
+        const future = stage.id === 'A2_update' ? a.stages[3] : check;
+        await go(page, `/learner/assessment/${a.id}/stage/${future.id}`);
+        await expect(page.getByRole('heading', { name: 'This stage is not available yet' })).toBeVisible();
+        await expect(page.getByText(check.selectedResponses[0].prompt, { exact: true })).toHaveCount(0);
+        await go(page, `/learner/assessment/${a.id}/stage/${stage.id}`);
+      }
+      if (stage.id === 'A2_check') {
+        await expect(page.getByRole('form', { name: 'Stage response' }).locator('[data-field-id]')).toHaveCount(1);
+        await expect(page.getByRole('textbox')).toHaveCount(0); await expect(page.getByRole('radio')).toHaveCount(3);
+        await expect(page.getByText(stage.selectedResponses[0].prompt, { exact: true })).toBeVisible();
+        await page.getByText('Earlier update', { exact: true }).click();
+        for (const fact of a.stages[2].information) await expect(page.getByText(fact, { exact: true })).toBeVisible();
+      }
       await fillStage(page, a, stage); await accessible(page);
+      for (const textarea of await page.getByRole('textbox').all()) {
+        expect(await textarea.getAttribute('spellcheck')).toBeNull();
+        expect(await textarea.evaluate(el => (el as HTMLTextAreaElement).spellcheck)).toBe(true);
+      }
+      for (const q of stage.selectedResponses) {
+        await expect(page.getByText('Best-supported answer:', { exact: true })).toHaveCount(0);
+        for (const text of Object.values(q.feedbackByOption)) await expect(page.getByText(text, { exact: true })).toHaveCount(0);
+      }
       if (stage.kind === 'predict' || stage.kind === 'compare') await page.screenshot({ path: testInfo.outputPath(`${a.shortId}-${stage.kind}.png`), fullPage: true });
       const draft = (await stateFor(page)).sessions[a.id].draft;
       // The run-scoped journal retains edits even when refresh beats the debounce.
@@ -66,7 +93,15 @@ test('complete ordered battery: locks, reloads, intermission, deferred feedback 
         else await expect(container.getByRole('radio').first()).toBeChecked();
       }
       await submit(page); const after = page.url(); const saved = (await stateFor(page)).sessions[a.id].submitted[stage.id]; expect(saved.answers).toEqual(draft.answers);
+      if (stage.id === 'A2_challenge') await expect(page).toHaveURL(/\/stage\/A2_check$/);
+      if (stage.id === 'A2_check') {
+        await expect(page).toHaveURL(/#\/learner\/intermission$/);
+        await expect(page.getByRole('heading', { name: config.intermission.heading })).toBeVisible();
+        await expect(page.locator('[data-feedback-id]')).toHaveCount(0);
+        for (const text of Object.values(stage.selectedResponses[0].feedbackByOption)) await expect(page.getByText(text, { exact: true })).toHaveCount(0);
+      }
       await go(page, `/learner/assessment/${a.id}/stage/${stage.id}`); await expect(page.locator('textarea,input')).toHaveCount(0); await expect(page.getByText('▣ Submitted and locked', { exact: true }).first()).toBeVisible();
+      await expect(page.getByText('Best-supported answer:', { exact: true })).toHaveCount(0);
       for (const q of stage.selectedResponses) for (const text of Object.values(q.feedbackByOption)) await expect(page.getByText(text, { exact: true })).toHaveCount(0);
       await page.reload(); await expect(page.locator('textarea,input')).toHaveCount(0); await page.goto(after);
     }
@@ -82,13 +117,17 @@ test('complete ordered battery: locks, reloads, intermission, deferred feedback 
     }
   }
   await expect(page).toHaveURL(/#\/learner\/review$/); await expect(page.getByRole('heading', { name: 'Assessment complete' })).toBeVisible(); await expect(page.locator('[data-feedback-id]')).toHaveCount(7);
+  await expect(page.locator('[data-feedback-id="A2_check"]')).toHaveCount(1);
+  await expect(page.locator('[data-feedback-id^="B1_"]')).toHaveCount(3); await expect(page.locator('[data-feedback-id^="B2_"]')).toHaveCount(3);
+  await expect(page.getByText(config.assessments[1].stages[4].selectedResponses[0].feedbackByOption.A, { exact: true })).toHaveCount(1);
   for (const a of config.assessments) for (const s of a.stages) for (const q of s.selectedResponses) await expect(page.getByText(q.feedbackByOption.A, { exact: true })).toBeVisible();
   await expect(page.locator('[data-trail-id]')).toHaveCount(4); for (const trail of await page.locator('[data-trail-id]').all()) await trail.locator(':scope > summary').click();
   for (const prediction of await page.locator('[data-trail-id] details').all()) { if (!(await prediction.evaluate(el => (el as HTMLDetailsElement).open))) await prediction.locator(':scope > summary').click(); }
   await expect(page.getByRole('textbox')).toHaveCount(1); await expect(page.getByText('Critical assumption or dependency', { exact: true })).toHaveCount(4);
   expect(await page.locator('main').innerText()).not.toMatch(/overall score|total score|competency profile|KCM|KQF|rubric|sample answer|reviewer note|validated/i);
   await accessible(page); await page.screenshot({ path: testInfo.outputPath('final-review.png'), fullPage: true });
-  const reflection = page.getByRole('textbox'); await reflection.fill('  I kept observations separate from inferences.\nI revised proportionately.  '); await page.reload(); await expect(page.getByRole('textbox')).toHaveValue('  I kept observations separate from inferences.\nI revised proportionately.  ');
+  const reflection = page.getByRole('textbox'); expect(await reflection.getAttribute('spellcheck')).toBeNull(); expect(await reflection.evaluate(el => (el as HTMLTextAreaElement).spellcheck)).toBe(true);
+  await reflection.fill('  I kept observations separate from inferences.\nI revised proportionately.  '); await page.reload(); await expect(page.getByRole('textbox')).toHaveValue('  I kept observations separate from inferences.\nI revised proportionately.  ');
   await page.getByRole('button', { name: 'Submit optional reflection' }).click(); await page.getByRole('dialog').getByRole('button', { name: 'Save and lock reflection', exact: true }).click(); await expect(page.getByRole('textbox')).toHaveCount(0);
   await page.reload(); await expect(page.getByText('▣ Reflection saved and locked')).toBeVisible();
 });
@@ -114,4 +153,23 @@ test('hash routing, old routes, legacy state and responsive accessibility', asyn
   }
   await page.getByRole('link', { name: 'Start assessment', exact: false }).click(); await page.getByRole('button', { name: 'Begin case' }).click(); await accessible(page);
   expect(await page.locator('body').evaluate(el => el.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('previous four-stage A2 run migrates with A1 retained and dependent progress reset', async ({ page }) => {
+  const oldRun = completedBattery(previousConfig); const raw = JSON.stringify(oldRun);
+  await go(page, '/learner');
+  await page.evaluate(value => localStorage.setItem('bharat-kalp:/bharat-kalp/:v2:learner', value), raw);
+  await page.reload(); await expect(page.getByText(/Incompatible case progress has been restarted/)).toBeVisible();
+  const restored = await stateFor(page); expect(restored.sessions.A1_FLOOD).toEqual(oldRun.sessions.A1_FLOOD);
+  for (const a of config.assessments.slice(1)) expect(restored.sessions[a.id]).toEqual({ contentVersion: a.contentVersion, startedAt: null, draft: null, submitted: {} });
+  expect(restored.intermission).toEqual({ seenAt: null, continuedAt: null });
+  expect(await page.evaluate(runId => localStorage.getItem(`bharat-kalp:/bharat-kalp/:v2:learner:backup:${runId}`), oldRun.runId)).toBe(raw);
+  await page.getByRole('link', { name: 'Continue assessment', exact: false }).click();
+  await expect(page).toHaveURL(/#\/learner\/assessment\/A2_LPG$/);
+  await expect(page.getByText('Evidence check', { exact: true })).toBeVisible();
+  await go(page, '/learner/assessment/A2_LPG/stage/A2_check');
+  await expect(page.getByRole('heading', { name: 'This stage is not available yet' })).toBeVisible();
+  await go(page, '/learner/assessment/A2_LPG'); await page.getByRole('button', { name: 'Begin case' }).click();
+  await expect(page).toHaveURL(/\/stage\/A2_initial$/); await expect(page.getByRole('textbox')).toBeEmpty();
+  await page.reload(); await expect(page.getByRole('textbox')).toBeEmpty(); await accessible(page);
 });

@@ -21,7 +21,7 @@ export function ResponseField({ field, value, onChange, error, disabled = false 
         {field.maxWords && <span id={`${id}-count`} role="status" aria-live="polite" aria-atomic="true" className={over ? styles.overLimit : styles.wordCount}>{count} / {field.maxWords} words · maximum</span>}</div>
       <p className={styles.help} id={`${id}-help`}>{field.prompt}</p>
       <textarea id={id} value={value} onChange={e => onChange(e.target.value)} rows={field.maxWords && field.maxWords > 150 ? 6 : 4}
-        disabled={disabled} aria-required={field.required} aria-invalid={!!error || over} aria-describedby={description} spellCheck={false} />
+        disabled={disabled} aria-required={field.required} aria-invalid={!!error || over} aria-describedby={description} />
     </>}
     {(error || over) && <p className={styles.fieldError} id={`${id}-error`}>{error || `Use ${field.maxWords} words or fewer. Your response has ${count} words.`}</p>}
   </div>;

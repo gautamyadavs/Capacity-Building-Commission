@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "contentVersion": "four-cases-2026-10-01",
+  "contentVersion": "four-cases-2026-10-01-v2",
   "confirmation": "Your submitted response will be locked before the next stage is revealed. You can return to read it, but you cannot change it.",
   "guidance": [
     "Use the facts supplied in the simulation as authoritative. You are not expected to recall a particular government procedure.",
@@ -246,7 +246,7 @@
       "shortId": "A2",
       "format": "A",
       "title": "LPG Supply Disruption",
-      "contentVersion": "four-cases-v2",
+      "contentVersion": "four-cases-v3",
       "suggestedTime": "30 minutes",
       "instructions": [
         "You are acting as the Secretary-level lead for a 30-day national continuity response to a temporary LPG supply disruption. Use the case facts as authoritative. Your task is not to recall existing rationing rules or predict the actual market. It is to make and justify a workable continuity strategy under uncertainty.",
@@ -379,34 +379,7 @@
           ],
           "groups": [],
           "note": [],
-          "selectedResponses": [
-            {
-              "id": "A2_check",
-              "label": "Evidence check",
-              "prompt": "Which conclusion is best supported by the new information?",
-              "options": [
-                {
-                  "id": "A",
-                  "label": "Use the increase in household bookings as the main estimate of the increase in actual household LPG consumption."
-                },
-                {
-                  "id": "B",
-                  "label": "Treat the viral message and booking increase as evidence that a nationwide stockout within 72 hours is now likely."
-                },
-                {
-                  "id": "C",
-                  "label": "Check actual consumption and location-specific stock before concluding that the booking increase represents a nationwide physical shortage."
-                }
-              ],
-              "correctOptionId": "C",
-              "feedbackByOption": {
-                "C": "Correct. A rise in bookings shows changed demand behaviour, but it does not by itself establish an equivalent increase in actual consumption or a nationwide physical shortage.",
-                "A": "Not quite. Bookings can rise because households order earlier or duplicate requests during uncertainty. The best-supported conclusion is to check actual consumption and location-specific stock before inferring a nationwide physical shortage.",
-                "B": "Not quite. The viral claim and resulting bookings show public anxiety, not evidence of a nationwide stockout within 72 hours. The case still shows that the most severe stock problem is localized."
-              },
-              "deferFeedbackUntilBatteryComplete": true
-            }
-          ],
+          "selectedResponses": [],
           "requires": [
             "A2_initial",
             "A2_execution"
@@ -476,6 +449,59 @@
           ],
           "contextStageIds": [
             "A2_initial",
+            "A2_update"
+          ]
+        },
+        {
+          "id": "A2_check",
+          "title": "Evidence check",
+          "kind": "evidence",
+          "suggestedTime": "2 minutes",
+          "fields": [],
+          "information": [],
+          "groups": [],
+          "note": [],
+          "selectedResponses": [
+            {
+              "id": "A2_check",
+              "label": "Evidence check",
+              "prompt": "Which conclusion is best supported by the new information?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Use the increase in household bookings as the main estimate of the increase in actual household LPG consumption."
+                },
+                {
+                  "id": "B",
+                  "label": "Treat the viral message and booking increase as evidence that a nationwide stockout within 72 hours is now likely."
+                },
+                {
+                  "id": "C",
+                  "label": "Check actual consumption and location-specific stock before concluding that the booking increase represents a nationwide physical shortage."
+                }
+              ],
+              "correctOptionId": "C",
+              "feedbackByOption": {
+                "C": "Correct. A rise in bookings shows changed demand behaviour, but it does not by itself establish an equivalent increase in actual consumption or a nationwide physical shortage.",
+                "A": "Not quite. Bookings can rise because households order earlier or duplicate requests during uncertainty. The best-supported conclusion is to check actual consumption and location-specific stock before inferring a nationwide physical shortage.",
+                "B": "Not quite. The viral claim and resulting bookings show public anxiety, not evidence of a nationwide stockout within 72 hours. The case still shows that the most severe stock problem is localized."
+              },
+              "deferFeedbackUntilBatteryComplete": true
+            }
+          ],
+          "requires": [
+            "A2_initial",
+            "A2_execution",
+            "A2_update",
+            "A2_challenge"
+          ],
+          "priorResponses": [
+            "A2_initial",
+            "A2_execution",
+            "A2_update",
+            "A2_challenge"
+          ],
+          "contextStageIds": [
             "A2_update"
           ]
         }
