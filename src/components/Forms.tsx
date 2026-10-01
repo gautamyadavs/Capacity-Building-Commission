@@ -13,12 +13,12 @@ export function ResponseField({ field, value, onChange, error, disabled = false 
     {field.type === 'choice' ? <fieldset disabled={disabled} aria-describedby={description} aria-invalid={!!error}>
       <legend>{field.label}{field.unscored && <span className={styles.optional}>Unscored</span>}</legend>
       <p id={`${id}-help`} className={styles.help}>{field.prompt}</p>
-      <div className={styles.choices}>{field.options?.map(option => <label key={option} className={value === option ? styles.selectedChoice : styles.choice}>
-        <input type="radio" name={id} value={option} required={field.required} checked={value === option} onChange={() => onChange(option)} />{option}
+      <div className={styles.choices}>{field.options?.map(option => <label key={option.id} className={value === option.id ? styles.selectedChoice : styles.choice}>
+        <input type="radio" name={id} value={option.id} required={field.required} checked={value === option.id} onChange={() => onChange(option.id)} />{option.label}
       </label>)}</div>
     </fieldset> : <>
       <div className={styles.fieldHeading}><label htmlFor={id}>{field.label}{!field.required && <span className={styles.optional}>Optional</span>}</label>
-        {field.maxWords && <span id={`${id}-count`} className={over ? styles.overLimit : styles.wordCount}>{count} / {field.maxWords} words</span>}</div>
+        {field.maxWords && <span id={`${id}-count`} role="status" aria-live="polite" aria-atomic="true" className={over ? styles.overLimit : styles.wordCount}>{count} / {field.maxWords} words · maximum</span>}</div>
       <p className={styles.help} id={`${id}-help`}>{field.prompt}</p>
       <textarea id={id} value={value} onChange={e => onChange(e.target.value)} rows={field.maxWords && field.maxWords > 150 ? 6 : 4}
         disabled={disabled} aria-required={field.required} aria-invalid={!!error || over} aria-describedby={description} spellCheck={false} />

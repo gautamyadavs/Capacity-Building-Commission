@@ -1,74 +1,111 @@
-import { describe,it,expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
-import { ConfigSchema, createRun, debriefEligible, fieldsFor, parseRun, stageStatus, submitStage, validate, wordCount } from '../src/model';
-import { config,started,validDraft,complete } from './helpers';
+import { ConfigSchema, assessmentAvailable, batteryComplete, createRun, currentStage, fieldsFor, intermissionDue, parseRun, restoreRun, submitStage, validate, wordCount } from '../src/model';
+import { beforeCase, complete, completedBattery, config, started, validDraft } from './helpers';
 
-describe('source fidelity',()=>{
-  const raw=readFileSync('docs/source-specification.md','utf8');
-  const normalized=raw.split('\n').map(l=>l.trim().replace(/^(?:\*\s+)?#{1,6}\s*|^\*\s+/,'').replace(/\\([\\`*_{}\[\]()#+\-.!>])/g,'$1')).join('\n');
-  it('pins the actual source document',()=>expect(createHash('sha256').update(raw).digest('hex')).toBe(config.source.sha256));
-  for(const a of config.assessments)it(`${a.id}: preserves all assessment prose, facts and prompts`,()=>{
-    const text=[...a.instructions,...a.reviewerNotes,...a.stages.flatMap(s=>[...s.information,...s.note,...s.groups.flatMap(g=>g.paragraphs),...s.reviewerNotes,...s.fields.filter(f=>f.type==='text').map(f=>f.prompt)])];
-    for(const p of text)expect(normalized,`Missing source text: ${p}`).toContain(p);
-    // Compare the complete learner information block, rather than only checking
-    // that the selected configuration sentences happen to exist in the source.
-    for(const s of a.stages) {
-      const start=normalized.indexOf(s.sourceSection);const following=normalized.slice(start+s.sourceSection.length).search(/\n[AB][12] Stage [0-4] - /);const next=following<0?-1:start+s.sourceSection.length+following;
-      let part=normalized.slice(start,next<0?undefined:next);
-      const info=part.match(/Learner sees: [^\n]+\n([\s\S]*?)(?:Prototype presentation|Learner enters)/)?.[1].trim().split(/\n+/).filter(Boolean)||[];
-      expect([...s.information,...s.groups.flatMap(g=>g.paragraphs)].sort()).toEqual(info.sort());
-    }
-  });
-  it('preserves shared instructions and developmental prompts',()=>{
-    for(const p of [config.confirmation,...config.openBook,...config.cards.flatMap(c=>[c.label,c.prompt]),...config.formats.flatMap(f=>[...f.debrief.information,...f.debrief.fields.flatMap(v=>[v.label,v.prompt])])])expect(normalized).toContain(p);
-  });
-  it('enforces exactly the documented per-field limits',()=>{
-    expect(config.assessments.map(a=>a.stages.map(s=>s.fields.filter(f=>f.type==='text').map(f=>f.maxWords)))).toEqual([
-      [[120,260,180,120,100],[180,80,90],[180,80,80]],[[120,260,180,100,100],[170,80,100],[180,80,80]],
-      [[100],[],[160,160,100,100],[180,100,120]],[[100],[],[160,160,100,100],[180,100,120]],
+describe('final four-case content', () => {
+  it('has the specified stage order and seven deferred checks', () => {
+    expect(config.assessments.map(a => a.stages.map(s => s.title))).toEqual([
+      ['Initial judgement', 'Make it executable', 'New information', 'Decision challenge'],
+      ['Initial judgement', 'Allocation and execution', 'Day 4 update', 'Allocation challenge'],
+      ['Predict', 'Observe and compare', 'Explain', 'Revise', 'Evidence checks'],
+      ['Predict', 'Observe and compare', 'Explain', 'Revise', 'Evidence checks'],
     ]);
-    expect(config.cardFields.every(f=>!f.maxWords)).toBe(true);
+    expect(config.assessments[1].stages[2].selectedResponses).toHaveLength(1);
+    const checks = config.assessments.flatMap(a => a.stages.flatMap(s => s.selectedResponses));
+    expect(checks.map(q => q.correctOptionId)).toEqual(['C', 'B', 'A', 'C', 'B', 'A', 'B']);
+    expect(checks.every(q => q.deferFeedbackUntilBatteryComplete && Object.keys(q.feedbackByOption).length === 3)).toBe(true);
   });
-});
-describe('assessment state machine',()=>{
-  for(const a of config.assessments)it(`${a.id}: locks each snapshot before the next stage`,()=>{
-    let run=started(a);
-    for(const [i,s] of a.stages.entries()) {
-      expect(stageStatus(a,run.sessions[a.id],s)).toBe('current');
-      for(const next of a.stages.slice(i+1))expect(stageStatus(a,run.sessions[a.id],next)).toBe('notYetAvailable');
-      const draft=validDraft(s);const original=structuredClone(draft);run=submitStage(config,run,a.id,s.id,draft);
-      draft.answers.field1='Changed after submission';draft.cardOrder.reverse();
-      expect(run.sessions[a.id].submitted[s.id].answers).toEqual(original.answers);
-      expect(run.sessions[a.id].submitted[s.id].cardOrder).toEqual(original.cardOrder);
-      expect(()=>submitStage(config,run,a.id,s.id,draft)).toThrow('no longer editable');
-      expect(parseRun(JSON.stringify(run),config,'learner')).toEqual(run);
+  it('configures exactly two identical prediction cards per case with the correct limits', () => {
+    for (const a of config.assessments.slice(2)) {
+      expect(a.predictions!.cards.map(c => c.label)).toEqual(['Prediction 1', 'Prediction 2']);
+      expect(a.predictions!.fields.map(f => [f.id, f.maxWords])).toEqual([['prediction', 35], ['why', 60], ['confidence', undefined]]);
+      expect(a.predictions!.fields.find(f => f.id === 'confidence')).toMatchObject({ required: true, unscored: true });
+      expect(a.predictions!.evidenceMaxWords).toBe(35);
+      expect(a.stages[0].fields[0].maxWords).toBe(60);
+      expect(a.stages[2].fields.map(f => f.maxWords)).toEqual([120, 150]);
+      expect(a.stages[3].fields[0].maxWords).toBe(180);
     }
   });
-  it('blocks submission before begin and stage skipping',()=>{
-    const a=config.assessments[0];expect(()=>submitStage(config,createRun(config,'learner'),a.id,a.stages[0].id,validDraft(a.stages[0]))).toThrow();
-    expect(()=>submitStage(config,started(a),a.id,a.stages[1].id,validDraft(a.stages[1]))).toThrow();
+  it('uses every specified open-response maximum and unscored position selectors', () => {
+    expect(config.assessments.slice(0, 2).map(a => a.stages.map(s => s.fields.find(f => f.type === 'text')!.maxWords))).toEqual([[200, 150, 160, 170], [220, 150, 150, 180]]);
+    for (const a of config.assessments.slice(0, 2)) expect(a.stages[3].fields[0]).toMatchObject({ id: 'position', unscored: true, options: [{ id: 'Maintain' }, { id: 'Modify' }, { id: 'Reverse' }] });
+    expect(config.finalReview.reflection).toMatchObject({ required: false, maxWords: 150 });
   });
-  for(const fid of ['A','B'] as const)for(const reverse of [false,true])it(`${fid}: debrief requires both cases, reverse=${reverse}`,()=>{
-    const cases=config.assessments.filter(a=>a.format===fid);if(reverse)cases.reverse();let run=createRun(config,'learner');
-    expect(debriefEligible(config,run,fid)).toBe(false);run=complete(cases[0],run);expect(debriefEligible(config,run,fid)).toBe(false);run=complete(cases[1],run);expect(debriefEligible(config,run,fid)).toBe(true);
-    expect(debriefEligible(config,run,fid==='A'?'B':'A')).toBe(false);
+  it('retains authoritative facts, replaces observed values, and removes reviewer content', () => {
+    const facts = config.assessments.map(a => JSON.stringify(a));
+    for (const text of ['140,000', '11,000', '600 buses', '260 buses', '420 buses', 'limited access to private transport', 'No single agency controls all resources']) expect(facts[0]).toContain(text);
+    for (const text of ['18 days', '9 to 12 days', 'no safe short-term substitute', 'last-mile allocation', '70 percent confidence']) expect(facts[1]).toContain(text);
+    for (const text of ['91 percent', '14 percent', '455 and 480', '38 to 46 percent', '39 percent', 'income distress']) expect(facts[2]).toContain(text);
+    for (const text of ['Monthly closures increase 32 percent', '23 to 15 days', 'backlog falls 11 percent', '17 percent to 20 percent', '56 percent to 54 percent', 'It does not show when substantive work', 'fewer cross-department grievances']) expect(facts[3]).toContain(text);
+    const publicContent = readFileSync('public/content/assessments.json', 'utf8');
+    expect(publicContent).not.toMatch(/reviewerNotes|reviewerSections|KCM|KQF|rubric|competency|psychometric|sample answer|pilot methodology|PEOE|POE-R|SJT|evidence architecture/i);
   });
-  it('rejects corrupt, incompatible and out-of-sequence data',()=>{
-    const a=config.assessments[0];const run=started(a);run.contentVersion='old';expect(()=>parseRun(JSON.stringify(run),config,'learner')).toThrow();
-    expect(()=>parseRun('{bad',config,'learner')).toThrow();let done=complete(a,started(a));delete done.sessions[a.id].submitted[a.stages[0].id];expect(()=>parseRun(JSON.stringify(done),config,'learner')).toThrow();
+  it('rejects a broken prerequisite graph and incomplete question feedback', () => {
+    const broken = structuredClone(config); broken.assessments[0].stages[1].requires = [];
+    expect(ConfigSchema.safeParse(broken).success).toBe(false);
+    const missing = structuredClone(config); missing.assessments[1].stages[2].selectedResponses[0].feedbackByOption = {};
+    expect(ConfigSchema.safeParse(missing).success).toBe(false);
   });
-  it('validates the configuration graph',()=>{const invalid=structuredClone(config);invalid.assessments[0].stages[0].requires=['future'];expect(ConfigSchema.safeParse(invalid).success).toBe(false);});
 });
-describe('validation',()=>{
-  it('counts whitespace consistently without changing the response',()=>{expect(wordCount('  one\n two\tthree  ')).toBe(3);expect(wordCount(' \n ')).toBe(0);});
-  for(const a of config.assessments)for(const s of a.stages)it(`${s.id}: validates every required field and word boundary`,()=>{
-    const draft=validDraft(s);expect(validate(config,s,draft)).toEqual({});
-    for(const f of fieldsFor(config,s)) {
-      const edited=structuredClone(draft);edited.answers[f.id]=' \n ';
-      expect(!!validate(config,s,edited)[f.id]).toBe(f.required);
-      if(f.maxWords){edited.answers[f.id]=Array(f.maxWords).fill('word').join(' ');expect(validate(config,s,edited)[f.id]).toBeUndefined();edited.answers[f.id]+=' word';expect(validate(config,s,edited)[f.id]).toContain(`${f.maxWords} words or fewer`);}
+describe('battery state and immutable submission', () => {
+  it('enforces case order and the intermission boundary', () => {
+    let run = createRun(config, 'learner');
+    expect(config.assessments.map(a => assessmentAvailable(config, run, a.id))).toEqual([true, false, false, false]);
+    run = complete(config.assessments[0], run); run = complete(config.assessments[1], run);
+    expect(intermissionDue(config, run)).toBe(true); expect(run.intermission.seenAt).not.toBeNull();
+    expect(assessmentAvailable(config, run, config.assessments[2].id)).toBe(false);
+    run.intermission.continuedAt = new Date().toISOString(); expect(assessmentAvailable(config, run, config.assessments[2].id)).toBe(true);
+  });
+  it('locks predictions before comparison and checks after both open explanation and revision', () => {
+    for (const index of [2, 3]) {
+      const a = config.assessments[index]; let run = started(index);
+      expect(currentStage(a, run.sessions[a.id])!.kind).toBe('predict');
+      expect(() => submitStage(config, run, a.id, a.stages[1].id, validDraft(a, a.stages[1]))).toThrow('no longer editable');
+      for (const s of a.stages.slice(0, 4)) {
+        expect(() => submitStage(config, run, a.id, a.stages[4].id, validDraft(a, a.stages[4]))).toThrow('no longer editable');
+        run = submitStage(config, run, a.id, s.id, validDraft(a, s));
+      }
+      expect(currentStage(a, run.sessions[a.id])!.kind).toBe('evidence');
     }
   });
-  it('captures confidence as unscored metadata with no scores',()=>{expect(config.cardFields.find(f=>f.id==='confidence')?.unscored).toBe(true);expect(JSON.stringify(createRun(config,'learner'))).not.toContain('score');});
+  it('deep-copies the exact response and rejects repeat submission', () => {
+    const a = config.assessments[0]; const s = a.stages[0]; const draft = validDraft(a, s); const exact = draft.answers.response;
+    const next = submitStage(config, started(), a.id, s.id, draft);
+    draft.answers.response = 'Retrospective change';
+    expect(next.sessions[a.id].submitted[s.id].answers.response).toBe(exact);
+    expect(() => submitStage(config, next, a.id, s.id, draft)).toThrow('no longer editable');
+  });
+  it('requires every case and every selected-response answer before final review', () => {
+    for (const i of [0, 1, 2, 3]) expect(batteryComplete(config, beforeCase(i))).toBe(false);
+    const run = completedBattery(); expect(batteryComplete(config, run)).toBe(true);
+    delete run.sessions[config.assessments[3].id].submitted.B2_checks.answers.B2_check3;
+    expect(batteryComplete(config, run)).toBe(false);
+  });
+  it('has no correctness key for position, classification or confidence', () => {
+    const a = config.assessments[2];
+    expect(fieldsFor(a, a.stages[1]).filter(f => f.type === 'choice').every(f => f.unscored)).toBe(true);
+    for (const option of ['Maintain', 'Modify', 'Reverse']) {
+      const challenge = config.assessments[0].stages[3]; const draft = validDraft(config.assessments[0], challenge); draft.answers.position = option;
+      expect(validate(config.assessments[0], challenge, draft)).toEqual({});
+    }
+  });
+  it('accepts one word and exact maxima, preserves over-limit drafts and validates stable option ids', () => {
+    expect(wordCount('  one\n two  ')).toBe(2); expect(wordCount('')).toBe(0);
+    for (const a of config.assessments) for (const s of a.stages) for (const f of fieldsFor(a, s).filter(f => f.type === 'text')) {
+      const draft = validDraft(a, s); draft.answers[f.id] = 'one'; expect(validate(a, s, draft)).toEqual({});
+      draft.answers[f.id] = Array(f.maxWords).fill('word').join(' '); expect(validate(a, s, draft)).toEqual({});
+      draft.answers[f.id] += ' extra'; expect(validate(a, s, draft)[f.id]).toContain('words or fewer');
+    }
+    const a = config.assessments[1]; const s = a.stages[2]; const draft = validDraft(a, s); draft.answers.A2_check = 'made-up'; expect(validate(a, s, draft).A2_check).toBe('Choose a listed option.');
+  });
+  it('restores valid state and resets only incompatible cases and dependent progress', () => {
+    const run = completedBattery(); expect(parseRun(JSON.stringify(run), config, 'learner')).toEqual(run);
+    run.sessions[config.assessments[3].id].contentVersion = 'old-version';
+    const restored = restoreRun(JSON.stringify(run), config, 'learner');
+    expect(restored.migrated).toBe(true); expect(restored.run.sessions[config.assessments[0].id]).toEqual(run.sessions[config.assessments[0].id]);
+    expect(restored.run.sessions[config.assessments[2].id]).toEqual(run.sessions[config.assessments[2].id]);
+    expect(restored.run.sessions[config.assessments[3].id].submitted).toEqual({}); expect(restored.run.intermission).toEqual(run.intermission);
+    expect(restoreRun(JSON.stringify({ schemaVersion: 1 }), config, 'learner').run.schemaVersion).toBe(2);
+  });
 });

@@ -1,234 +1,63 @@
 {
-  "schemaVersion": 1,
-  "contentVersion": "2026-09-30.1",
-  "source": {
-    "url": "https://docs.google.com/document/d/1mzUrzMVI76GCWrWZDQud1zUF3KwtNDkSZcj0TiffTUc/edit",
-    "sha256": "fe46bbbd401685cadc87beda4a21a9e36daee37eb16886c3241643970a6cf538",
-    "retrievedOn": "2026-09-30"
+  "schemaVersion": 2,
+  "contentVersion": "four-cases-2026-10-01",
+  "confirmation": "Your submitted response will be locked before the next stage is revealed. You can return to read it, but you cannot change it.",
+  "guidance": [
+    "Use the facts supplied in the simulation as authoritative. You are not expected to recall a particular government procedure.",
+    "Bullets are welcome. The word limits are maximums, not targets. Writing style is not assessed.",
+    "Open-ended decisions can have more than one defensible response. There is no hidden correct policy to recall.",
+    "Drafts and submitted responses are saved on this browser so you can stop and resume."
+  ],
+  "intermission": {
+    "afterAssessmentId": "A2_LPG",
+    "heading": "You have completed 2 of 4 cases.",
+    "body": "Your progress is saved on this browser. You can continue now or return later."
   },
-  "confirmation": "Once you continue, this response will be locked and cannot be edited. New case information may be revealed after submission. You will still be able to view your submitted response.",
-  "openBook": [
-    "The cases are designed as open-book reasoning tasks. The learner may consult notes or online sources unless CBC later specifies a different policy.",
-    "All facts supplied inside the case are the controlling facts for the simulated scenario. External research should not be necessary to understand the task and should not override the stated case facts."
-  ],
-  "notAssessed": [
-    "Writing polish, grammar, accent, or presentation style are not target constructs.",
-    "Recall of named leadership frameworks or Indian Knowledge Systems terminology is not required unless a task explicitly asks for it.",
-    "Sector-specific knowledge that is not supplied in the case should not determine the score.",
-    "There is no single hidden policy answer. Different decisions may be strong if the reasoning, evidence use, trade-offs, and implementation logic are defensible.",
-    "The fixed decision challenge is not a writing-style test. Learners may refer to the case facts and their submitted responses; scoring should focus on the reasoning demonstrated."
-  ],
-  "status": "Status: working design, not an approved Bharat KALP assessment. Scenario facts are simulated for prototyping and should be reviewed for realism by CBC and relevant subject matter experts before any pilot. Suggested timings and word limits are placeholders to test burden and usability, not validated cutoffs.",
-  "sourcePrompt": "If an external source materially influenced the response, the learner can paste the URL and briefly state what it informed. The number of sources is not itself scored.",
-  "cards": [
-    {
-      "id": "primary",
-      "label": "Prediction Card 1 - Primary outcome",
-      "prompt": "What important outcome do you expect the intervention to produce?"
-    },
-    {
-      "id": "system",
-      "label": "Prediction Card 2 - System response",
-      "prompt": "What important response do you expect elsewhere in the system?"
-    },
-    {
-      "id": "secondary",
-      "label": "Prediction Card 3 - Secondary consequence",
-      "prompt": "What other consequence do you think will matter for the decision?"
-    }
-  ],
-  "cardFields": [
-    {
-      "id": "prediction",
-      "label": "Prediction",
-      "prompt": "state the expected direction or pattern. An exact number is not required unless the learner chooses to provide one.",
+  "completionAcknowledgement": "Your responses have been saved and locked. You will be able to review your complete reasoning trail after finishing the assessment.",
+  "finalReview": {
+    "heading": "Assessment complete",
+    "intro": "You have completed all four governance cases. Your full decision and reasoning trail is preserved below.",
+    "explanation": "Some questions had one best-supported interpretation of the evidence. Other decisions allowed more than one defensible response. The review below focuses on the evidence and reasoning process rather than presenting a model policy answer.",
+    "guidance": "Across these cases, strong reasoning involved making priorities and assumptions explicit, distinguishing observations from inferences, considering how decisions affect different parts of a system and different groups of citizens, keeping plausible alternatives open when evidence was incomplete, and revising decisions proportionately as conditions changed.",
+    "reflection": {
+      "id": "reflection",
+      "label": "Optional final reflection",
+      "prompt": "Looking across the four cases, what changed in how you framed, tested, or revised your reasoning?",
       "type": "text",
-      "required": true
-    },
-    {
-      "id": "why",
-      "label": "Why",
-      "prompt": "explain the causal reasoning behind the prediction.",
-      "type": "text",
-      "required": true
-    },
-    {
-      "id": "confidence",
-      "label": "Confidence",
-      "prompt": "High, Medium, or Low. This is not scored in the first prototype.",
-      "type": "choice",
-      "required": true,
-      "options": [
-        "High",
-        "Medium",
-        "Low"
-      ],
-      "unscored": true
-    },
-    {
-      "id": "weaken",
-      "label": "What would reduce your confidence?",
-      "prompt": "state one observation that would materially weaken the prediction.",
-      "type": "text",
-      "required": true
+      "required": false,
+      "maxWords": 150
     }
-  ],
-  "comparisonOptions": [
-    "Supported",
-    "Partly supported",
-    "Not supported",
-    "Insufficient evidence"
-  ],
-  "comparisonPrompt": "For each classification, add a brief evidence note identifying the observation(s) that led to the classification. Maximum 60 words per prediction.",
-  "formats": [
-    {
-      "id": "A",
-      "title": "Progressive Decision Simulation",
-      "description": "The learner makes a decision in writing, receives material new information that changes the situation, updates the decision, and then responds to a fixed decision challenge. This format is designed to make decision logic, trade-offs, adaptation, and defensibility observable in a fully asynchronous flow.",
-      "assessmentIds": [
-        "A1_FLOOD",
-        "A2_LPG"
-      ],
-      "debrief": {
-        "information": [
-          "You have completed two progressive decision simulations. These activities were designed to exercise how you frame complex problems, use evidence, prioritise, justify trade-offs, and adapt when circumstances change.",
-          "There is no single model answer shown. The purpose of this debrief is to help you examine how your own decisions evolved across the two situations.",
-          "Your submitted Decision Trail for A1 and A2 is displayed read-only, showing Stage 1, Stage 2, and Stage 3 side by side or sequentially."
-        ],
-        "fields": [
-          {
-            "id": "reflection1",
-            "label": "Reflection 1 - What changed?",
-            "prompt": "Across the two cases, where did new information most materially change your reasoning?",
-            "type": "text",
-            "required": false
-          },
-          {
-            "id": "reflection2",
-            "label": "Reflection 2 - What stayed?",
-            "prompt": "Where did you deliberately keep part of your original approach despite pressure to change it? Why?",
-            "type": "text",
-            "required": false
-          },
-          {
-            "id": "reflection3",
-            "label": "Reflection 3 - Assumptions",
-            "prompt": "Which assumption in either case turned out to matter most to your decision?",
-            "type": "text",
-            "required": false
-          },
-          {
-            "id": "reflection4",
-            "label": "Reflection 4 - Next practice",
-            "prompt": "If you faced another unfamiliar governance problem tomorrow, what would you do differently in how you frame, test, or revise your decision?",
-            "type": "text",
-            "required": false
-          }
-        ],
-        "button": "Complete Format A"
-      },
-      "reviewerNotes": [
-        "A single written response can show problem framing, analysis, prioritisation, and a proposed course of action. This format adds two further evidence points without requiring synchronous administration. First, a material information update tests whether the learner can revise rather than simply defend the original plan. Second, a fixed decision challenge tests whether the learner can engage a credible counterargument, make the decision again under pressure, and state what would make them change course.",
-        "The learner therefore experiences a sequence closer to real governance work: decide, commit, receive new information, update, face a challenge, and defend or reconsider the decision.",
-        "The format is fully asynchronous. Every learner receives the same case information, update, and decision challenge. Previous responses are locked before later information is revealed.",
-        "3.2 Evidence architecture across the two items",
-        "Both items should provide evidence for the same five common dimensions so that performance can be compared across different governance contexts:",
-        "Problem framing and systems diagnosis.",
-        "Evidence use and critical analysis.",
-        "Strategic prioritisation.",
-        "Decision quality and trade-off reasoning.",
-        "Adaptation under uncertainty.",
-        "Each case also provides stronger secondary evidence in a different area. A1 Flash Flood is designed to provide additional evidence about institutional execution and delegation. A2 LPG Supply Disruption is designed to provide additional evidence about ethical and citizen-centred judgement.",
-        "Stakeholder alignment may appear in either response, but these individual asynchronous tasks should not be treated as direct evidence of actual influence, collaborative learning, or observed team leadership.",
-        "Scoring principle: use the same five common-dimension rubric anchors across both items. Do not require every case to provide equally strong evidence for every leadership capability."
-      ]
-    },
-    {
-      "id": "B",
-      "title": "Predict-Observe-Explain-Revise",
-      "description": "The learner commits to predictions about how a governance system will respond, then sees a simulated outcome, explains where the prediction did or did not hold, and revises the mental model and proposed action. This format is designed to make causal reasoning, systems thinking, evidence interpretation, and learning from mismatch observable.",
-      "assessmentIds": [
-        "B1_AIR_POE",
-        "B2_GRIEVANCE_POE"
-      ],
-      "debrief": {
-        "information": [
-          "You have completed two Predict-Observe-Explain-Revise activities. The purpose of this debrief is to examine how your expectations, explanations, and decisions changed when the system behaved differently from what you anticipated.",
-          "For B1 and B2, display a read-only Prediction Trail:",
-          "Prediction -> Observed evidence -> Evidence classification -> Explanation -> Revised action",
-          "Do not label any prediction as correct or incorrect beyond the learner's own submitted evidence classification. Do not display a model causal explanation."
-        ],
-        "fields": [
-          {
-            "id": "reflection1",
-            "label": "Reflection 1 - Surprise",
-            "prompt": "Where were you most surprised by the observed evidence, and what assumption did that reveal?",
-            "type": "text",
-            "required": false
-          },
-          {
-            "id": "reflection2",
-            "label": "Reflection 2 - Updating",
-            "prompt": "In which case did you change your view most, and what evidence caused the change?",
-            "type": "text",
-            "required": false
-          },
-          {
-            "id": "reflection3",
-            "label": "Reflection 3 - Unresolved uncertainty",
-            "prompt": "Where did the evidence remain insufficient to choose confidently between explanations?",
-            "type": "text",
-            "required": false
-          },
-          {
-            "id": "reflection4",
-            "label": "Reflection 4 - Future practice",
-            "prompt": "The next time you make a prediction about a complex governance system, what will you do differently in how you frame assumptions, look for evidence, or revise your decision?",
-            "type": "text",
-            "required": false
-          }
-        ],
-        "button": "Complete Format B"
-      },
-      "reviewerNotes": [
-        "POE-R is designed to make the learner's causal model visible before the outcome is known. The learner predicts what will happen and why, commits to that prediction, then sees a simulated outcome. The assessment is not about guessing the exact future. Strong evidence comes from the quality of the reasoning behind the prediction, how the learner interprets what the new evidence does and does not support, and whether the learner updates the mental model and action proportionately.",
-        "Observe is evidence, not an answer key. A simulated outcome may support more than one explanation, and the learner should not be rewarded simply for matching the scenario writer's intended story.",
-        "The format is fully asynchronous. Previous responses are locked before later information is revealed.",
-        "4.2 Evidence architecture across the two items",
-        "Both POE-R items use the same four common scored dimensions:",
-        "Systems diagnosis: identifies interactions, dependencies, and consequences rather than treating outcomes in isolation.",
-        "Evidence use and critical analysis: distinguishes what the observed evidence supports from what it only suggests; considers competing explanations.",
-        "Decision quality after new evidence: revises action in a way that follows from the evidence, uncertainty, and trade-offs.",
-        "Adaptation under uncertainty: updates proportionately rather than clinging to the original view or abandoning it merely because the headline result changed.",
-        "Causal reasoning is the mechanism through which these dimensions are elicited, not a new standalone Bharat KALP competency. The tasks can provide supporting evidence relevant to Learning Agility, but one simulated update should not be treated as proof of the broader Learning Agility construct.",
-        "B1 Air Quality provides additional evidence about strategic and system-level prioritisation and citizen impact. B2 Public Grievance Reform provides additional evidence about institutional awareness, incentives, execution, and citizen-centred service quality.",
-        "Confidence ratings are captured as unscored metadata in the first prototype. They help make uncertainty visible but should not affect the readiness score unless later pilot evidence supports a defensible interpretation."
-      ]
-    }
-  ],
+  },
   "assessments": [
     {
       "id": "A1_FLOOD",
       "shortId": "A1",
       "format": "A",
       "title": "Flash Flood and Transport Disruption",
+      "contentVersion": "four-cases-v2",
+      "suggestedTime": "30 minutes",
       "instructions": [
-        "You are acting as the Secretary-level lead for a multi-agency transport and continuity response in a large metropolitan region. Use the facts supplied in the case as authoritative. You may consult external resources if useful, but you are not expected to know local emergency procedures.",
-        "You will first submit an initial response. Once submitted, that version will be locked. You will then receive new information and be asked to update your response. A final decision challenge will ask you to defend, modify, or reverse your current approach.",
+        "You are acting as the Secretary-level lead for a multi-agency transport and continuity response in a large metropolitan region. Use the facts supplied in the case as authoritative. You are not expected to know a particular city's emergency procedures.",
+        "You will make an initial judgement, make the response executable, receive new information, and then respond to a final decision challenge.",
+        "Your submitted responses will be locked before later information is revealed.",
         "Bullets are welcome. The word limits are maximums, not targets. Writing style is not assessed."
       ],
-      "reviewerNotes": [
-        "Purpose of variation: high-uncertainty crisis requiring cross-agency prioritisation, resource allocation, institutional execution, communication, and rapid adaptation.",
-        "Scenario setting: fictional metropolitan region. No knowledge of a real city's emergency protocol is assumed."
-      ],
-      "sourceSection": "3.4 Assessment A1 - Flash Flood and Transport Disruption",
       "stages": [
         {
-          "id": "A1_stage1",
-          "title": "Initial decision",
-          "kind": "decision",
-          "suggestedTime": "35 minutes",
-          "sourceSection": "A1 Stage 1 - Initial decision",
+          "id": "A1_initial",
+          "title": "Initial judgement",
+          "kind": "open",
+          "suggestedTime": "10 minutes",
+          "fields": [
+            {
+              "id": "response",
+              "label": "Initial judgement",
+              "prompt": "What do you think is the central problem, and what would you do first? Explain your reasoning.",
+              "type": "text",
+              "required": true,
+              "maxWords": 200
+            }
+          ],
           "information": [
             "It is 07:00 after seven hours of intense rainfall. You have been asked to lead the next 6 hours of emergency transport coordination and set direction for the following 72 hours.",
             "Your immediate objective is to protect life and maintain essential movement over the next 6 hours while establishing a credible 72-hour continuity plan."
@@ -269,69 +98,65 @@
               "paragraphs": [
                 "The weather service estimates a 60 percent chance of another 90 to 130 mm of rain over the next 12 hours."
               ]
+            },
+            {
+              "title": "Citizens and coordination",
+              "paragraphs": [
+                "Several of the low-lying wards under evacuation advisory include households with limited access to private transport.",
+                "The 600 buses are drawn from both metropolitan and state transport fleets. District administrations manage evacuation and shelters, police control priority-road access, and the rail authority manages the terminals. No single agency controls all resources needed for the response."
+              ]
             }
           ],
           "note": [],
-          "fields": [
-            {
-              "id": "field1",
-              "label": "Situation assessment",
-              "prompt": "What is the central problem you are trying to manage, and what matters most in deciding how to respond?",
-              "maxWords": 120,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Recommended response and rationale",
-              "prompt": "What would you do over the next 6 hours? State your priorities and explain the reasoning behind them.",
-              "maxWords": 260,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Implementation",
-              "prompt": "How should the response be carried out across the relevant agencies, people, and constrained resources?",
-              "maxWords": 180,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field4",
-              "label": "72-hour direction",
-              "prompt": "What should the system be trying to achieve after the immediate 6-hour response?",
-              "maxWords": 120,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field5",
-              "label": "Risks, uncertainty, and evidence needs",
-              "prompt": "What uncertainty or risk most affects your plan, and what information would you want next?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
-            }
-          ],
+          "selectedResponses": [],
           "requires": [],
           "priorResponses": [],
-          "reviewerNotes": [
-            "Whether the learner identifies the central system problem without being told how to decompose it.",
-            "Whether life safety, essential mobility, information integrity, infrastructure constraints, and restoration are integrated rather than treated as independent checklist items.",
-            "Whether scarce transport is prioritised using a defensible principle rather than first-come or equal splitting.",
-            "Whether implementation includes credible ownership, coordination, decision rights, or escalation without requiring the learner to use those exact terms.",
-            "Whether the learner distinguishes immediate response from the 72-hour direction.",
-            "Whether uncertainty is connected to information needs rather than ignored."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": []
         },
         {
-          "id": "A1_stage2",
-          "title": "New information and update",
+          "id": "A1_execution",
+          "title": "Make it executable",
+          "kind": "open",
+          "suggestedTime": "6 minutes",
+          "fields": [
+            {
+              "id": "response",
+              "label": "Make it executable",
+              "prompt": "How would you use the available transport capacity and coordinate the response across the institutions involved? Explain the principle guiding your choices.",
+              "type": "text",
+              "required": true,
+              "maxWords": 150
+            }
+          ],
+          "information": [],
+          "groups": [],
+          "note": [],
+          "selectedResponses": [],
+          "requires": [
+            "A1_initial"
+          ],
+          "priorResponses": [
+            "A1_initial"
+          ],
+          "contextStageIds": [
+            "A1_initial"
+          ]
+        },
+        {
+          "id": "A1_update",
+          "title": "New information",
           "kind": "update",
-          "suggestedTime": "15 minutes",
-          "sourceSection": "A1 Stage 2 - New information and update",
+          "suggestedTime": "8 minutes",
+          "fields": [
+            {
+              "id": "response",
+              "label": "New information",
+              "prompt": "Given the new information, what would you change, what would you deliberately retain, and why?",
+              "type": "text",
+              "required": true,
+              "maxWords": 160
+            }
+          ],
           "information": [
             "Three hours later, the following developments are confirmed:",
             "A structural inspection confirms major water ingress in one central metro tunnel. It will not reopen today.",
@@ -339,116 +164,80 @@
             "The weather forecast improves. There is now a 35 percent chance of 60 to 90 mm of additional rain over the next 12 hours.",
             "The largest shelter district reports that current shelter capacity will be reached in approximately two hours unless additional space is opened.",
             "The rail authority now says it needs only 180 of the 260 buses originally requested because special trains have been added at an unaffected terminal.",
-            "Major media outlets are asking the government to announce a single citywide reopening time within the next 30 minutes.",
-            "Your Stage 1 response is shown in a read-only panel beside the new information."
+            "Major media outlets are asking the government to announce a single citywide reopening time within the next 30 minutes."
           ],
           "groups": [],
           "note": [],
-          "fields": [
-            {
-              "id": "field1",
-              "label": "Update",
-              "prompt": "What would you change in your response now, and why?",
-              "maxWords": 180,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Retain",
-              "prompt": "What important part of your original response should remain unchanged, and why?",
-              "maxWords": 80,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Immediate priority and next evidence",
-              "prompt": "What is now your most important immediate priority, and what evidence would you watch most closely next?",
-              "maxWords": 90,
-              "type": "text",
-              "required": true
-            }
-          ],
+          "selectedResponses": [],
           "requires": [
-            "A1_stage1"
+            "A1_initial",
+            "A1_execution"
           ],
           "priorResponses": [
-            "A1_stage1"
+            "A1_initial",
+            "A1_execution"
           ],
-          "reviewerNotes": [
-            "Whether the learner updates proportionately rather than treating all new information as equally important.",
-            "Whether the reduced rail bus requirement changes resource use when appropriate.",
-            "Whether the tunnel finding, pump failure, and shelter constraint alter the operating plan where relevant.",
-            "Whether improved weather probability is treated as changed risk rather than certainty.",
-            "Whether sound parts of the original plan are retained rather than changing everything merely because circumstances changed."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [
+            "A1_initial"
+          ]
         },
         {
-          "id": "A1_stage3",
+          "id": "A1_challenge",
           "title": "Decision challenge",
           "kind": "challenge",
-          "suggestedTime": "approximately 8 to 10 minutes",
-          "sourceSection": "A1 Stage 3 - Decision challenge",
-          "information": [
-            "At the next coordination review, a senior official argues that the improved rainfall forecast and the addition of special trains mean the government should now redirect most emergency bus capacity toward restoring normal commuter movement. The official also argues for announcing a single citywide reopening target to reassure the public and reduce economic disruption.",
-            "Your Stage 1 and Stage 2 responses remain visible and read-only."
-          ],
-          "groups": [],
-          "note": [],
+          "suggestedTime": "6 minutes",
           "fields": [
             {
-              "id": "decision",
-              "label": "Decision selector",
-              "prompt": "Maintain / Modify / Reverse my current approach",
+              "id": "position",
+              "label": "Your position",
+              "prompt": "How does your position change?",
               "type": "choice",
               "required": true,
+              "unscored": true,
               "options": [
-                "Maintain",
-                "Modify",
-                "Reverse"
+                {
+                  "id": "Maintain",
+                  "label": "Maintain"
+                },
+                {
+                  "id": "Modify",
+                  "label": "Modify"
+                },
+                {
+                  "id": "Reverse",
+                  "label": "Reverse"
+                }
               ]
             },
             {
-              "id": "field1",
-              "label": "Response to the challenge",
-              "prompt": "How would you respond to this argument? Explain why your selected course is preferable now.",
-              "maxWords": 180,
+              "id": "response",
+              "label": "Decision challenge",
+              "prompt": "How would you respond to the official's argument? Explain your decision, the most important trade-off or obligation guiding it, and one specific change in conditions that would make you reconsider.",
               "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Trade-off accepted",
-              "prompt": "What important cost, risk, or competing objective are you accepting with this decision?",
-              "maxWords": 80,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Change condition",
-              "prompt": "What specific new evidence or change in conditions would make you choose differently?",
-              "maxWords": 80,
-              "type": "text",
-              "required": true
+              "required": true,
+              "maxWords": 170
             }
           ],
+          "information": [
+            "At the next coordination review, a senior official argues that the improved rainfall forecast and the addition of special trains mean the government should now redirect most emergency bus capacity toward restoring normal commuter movement. The official also argues for announcing a single citywide reopening target to reassure the public and reduce economic disruption."
+          ],
+          "groups": [],
+          "note": [],
+          "selectedResponses": [],
           "requires": [
-            "A1_stage2"
+            "A1_initial",
+            "A1_execution",
+            "A1_update"
           ],
           "priorResponses": [
-            "A1_stage1",
-            "A1_stage2"
+            "A1_initial",
+            "A1_execution",
+            "A1_update"
           ],
-          "reviewerNotes": [
-            "Whether the learner engages the strongest part of the challenge rather than dismissing it.",
-            "Whether the final decision is consistent with the available evidence and prior reasoning, or whether any change is explicitly justified.",
-            "Whether the learner names a real trade-off rather than presenting the decision as cost-free.",
-            "Whether the change condition is specific enough to guide a future decision."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [
+            "A1_initial",
+            "A1_update"
+          ]
         }
       ]
     },
@@ -457,23 +246,29 @@
       "shortId": "A2",
       "format": "A",
       "title": "LPG Supply Disruption",
+      "contentVersion": "four-cases-v2",
+      "suggestedTime": "30 minutes",
       "instructions": [
-        "You are acting as the Secretary-level lead for a 30-day national continuity response to a temporary LPG supply disruption. Use the case facts as authoritative. Your task is not to predict the actual market or recall existing rationing rules. It is to make and justify a workable continuity strategy under uncertainty.",
-        "Your initial response will be locked before later developments are revealed. You will then update your approach and respond to a fixed decision challenge.",
+        "You are acting as the Secretary-level lead for a 30-day national continuity response to a temporary LPG supply disruption. Use the case facts as authoritative. Your task is not to recall existing rationing rules or predict the actual market. It is to make and justify a workable continuity strategy under uncertainty.",
+        "Your responses will be locked before later developments are revealed.",
         "Bullets are welcome. The word limits are maximums, not targets. Writing style is not assessed."
       ],
-      "reviewerNotes": [
-        "Purpose of variation: national-level scarcity management requiring allocation principles, demand management, public trust, logistics, and defensible burden sharing.",
-        "Scenario setting: fictional national supply disruption. No knowledge of current geopolitical events or actual LPG policy is assumed."
-      ],
-      "sourceSection": "3.5 Assessment A2 - LPG Supply Disruption",
       "stages": [
         {
-          "id": "A2_stage1",
-          "title": "Initial decision",
-          "kind": "decision",
-          "suggestedTime": "35 minutes",
-          "sourceSection": "A2 Stage 1 - Initial decision",
+          "id": "A2_initial",
+          "title": "Initial judgement",
+          "kind": "open",
+          "suggestedTime": "10 minutes",
+          "fields": [
+            {
+              "id": "response",
+              "label": "Initial judgement",
+              "prompt": "What do you see as the central problem, and what would you do over the next 30 days? Explain your reasoning.",
+              "type": "text",
+              "required": true,
+              "maxWords": 220
+            }
+          ],
           "information": [
             "A shipping disruption is expected to constrain LPG imports for an uncertain period estimated at two to five weeks."
           ],
@@ -514,69 +309,65 @@
                 "Hospitals and large community kitchens are asking for guaranteed allocations.",
                 "There is strong pressure to announce immediate uniform national rationing."
               ]
+            },
+            {
+              "title": "Citizens and coordination",
+              "paragraphs": [
+                "Some households, particularly in remote areas and lower-income communities, have no safe short-term substitute for LPG. By contrast, some commercial and industrial users can switch fuels within three to seven days, although doing so raises their operating costs.",
+                "The central government controls the emergency buffer and coordinates additional supply. States and distributors manage much of the last-mile allocation, while interstate transfers depend on transport capacity and receiving infrastructure."
+              ]
             }
           ],
           "note": [],
-          "fields": [
-            {
-              "id": "field1",
-              "label": "Situation assessment",
-              "prompt": "What is the central problem you are trying to manage, and what matters most in deciding how to respond?",
-              "maxWords": 120,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Recommended response and rationale",
-              "prompt": "What would you do over the next 30 days? State your priorities and explain the reasoning behind them.",
-              "maxWords": 260,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Implementation",
-              "prompt": "How should the response be carried out across supply, distribution, and the relevant institutions or user groups?",
-              "maxWords": 180,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field4",
-              "label": "Public communication",
-              "prompt": "What would you communicate publicly at this point?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field5",
-              "label": "Risks, uncertainty, and evidence needs",
-              "prompt": "What uncertainty or risk most affects your plan, and what information would you want next?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
-            }
-          ],
+          "selectedResponses": [],
           "requires": [],
           "priorResponses": [],
-          "reviewerNotes": [
-            "Whether the learner independently distinguishes overall stock, regional distribution risk, demand behavior, and public confidence where relevant.",
-            "Whether allocation or conservation choices follow a defensible principle rather than an unexplained uniform rule.",
-            "Whether essential services, households, and users with feasible alternatives are weighed without being explicitly cued in the prompt.",
-            "Whether logistics lead times affect the plan rather than being treated as instantaneous.",
-            "Whether communication reduces avoidable panic without making guarantees unsupported by the evidence.",
-            "Whether the learner identifies the information most important to deciding whether restrictions should be targeted, tightened, or relaxed."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": []
         },
         {
-          "id": "A2_stage2",
-          "title": "Day 4 disruption",
+          "id": "A2_execution",
+          "title": "Allocation and execution",
+          "kind": "open",
+          "suggestedTime": "6 minutes",
+          "fields": [
+            {
+              "id": "response",
+              "label": "Allocation and execution",
+              "prompt": "If supply needs to be conserved or redistributed, what principle would guide how the burden and available supply are distributed across states and user groups, and how would you make that approach workable?",
+              "type": "text",
+              "required": true,
+              "maxWords": 150
+            }
+          ],
+          "information": [],
+          "groups": [],
+          "note": [],
+          "selectedResponses": [],
+          "requires": [
+            "A2_initial"
+          ],
+          "priorResponses": [
+            "A2_initial"
+          ],
+          "contextStageIds": [
+            "A2_initial"
+          ]
+        },
+        {
+          "id": "A2_update",
+          "title": "Day 4 update",
           "kind": "update",
-          "suggestedTime": "15 minutes",
-          "sourceSection": "A2 Stage 2 - Day 4 disruption",
+          "suggestedTime": "7 minutes",
+          "fields": [
+            {
+              "id": "response",
+              "label": "Day 4 update",
+              "prompt": "What would you materially change now, what would you deliberately retain, and why?",
+              "type": "text",
+              "required": true,
+              "maxWords": 150
+            }
+          ],
           "information": [
             "On Day 4, the situation changes:",
             "An unexpected bottling-plant outage reduces national dispatch capacity by approximately 8 percent for five days.",
@@ -584,116 +375,109 @@
             "Household bookings rise a further 19 percent within 24 hours.",
             "Two rural districts now report less than five days of distributor stock.",
             "Guaranteed allocations to hospitals and community kitchens are currently being met.",
-            "The alternative import cargo is now expected in seven days, with approximately 70 percent confidence.",
-            "Your Stage 1 response appears in a read-only panel."
+            "The alternative import cargo is now expected in seven days, with approximately 70 percent confidence."
           ],
           "groups": [],
           "note": [],
-          "fields": [
+          "selectedResponses": [
             {
-              "id": "field1",
-              "label": "Update",
-              "prompt": "What would you materially change in your response now, and why?",
-              "maxWords": 170,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Retain",
-              "prompt": "What important part of your original response should remain unchanged, and why?",
-              "maxWords": 80,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Immediate priority and next evidence",
-              "prompt": "What is now your most important immediate priority, and what evidence would you watch most closely next?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
+              "id": "A2_check",
+              "label": "Evidence check",
+              "prompt": "Which conclusion is best supported by the new information?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Use the increase in household bookings as the main estimate of the increase in actual household LPG consumption."
+                },
+                {
+                  "id": "B",
+                  "label": "Treat the viral message and booking increase as evidence that a nationwide stockout within 72 hours is now likely."
+                },
+                {
+                  "id": "C",
+                  "label": "Check actual consumption and location-specific stock before concluding that the booking increase represents a nationwide physical shortage."
+                }
+              ],
+              "correctOptionId": "C",
+              "feedbackByOption": {
+                "C": "Correct. A rise in bookings shows changed demand behaviour, but it does not by itself establish an equivalent increase in actual consumption or a nationwide physical shortage.",
+                "A": "Not quite. Bookings can rise because households order earlier or duplicate requests during uncertainty. The best-supported conclusion is to check actual consumption and location-specific stock before inferring a nationwide physical shortage.",
+                "B": "Not quite. The viral claim and resulting bookings show public anxiety, not evidence of a nationwide stockout within 72 hours. The case still shows that the most severe stock problem is localized."
+              },
+              "deferFeedbackUntilBatteryComplete": true
             }
           ],
           "requires": [
-            "A2_stage1"
+            "A2_initial",
+            "A2_execution"
           ],
           "priorResponses": [
-            "A2_stage1"
+            "A2_initial",
+            "A2_execution"
           ],
-          "reviewerNotes": [
-            "Whether the learner distinguishes a temporary dispatch shock from the wider supply and distribution problem.",
-            "Whether a demand spike caused by misinformation changes communication or demand-management actions without being mistaken automatically for equivalent growth in actual consumption.",
-            "Whether the two low-stock rural districts receive proportionate attention without assuming the whole country is in the same position.",
-            "Whether the learner updates while preserving priorities that remain supported by the evidence.",
-            "Whether the learner identifies a useful next trigger rather than responding only to public pressure."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [
+            "A2_initial"
+          ]
         },
         {
-          "id": "A2_stage3",
-          "title": "Decision challenge",
+          "id": "A2_challenge",
+          "title": "Allocation challenge",
           "kind": "challenge",
-          "suggestedTime": "approximately 8 to 10 minutes",
-          "sourceSection": "A2 Stage 3 - Decision challenge",
-          "information": [
-            "A coalition of higher-stock states argues that any release from the central buffer should be distributed proportionately across all states rather than targeted toward the lowest-stock areas. They argue that equal treatment is necessary to maintain trust and avoid political conflict.",
-            "Your Stage 1 and Stage 2 responses remain visible and read-only."
-          ],
-          "groups": [],
-          "note": [],
+          "suggestedTime": "7 minutes",
           "fields": [
             {
-              "id": "decision",
-              "label": "Decision selector",
-              "prompt": "Maintain / Modify / Reverse my current approach",
+              "id": "position",
+              "label": "Your position",
+              "prompt": "How does your position change?",
               "type": "choice",
               "required": true,
+              "unscored": true,
               "options": [
-                "Maintain",
-                "Modify",
-                "Reverse"
+                {
+                  "id": "Maintain",
+                  "label": "Maintain"
+                },
+                {
+                  "id": "Modify",
+                  "label": "Modify"
+                },
+                {
+                  "id": "Reverse",
+                  "label": "Reverse"
+                }
               ]
             },
             {
-              "id": "field1",
-              "label": "Response to the challenge",
-              "prompt": "How would you respond to this argument? Explain why your selected course is preferable now.",
-              "maxWords": 180,
+              "id": "response",
+              "label": "Allocation challenge",
+              "prompt": "What would you decide now? Respond to the strongest argument against your position, explain the principle or obligation guiding your decision, state the important trade-off you are accepting, and identify one change in conditions that would make you reconsider.",
               "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Trade-off accepted",
-              "prompt": "What important cost, risk, or competing objective are you accepting with this decision?",
-              "maxWords": 80,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Change condition",
-              "prompt": "What specific new evidence or change in conditions would make you choose differently?",
-              "maxWords": 80,
-              "type": "text",
-              "required": true
+              "required": true,
+              "maxWords": 180
             }
           ],
+          "information": [
+            "Several higher-stock states object to allocating the central buffer mainly on current days of stock. They argue that some states built larger inventories through earlier conservation measures, that their populations could also become vulnerable if the disruption lasts five weeks, and that repeatedly changing allocation rules will reduce trust in the national response.",
+            "They propose a published formula that guarantees every state a baseline allocation and distributes the remainder using factors such as current stock, essential-service demand, population dependent on LPG, and transfer time.",
+            "Lower-stock states argue that the buffer exists precisely to prevent the first local shortages and that distributing scarce supply to states with more than 20 days of stock while some districts have fewer than five would delay help until after avoidable harm occurs."
+          ],
+          "groups": [],
+          "note": [],
+          "selectedResponses": [],
           "requires": [
-            "A2_stage2"
+            "A2_initial",
+            "A2_execution",
+            "A2_update"
           ],
           "priorResponses": [
-            "A2_stage1",
-            "A2_stage2"
+            "A2_initial",
+            "A2_execution",
+            "A2_update"
           ],
-          "reviewerNotes": [
-            "Whether the learner can defend or revise an allocation principle under stakeholder pressure.",
-            "Whether equal treatment is distinguished from equitable treatment where the evidence supports different levels of need.",
-            "Whether the learner acknowledges the political and trust trade-off rather than treating targeted allocation as cost-free.",
-            "Whether the stated change condition could genuinely alter the allocation decision."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [
+            "A2_initial",
+            "A2_update"
+          ]
         }
       ]
     },
@@ -701,200 +485,197 @@
       "id": "B1_AIR_POE",
       "shortId": "B1",
       "format": "B",
-      "title": "Air Quality Emergency: Predicting System Effects",
+      "title": "Air Quality Emergency",
+      "contentVersion": "four-cases-v2",
+      "suggestedTime": "30–35 minutes",
       "instructions": [
-        "In this assessment, you are not being asked to guess the correct future. You are being asked to make your reasoning visible before you know the outcome.",
-        "You will first predict how a 48-hour response package is likely to affect the system and explain why. Your predictions will then be locked. You will see a simulated outcome, compare it with your predictions, explain what the evidence may mean, and revise your response.",
-        "A prediction that turns out to be wrong can still provide strong evidence if it was well reasoned and you update appropriately when better evidence appears.",
-        "Bullets are welcome. Writing style is not assessed."
+        "In this case, you are not being asked to guess the correct future. You are being asked to make your reasoning visible before you know the outcome.",
+        "You will first make two predictions and explain why you expect them. Your predictions will then be locked. You will see a simulated outcome, compare it with your predictions, explain what the evidence may mean, and revise your response.",
+        "A prediction that does not match the later evidence can still reflect strong reasoning if it was well supported and you update appropriately when better evidence appears.",
+        "Bullets are welcome. Writing style is not assessed.",
+        "The word limits are maximums, not targets."
       ],
-      "reviewerNotes": [
-        "Purpose of variation: complex physical and institutional system with uncertain causal contribution, time lags, health consequences, capacity constraints, and distributional costs.",
-        "Scenario setting: fictional metropolitan region, deliberately not tied to a named real-world emergency framework."
-      ],
-      "sourceSection": "4.5 Assessment B1 - Air Quality Emergency: Predicting System Effects",
       "stages": [
         {
           "id": "B1_predict",
           "title": "Predict",
           "kind": "predict",
-          "suggestedTime": "approximately 12 to 15 minutes",
-          "sourceSection": "B1 Stage 1 - Predict",
-          "information": [
-            "You are the Secretary-level chair of a 14-day intergovernmental response group in a fictional metropolitan region experiencing severe air pollution.",
-            "Air Quality Index has ranged from 430 to 490 for the last 72 hours and is currently 462.",
-            "Respiratory emergency-department visits are 31 percent above the recent baseline; paediatric respiratory visits are 42 percent above baseline.",
-            "High-filtration mask stocks available to public facilities are estimated to last nine days at current distribution rates.",
-            "Source Model A estimates contribution as road transport 28 percent, construction and dust 22 percent, industry 16 percent, regional or upwind sources 26 percent, and other sources 8 percent.",
-            "Source Model B estimates regional or upwind contribution at 41 percent and correspondingly lower local contributions. Both models have material uncertainty.",
-            "Stricter construction restrictions would affect a large daily-wage workforce.",
-            "School attendance is 18 percent below normal. Approximately 68 percent of households report reliable access for remote learning.",
-            "Bus ridership is already 17 percent above normal and the system is close to peak operating capacity.",
-            "Registered large construction sites are estimated to be 76 percent compliant with current controls. Informal-site compliance is unknown.",
-            "The response group adopts the following 48-hour package:",
-            "Intensify enforcement at registered large construction sites.",
-            "Restrict heavy goods vehicles in the central zone during daytime hours.",
-            "Add approximately 20 percent bus capacity where vehicles and staff can be redeployed.",
-            "Prioritise high-filtration masks for clinics, schools, and high-exposure public workers.",
-            "Request neighbouring jurisdictions to reduce major point-source emissions, but no binding regional action has yet been agreed."
-          ],
-          "groups": [],
-          "note": [
-            "Use the following information as part of the simulated case: citywide air-quality readings can change because of both emissions and atmospheric conditions. Changes in exposure may not immediately appear in health-service data. Source-contribution estimates are uncertain and may change as additional evidence becomes available."
-          ],
+          "suggestedTime": "10 minutes",
           "fields": [
             {
-              "id": "field4",
+              "id": "assumption",
               "label": "Critical assumption or dependency",
-              "prompt": "What assumption, dependency, or interaction is most important to whether your predictions hold?",
-              "maxWords": 100,
+              "prompt": "What assumption or dependency matters most to whether your predictions hold, and what observation would make you question it?",
               "type": "text",
-              "required": true
+              "required": true,
+              "maxWords": 60
             }
           ],
+          "information": [
+            "You are chairing a 14-day intergovernmental response group in a fictional metropolitan region experiencing severe air pollution."
+          ],
+          "groups": [
+            {
+              "title": "Air quality and health",
+              "paragraphs": [
+                "AQI has ranged from 430 to 490 for the last 72 hours and is currently 462.",
+                "Respiratory emergency-department visits are 31 percent above the recent baseline.",
+                "Paediatric respiratory visits are 42 percent above baseline."
+              ]
+            },
+            {
+              "title": "Source uncertainty",
+              "paragraphs": [
+                "Model A estimates road transport 28 percent, construction and dust 22 percent, industry 16 percent, regional or upwind sources 26 percent, and other sources 8 percent.",
+                "Model B estimates regional or upwind contribution at 41 percent, with correspondingly lower local contributions.",
+                "Both models have material uncertainty."
+              ]
+            },
+            {
+              "title": "Construction",
+              "paragraphs": [
+                "Registered large construction sites are estimated to be 76 percent compliant with current controls.",
+                "Informal-site compliance is unknown.",
+                "Stronger construction restrictions would affect a substantial daily-wage workforce."
+              ]
+            },
+            {
+              "title": "Mobility",
+              "paragraphs": [
+                "Bus ridership is already 17 percent above normal.",
+                "The bus system is close to peak operating capacity."
+              ]
+            },
+            {
+              "title": "Protection",
+              "paragraphs": [
+                "High-filtration mask stocks available to public facilities are estimated to last approximately nine days at current distribution rates."
+              ]
+            },
+            {
+              "title": "Regional coordination",
+              "paragraphs": [
+                "Neighbouring jurisdictions have not agreed to binding regional emission reductions."
+              ]
+            },
+            {
+              "title": "48-hour response package",
+              "paragraphs": [
+                "Intensify enforcement at registered large construction sites.",
+                "Restrict heavy goods vehicles in the central zone during daytime hours.",
+                "Add approximately 20 percent bus capacity where vehicles and staff can be redeployed.",
+                "Prioritise high-filtration masks for clinics, schools, and high-exposure public workers.",
+                "Request neighbouring jurisdictions to reduce major point-source emissions."
+              ]
+            }
+          ],
+          "note": [
+            "Citywide air-quality readings can change because of both emissions and atmospheric conditions. Changes in exposure may not immediately appear in health-service data. Source-contribution estimates are uncertain and may change as additional evidence becomes available."
+          ],
+          "selectedResponses": [],
           "requires": [],
           "priorResponses": [],
-          "reviewerNotes": [
-            "Whether predictions follow from an explicit causal model rather than generic optimism or pessimism.",
-            "Whether the learner reasons across more than one part of the system rather than selecting three versions of the same outcome.",
-            "Whether uncertainty in source estimates, time lags, capacity constraints, or distributional effects is incorporated where relevant.",
-            "Whether the learner can name an observation that would materially weaken each prediction.",
-            "Confidence level itself is not scored.",
-            "This note is included to reduce dependence on prior environmental-policy expertise. It does not identify which explanation will best fit the later evidence."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [],
+          "responseInstruction": "Make two specific predictions that you think are most important for judging the effects of this 48-hour response. Each prediction should describe one observable pattern. You do not need to predict every possible effect."
         },
         {
           "id": "B1_compare",
           "title": "Observe and compare",
           "kind": "compare",
-          "suggestedTime": "approximately 6 to 8 minutes",
-          "sourceSection": "B1 Stage 2 - Observe and compare",
-          "information": [
-            "Registered construction-site compliance rises from 76 percent to 91 percent.",
-            "Heavy goods traffic in the central zone falls by approximately 14 percent during restriction hours.",
-            "At selected roadside monitoring sites in the central zone, pollution readings improve modestly, but the improvement is not consistent across the metropolitan region.",
-            "Bus ridership rises a further 9 percent.",
-            "Citywide Air Quality Index remains between 455 and 480 and does not show a sustained improvement.",
-            "Respiratory emergency-department visits are now 39 percent above the recent baseline.",
-            "A revised source analysis estimates regional or upwind contribution at approximately 45 to 50 percent, with moderate confidence.",
-            "Neighbouring jurisdictions have not yet adopted comparable controls.",
-            "Labour officials report significant income distress among casual workers affected by the construction restrictions.",
-            "Atmospheric dispersion remained unfavorable during much of the 48-hour period. The weather service now says stronger dispersion may occur in the next 36 to 48 hours, with moderate confidence.",
-            "The learner's original predictions remain visible and read-only."
-          ],
-          "groups": [],
-          "note": [],
+          "suggestedTime": "6 minutes",
           "fields": [],
+          "information": [],
+          "groups": [
+            {
+              "title": "Observed evidence",
+              "paragraphs": [
+                "Registered-site compliance rises from 76 percent to 91 percent.",
+                "Heavy-goods traffic in the central zone falls approximately 14 percent during restriction hours.",
+                "Selected roadside monitoring sites inside the restricted zone show modest improvement during restriction hours. The improvement is not consistent across the metropolitan region.",
+                "Citywide AQI remains between 455 and 480, with no sustained citywide improvement.",
+                "A revised source analysis places regional or upwind contribution at approximately 38 to 46 percent, with moderate confidence. Material uncertainty remains.",
+                "Neighbouring jurisdictions have not yet adopted comparable controls.",
+                "Atmospheric dispersion remained unfavorable during much of the period. Stronger dispersion may occur during the next 36 to 48 hours, with moderate confidence.",
+                "Respiratory emergency-department visits are now 39 percent above the recent baseline.",
+                "Bus ridership rises another 9 percent, leaving the system close to operational capacity.",
+                "Labour officials report significant income distress among casual workers affected by construction restrictions."
+              ]
+            }
+          ],
+          "note": [],
+          "selectedResponses": [],
           "requires": [
             "B1_predict"
           ],
           "priorResponses": [
             "B1_predict"
           ],
-          "reviewerNotes": [
-            "Whether the learner evaluates each prior prediction against the actual evidence rather than rewriting the prediction retrospectively.",
-            "Whether mixed local and citywide indicators are interpreted without collapsing them into a simple worked/did-not-work conclusion.",
-            "Whether lack of immediate improvement is distinguished from evidence that an intervention had zero effect.",
-            "Whether Insufficient evidence is used appropriately when the observations cannot resolve the prediction."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [
+            "B1_predict"
+          ]
         },
         {
           "id": "B1_explain",
           "title": "Explain",
           "kind": "explain",
-          "suggestedTime": "approximately 12 to 15 minutes",
-          "sourceSection": "B1 Stage 3 - Explain",
+          "suggestedTime": "8 minutes",
+          "fields": [
+            {
+              "id": "pattern",
+              "label": "Pattern or mismatch",
+              "prompt": "What is the most important pattern or mismatch between your forecast and the observed evidence? State what the evidence supports and what it does not yet establish.",
+              "type": "text",
+              "required": true,
+              "maxWords": 120
+            },
+            {
+              "id": "explanation",
+              "label": "Explanation and alternatives",
+              "prompt": "What is your leading explanation for that pattern? Give one serious alternative explanation and identify the additional evidence that would best distinguish between them.",
+              "type": "text",
+              "required": true,
+              "maxWords": 150
+            }
+          ],
           "information": [],
           "groups": [],
           "note": [],
-          "fields": [
-            {
-              "id": "field1",
-              "label": "Most important mismatch",
-              "prompt": "What is the most important difference between what you expected and what you observed?",
-              "maxWords": 160,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Strongest explanation",
-              "prompt": "What is your strongest explanation for that pattern? Identify the evidence that supports it.",
-              "maxWords": 160,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Plausible alternative",
-              "prompt": "What other plausible explanation should remain under consideration?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field4",
-              "label": "Discriminating evidence",
-              "prompt": "What additional evidence would most help distinguish between your leading explanation and the alternative?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
-            }
-          ],
+          "selectedResponses": [],
           "requires": [
+            "B1_predict",
             "B1_compare"
           ],
           "priorResponses": [
             "B1_predict",
             "B1_compare"
           ],
-          "reviewerNotes": [
-            "Whether the learner separates observed changes in implementation or local indicators from the broader system outcome.",
-            "Whether the strongest explanation is supported by the evidence rather than asserted as certain.",
-            "Whether revised regional contribution, atmospheric conditions, time lag, and incomplete regional coordination are weighed rather than cherry-picked.",
-            "Whether a genuinely plausible alternative is retained where the evidence is not decisive.",
-            "Whether the proposed additional evidence could actually discriminate between explanations."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [
+            "B1_predict",
+            "B1_compare"
+          ]
         },
         {
           "id": "B1_revise",
           "title": "Revise",
           "kind": "revise",
-          "suggestedTime": "approximately 10 minutes",
-          "sourceSection": "B1 Stage 4 - Revise",
+          "suggestedTime": "8 minutes",
+          "fields": [
+            {
+              "id": "response",
+              "label": "Revised action",
+              "prompt": "Based on your explanation, what would you change and what would you retain for the next 72 hours? Explain how your decision follows from the evidence, name the most important trade-off you are accepting, and identify one indicator or threshold that would trigger another material change.",
+              "type": "text",
+              "required": true,
+              "maxWords": 180
+            }
+          ],
           "information": [],
           "groups": [],
           "note": [],
-          "fields": [
-            {
-              "id": "field1",
-              "label": "Change",
-              "prompt": "What would you change in the response for the next 72 hours based on what you now know?",
-              "maxWords": 180,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Retain",
-              "prompt": "What would you retain from the current response, and why?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Monitor and trigger",
-              "prompt": "What would you monitor next, and what result would cause another material change in strategy?",
-              "maxWords": 120,
-              "type": "text",
-              "required": true
-            }
-          ],
+          "selectedResponses": [],
           "requires": [
+            "B1_predict",
+            "B1_compare",
             "B1_explain"
           ],
           "priorResponses": [
@@ -902,207 +683,348 @@
             "B1_compare",
             "B1_explain"
           ],
-          "reviewerNotes": [
-            "Strong responses should update proportionately. Changing nothing despite material evidence is weak, but changing every action merely because the headline outcome did not improve is also weak. Look for a revised causal model, targeted action, attention to citizen consequences, and explicit monitoring."
+          "contextStageIds": [
+            "B1_predict",
+            "B1_compare"
+          ]
+        },
+        {
+          "id": "B1_checks",
+          "title": "Evidence checks",
+          "kind": "evidence",
+          "suggestedTime": "4–5 minutes",
+          "fields": [],
+          "information": [],
+          "groups": [],
+          "note": [],
+          "selectedResponses": [
+            {
+              "id": "B1_check1",
+              "label": "Evidence check 1",
+              "prompt": "Which conclusion is best supported by the 48-hour observations?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "The local controls were ineffective because citywide AQI did not improve during the period"
+                },
+                {
+                  "id": "B",
+                  "label": "The local controls changed some local indicators, but their effect on citywide AQI cannot yet be isolated"
+                },
+                {
+                  "id": "C",
+                  "label": "Regional sources explain the citywide result because their estimated contribution increased in the revised analysis"
+                }
+              ],
+              "correctOptionId": "B",
+              "feedbackByOption": {
+                "B": "Correct. The observations show changes in implementation and some local indicators while citywide AQI stayed high. The evidence therefore supports a mixed effect, not a clean estimate of the package's citywide impact.",
+                "A": "Not quite. Citywide AQI stayed high, but several local indicators changed. The evidence therefore does not support concluding that the local controls had no effect.",
+                "C": "Not quite. The revised regional estimate increases the plausibility of a regional contribution but does not establish the cause of the citywide result."
+              },
+              "deferFeedbackUntilBatteryComplete": true
+            },
+            {
+              "id": "B1_check2",
+              "label": "Evidence check 2",
+              "prompt": "Which additional evidence would best distinguish whether the controls changed emissions but the citywide signal was obscured, versus whether the controls had little effect on emissions?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Matched roadside, background, and upwind monitor trends across changing weather conditions"
+                },
+                {
+                  "id": "B",
+                  "label": "Neighborhood perception surveys collected before and after the response package"
+                },
+                {
+                  "id": "C",
+                  "label": "Respiratory emergency-department trends separated by age group and neighborhood"
+                }
+              ],
+              "correctOptionId": "A",
+              "feedbackByOption": {
+                "A": "Correct. Comparing roadside, background, and upwind monitoring across changing weather conditions would help separate local emission changes from regional or atmospheric masking.",
+                "B": "Not quite. Perception surveys describe experienced conditions but do not directly distinguish the competing emission mechanisms.",
+                "C": "Not quite. Health-service trends matter for impact but are delayed and nonspecific for distinguishing these competing emission mechanisms."
+              },
+              "deferFeedbackUntilBatteryComplete": true
+            },
+            {
+              "id": "B1_check3",
+              "label": "Evidence check 3",
+              "prompt": "Which interpretation of the respiratory emergency-department data is best supported at this point?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "The rise shows the package worsened respiratory harm during the 48-hour period"
+                },
+                {
+                  "id": "B",
+                  "label": "The rise shows the package produced no meaningful health benefit during the period"
+                },
+                {
+                  "id": "C",
+                  "label": "The rise is concerning, but it does not isolate the package's health effect over 48 hours"
+                }
+              ],
+              "correctOptionId": "C",
+              "feedbackByOption": {
+                "C": "Correct. The rise is important, but health-service use can lag exposure and other influences remain active. The 48-hour data therefore cannot isolate the package's health effect.",
+                "A": "Not quite. A rise during the intervention does not establish that the intervention caused the rise.",
+                "B": "Not quite. Continued elevated visits do not establish that the package produced no health benefit. The observation window is too short for that inference."
+              },
+              "deferFeedbackUntilBatteryComplete": true
+            }
           ],
-          "sourcesEnabled": true
+          "requires": [
+            "B1_predict",
+            "B1_compare",
+            "B1_explain",
+            "B1_revise"
+          ],
+          "priorResponses": [
+            "B1_predict",
+            "B1_compare",
+            "B1_explain",
+            "B1_revise"
+          ],
+          "contextStageIds": [
+            "B1_predict",
+            "B1_compare"
+          ]
         }
-      ]
+      ],
+      "predictions": {
+        "cards": [
+          {
+            "id": "prediction1",
+            "label": "Prediction 1"
+          },
+          {
+            "id": "prediction2",
+            "label": "Prediction 2"
+          }
+        ],
+        "fields": [
+          {
+            "id": "prediction",
+            "label": "Prediction",
+            "prompt": "What do you expect to observe over the next 48 hours?",
+            "type": "text",
+            "required": true,
+            "maxWords": 35
+          },
+          {
+            "id": "why",
+            "label": "Why",
+            "prompt": "Why do you expect this? Explain the causal chain or interaction behind your prediction.",
+            "type": "text",
+            "required": true,
+            "maxWords": 60
+          },
+          {
+            "id": "confidence",
+            "label": "Confidence",
+            "prompt": "How confident are you in this prediction?",
+            "type": "choice",
+            "required": true,
+            "unscored": true,
+            "options": [
+              {
+                "id": "High",
+                "label": "High"
+              },
+              {
+                "id": "Medium",
+                "label": "Medium"
+              },
+              {
+                "id": "Low",
+                "label": "Low"
+              }
+            ]
+          }
+        ],
+        "comparisonOptions": [
+          "Supported",
+          "Partly supported",
+          "Not supported",
+          "Insufficient evidence"
+        ],
+        "comparisonPrompt": "How does the evidence relate to your original prediction?",
+        "evidencePrompt": "Which observation or observations most influenced your classification?",
+        "evidenceMaxWords": 35
+      }
     },
     {
       "id": "B2_GRIEVANCE_POE",
       "shortId": "B2",
       "format": "B",
-      "title": "Public Grievance Reform: Predicting Institutional Response",
+      "title": "Public Grievance Reform",
+      "contentVersion": "four-cases-v2",
+      "suggestedTime": "32–37 minutes",
       "instructions": [
-        "This assessment uses the same Predict-Observe-Explain-Revise structure as the previous POE-R item, but the system is institutional rather than physical. You will predict how a reform may affect the service system, commit to those predictions, inspect a simulated outcome, explain what may have produced it, and revise the reform.",
+        "This case uses the same reasoning sequence as the previous case, but the system is institutional rather than physical.",
+        "You will predict how a reform may affect the service system, commit to those predictions, inspect a simulated outcome, explain what may have produced it, and revise the reform.",
         "You are not expected to know a particular grievance platform or existing government procedure. Use the supplied case facts as authoritative.",
-        "Bullets are welcome. Writing style is not assessed."
+        "Bullets are welcome. The word limits are maximums, not targets. Writing style is not assessed."
       ],
-      "reviewerNotes": [
-        "Purpose of variation: non-crisis governance problem focused on institutional incentives, implementation behavior, measurement, citizen outcomes, and unintended effects of performance management.",
-        "Scenario setting: fictional cross-government service-delivery reform. All information required for the task is supplied."
-      ],
-      "sourceSection": "4.6 Assessment B2 - Public Grievance Reform: Predicting Institutional Response",
       "stages": [
         {
           "id": "B2_predict",
           "title": "Predict",
           "kind": "predict",
-          "suggestedTime": "approximately 12 to 15 minutes",
-          "sourceSection": "B2 Stage 1 - Predict",
-          "information": [
-            "You are the Secretary responsible for a 90-day cross-department initiative to reduce a large public-grievance backlog while improving the quality of resolution.",
-            "There are 180,000 open grievances across 12 departments.",
-            "Twenty-four percent of open grievances are older than 90 days.",
-            "Median time to closure is 23 days.",
-            "Citizen satisfaction with closed cases is 56 percent.",
-            "Seventeen percent of cases are reopened within 30 days of closure.",
-            "Sixty-one percent of all grievances come from four high-volume departments.",
-            "Twelve percent require action from more than one department.",
-            "No additional staffing is approved for the first 90 days.",
-            "A reform package is proposed:",
-            "Publish a department-level dashboard showing backlog, closure time, and age of open cases.",
-            "Set a 15-day closure target.",
-            "Automatically escalate unresolved cases after Day 10.",
-            "Use dashboard measures in regular senior performance reviews.",
-            "Use standard closure categories across departments.",
-            "Require senior review of cases open more than 30 days."
-          ],
-          "groups": [],
-          "note": [],
+          "suggestedTime": "10 minutes",
           "fields": [
             {
-              "id": "field4",
+              "id": "assumption",
               "label": "Critical assumption or dependency",
-              "prompt": "What assumption, dependency, or interaction is most important to whether your predictions hold?",
-              "maxWords": 100,
+              "prompt": "What assumption or dependency matters most to whether your predictions hold, and what observation would make you question it?",
               "type": "text",
-              "required": true
+              "required": true,
+              "maxWords": 60
             }
           ],
+          "information": [
+            "You are the Secretary responsible for a 90-day cross-department initiative to reduce a large public-grievance backlog while improving the quality of resolution."
+          ],
+          "groups": [
+            {
+              "title": "Service system",
+              "paragraphs": [
+                "180,000 open grievances across 12 departments.",
+                "24 percent of open grievances are older than 90 days.",
+                "Median time to closure is 23 days.",
+                "Citizen satisfaction with closed cases is 56 percent.",
+                "17 percent of cases are reopened within 30 days of closure.",
+                "61 percent of all grievances come from four high-volume departments.",
+                "12 percent require action from more than one department.",
+                "No additional staffing is approved for the first 90 days.",
+                "Departments vary considerably in case complexity and in the proportion of grievances requiring coordination with another department.",
+                "Existing dashboard measures are not adjusted for those differences."
+              ]
+            },
+            {
+              "title": "Proposed reform",
+              "paragraphs": [
+                "Publish a department-level dashboard showing backlog, closure time, and age of open cases.",
+                "Set a 15-day closure target.",
+                "Automatically escalate unresolved cases after Day 10.",
+                "Use dashboard measures in regular senior performance reviews.",
+                "Use standard closure categories across departments.",
+                "Require senior review of cases open more than 30 days."
+              ]
+            }
+          ],
+          "note": [],
+          "selectedResponses": [],
           "requires": [],
           "priorResponses": [],
-          "reviewerNotes": [
-            "Whether the learner predicts effects beyond the intended headline metric.",
-            "Whether the learner reasons about relationships among throughput, resolution quality, staff behavior, complex cases, and citizen experience without being told which mechanism to identify.",
-            "Whether the learner identifies a meaningful assumption or dependency rather than simply restating a policy feature.",
-            "Whether the learner can name evidence that would weaken each prediction.",
-            "Confidence level itself is not scored."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [],
+          "responseInstruction": "Make two specific predictions that you think are most important for judging whether this reform is working. Each prediction should describe one observable pattern. You do not need to predict every possible effect."
         },
         {
           "id": "B2_compare",
           "title": "Observe and compare",
           "kind": "compare",
-          "suggestedTime": "approximately 6 to 8 minutes",
-          "sourceSection": "B2 Stage 2 - Observe and compare",
-          "information": [
-            "The number of cases closed per month increases by 38 percent.",
-            "Median closure time falls from 23 days to 14 days.",
-            "The 30-day reopen rate rises from 17 percent to 22 percent.",
-            "Citizen satisfaction with closed cases falls from 56 percent to 52 percent.",
-            "Twenty-two percent of closures use generic categories such as information provided or outside jurisdiction.",
-            "Transfers of cases between departments increase by 26 percent.",
-            "The number of cross-department cases open for more than 30 days increases by 18 percent.",
-            "The oldest 10 percent of cases show little improvement.",
-            "Closure volume rises noticeably in the final two working days before scheduled senior performance reviews.",
-            "One department adds a local quality-review step before closure. Its median closure time is 15 days and citizen satisfaction rises to 63 percent.",
-            "The learner's original predictions remain visible and read-only."
-          ],
-          "groups": [],
-          "note": [],
+          "suggestedTime": "6 minutes",
           "fields": [],
+          "information": [],
+          "groups": [
+            {
+              "title": "Observed evidence",
+              "paragraphs": [
+                "Monthly closures increase 32 percent.",
+                "Median closure time falls from 23 to 15 days.",
+                "Overall open backlog falls 11 percent.",
+                "The 30-day reopen rate rises from 17 percent to 20 percent.",
+                "Citizen satisfaction falls from 56 percent to 54 percent.",
+                "19 percent of closures use broad categories such as \"information provided\" or \"outside jurisdiction.\"",
+                "Transfers between departments increase 21 percent.",
+                "Cross-department cases open more than 30 days increase 13 percent.",
+                "The oldest 10 percent of grievances show little improvement.",
+                "Recorded closures increase in the final two working days before scheduled performance reviews.",
+                "The system records when a closure is formally posted. It does not show when substantive work on the case was completed.",
+                "One department introduces a local quality check before closure. Its median closure time is 16 days, its 30-day reopen rate is 14 percent, and citizen satisfaction is 62 percent.",
+                "That department also has fewer cross-department grievances than the system average."
+              ]
+            }
+          ],
+          "note": [],
+          "selectedResponses": [],
           "requires": [
             "B2_predict"
           ],
           "priorResponses": [
             "B2_predict"
           ],
-          "reviewerNotes": [
-            "Whether the learner recognizes that faster closure and higher volume are real changes without treating them automatically as proof of better service.",
-            "Whether behavioral traces are interpreted as evidence to explain rather than as a stated causal mechanism.",
-            "Whether cross-department and older complex cases are incorporated where relevant.",
-            "Whether the quality-review department is treated as useful comparative evidence without assuming that one comparison proves causality."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [
+            "B2_predict"
+          ]
         },
         {
           "id": "B2_explain",
           "title": "Explain",
           "kind": "explain",
-          "suggestedTime": "approximately 12 to 15 minutes",
-          "sourceSection": "B2 Stage 3 - Explain",
+          "suggestedTime": "8 minutes",
+          "fields": [
+            {
+              "id": "pattern",
+              "label": "Pattern or mismatch",
+              "prompt": "What is the most important pattern or mismatch between what you expected and what occurred? What does the evidence support, and what does it not yet establish?",
+              "type": "text",
+              "required": true,
+              "maxWords": 120
+            },
+            {
+              "id": "explanation",
+              "label": "Explanation and alternatives",
+              "prompt": "What is your leading explanation for that pattern? Give one serious alternative explanation and identify the additional evidence that would best distinguish between them.",
+              "type": "text",
+              "required": true,
+              "maxWords": 150
+            }
+          ],
           "information": [],
           "groups": [],
           "note": [],
-          "fields": [
-            {
-              "id": "field1",
-              "label": "Most important mismatch",
-              "prompt": "What is the most important difference between what you expected and what you observed?",
-              "maxWords": 160,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Strongest explanation",
-              "prompt": "What is your strongest explanation for that pattern? Identify the evidence that supports it.",
-              "maxWords": 160,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Plausible alternative",
-              "prompt": "What other plausible explanation should remain under consideration?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field4",
-              "label": "Discriminating evidence",
-              "prompt": "What additional evidence would most help distinguish between your leading explanation and the alternative?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
-            }
-          ],
+          "selectedResponses": [],
           "requires": [
+            "B2_predict",
             "B2_compare"
           ],
           "priorResponses": [
             "B2_predict",
             "B2_compare"
           ],
-          "reviewerNotes": [
-            "Whether the learner distinguishes outputs such as closure speed from citizen outcomes such as durable resolution and satisfaction.",
-            "Whether the learner can infer plausible incentive, workflow, capacity, or case-mix mechanisms without assuming malicious intent.",
-            "Whether the explanation accounts for more than one observed pattern instead of fitting a single statistic.",
-            "Whether an alternative explanation remains plausible where the available evidence is insufficient.",
-            "Whether the proposed next evidence would help distinguish among competing mechanisms."
-          ],
-          "sourcesEnabled": true
+          "contextStageIds": [
+            "B2_predict",
+            "B2_compare"
+          ]
         },
         {
           "id": "B2_revise",
           "title": "Revise",
           "kind": "revise",
-          "suggestedTime": "approximately 10 minutes",
-          "sourceSection": "B2 Stage 4 - Revise",
+          "suggestedTime": "8 minutes",
+          "fields": [
+            {
+              "id": "response",
+              "label": "Revised action",
+              "prompt": "Based on what you now know, how would you change the reform for the next 60 days, and what would you deliberately retain? Explain how your changes follow from the evidence, state the most important trade-off you are accepting, and identify one indicator or threshold that would trigger another material change.",
+              "type": "text",
+              "required": true,
+              "maxWords": 180
+            }
+          ],
           "information": [],
           "groups": [],
           "note": [],
-          "fields": [
-            {
-              "id": "field1",
-              "label": "Change",
-              "prompt": "What would you change in the reform for the next 60 days based on what you now know?",
-              "maxWords": 180,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field2",
-              "label": "Retain",
-              "prompt": "What would you retain from the current reform, and why?",
-              "maxWords": 100,
-              "type": "text",
-              "required": true
-            },
-            {
-              "id": "field3",
-              "label": "Monitor and trigger",
-              "prompt": "What would you monitor next, and what result would cause another material change in the reform?",
-              "maxWords": 120,
-              "type": "text",
-              "required": true
-            }
-          ],
+          "selectedResponses": [],
           "requires": [
+            "B2_predict",
+            "B2_compare",
             "B2_explain"
           ],
           "priorResponses": [
@@ -1110,53 +1032,179 @@
             "B2_compare",
             "B2_explain"
           ],
-          "reviewerNotes": [
-            "Look for a proportionate revision that preserves useful accountability while responding to evidence about quality, incentives, complex cases, and citizen outcomes. Do not require any one mechanism or preferred policy design."
+          "contextStageIds": [
+            "B2_predict",
+            "B2_compare"
+          ]
+        },
+        {
+          "id": "B2_checks",
+          "title": "Evidence checks",
+          "kind": "evidence",
+          "suggestedTime": "4–5 minutes",
+          "fields": [],
+          "information": [],
+          "groups": [],
+          "note": [],
+          "selectedResponses": [
+            {
+              "id": "B2_check1",
+              "label": "Evidence check 1",
+              "prompt": "Which conclusion is best supported by the observed pattern?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "The reform improved service quality because cases were closed faster and in greater numbers."
+                },
+                {
+                  "id": "B",
+                  "label": "The reform improved throughput, but the results do not show that faster closure consistently produced durable resolution."
+                },
+                {
+                  "id": "C",
+                  "label": "The 15-day target caused departments to close or transfer cases mainly to improve their review metrics."
+                }
+              ],
+              "correctOptionId": "B",
+              "feedbackByOption": {
+                "B": "Correct. Closure volume and speed improved, but reopenings increased and citizen satisfaction declined. The evidence therefore supports improved throughput without establishing improved quality of resolution.",
+                "A": "Not quite. Faster closure and higher volume demonstrate improved throughput, not necessarily better or more durable resolution.",
+                "C": "Not quite. The timing and transfer patterns raise a plausible incentive concern, but they do not establish why staff behaved as they did."
+              },
+              "deferFeedbackUntilBatteryComplete": true
+            },
+            {
+              "id": "B2_check2",
+              "label": "Evidence check 2",
+              "prompt": "Which additional evidence would best distinguish deadline-driven premature closure from genuine difficulty resolving complex cases?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Case-level audits linking complexity, transfer reasons, reopenings, and timing around the 15-day target."
+                },
+                {
+                  "id": "B",
+                  "label": "Staff surveys comparing perceived workload, accountability, and confidence in the new review process."
+                },
+                {
+                  "id": "C",
+                  "label": "Department trends comparing monthly closure volume, median closure time, and backlog across the 90 days."
+                }
+              ],
+              "correctOptionId": "A",
+              "feedbackByOption": {
+                "A": "Correct. Case-level evidence can show whether complex cases behave differently and whether weak closures, transfers, or reopenings cluster around the deadline, helping distinguish between the competing explanations.",
+                "B": "Not quite. Staff perceptions provide useful context but cannot by themselves establish what happened to individual cases.",
+                "C": "Not quite. Aggregate trends show what changed but provide limited evidence about why."
+              },
+              "deferFeedbackUntilBatteryComplete": true
+            },
+            {
+              "id": "B2_check3",
+              "label": "Evidence check 3",
+              "prompt": "What can reasonably be concluded from the department that added a local quality-review step?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Its better results show that the added quality-review step caused the improvement in citizen outcomes."
+                },
+                {
+                  "id": "B",
+                  "label": "Its better results make quality review worth testing, but the comparison alone does not establish causation."
+                },
+                {
+                  "id": "C",
+                  "label": "Its different case mix makes the department unsuitable for learning anything about the quality-review step."
+                }
+              ],
+              "correctOptionId": "B",
+              "feedbackByOption": {
+                "B": "Correct. The comparison is promising evidence, but differences in case mix mean it cannot establish causation by itself. It supports further testing rather than a definitive conclusion.",
+                "A": "Not quite. The department differs from others in more than the quality-review step, so its stronger outcomes do not by themselves establish causation.",
+                "C": "Not quite. A confounded comparison can still provide useful evidence. It can justify further testing even when it cannot establish causation."
+              },
+              "deferFeedbackUntilBatteryComplete": true
+            }
           ],
-          "sourcesEnabled": true
+          "requires": [
+            "B2_predict",
+            "B2_compare",
+            "B2_explain",
+            "B2_revise"
+          ],
+          "priorResponses": [
+            "B2_predict",
+            "B2_compare",
+            "B2_explain",
+            "B2_revise"
+          ],
+          "contextStageIds": [
+            "B2_predict",
+            "B2_compare"
+          ]
         }
-      ]
-    }
-  ],
-  "reviewerSections": [
-    {
-      "title": "5. Evidence map",
-      "paragraphs": [
-        "A1 Flash Flood and Transport Disruption",
-        "Primary evidence: problem framing and systems diagnosis; strategic prioritisation; decision quality and trade-offs; stakeholder alignment strategy; institutional execution and delegation; adaptation under uncertainty.",
-        "Secondary evidence: evidence use; ethical and citizen-centred judgement.",
-        "A2 LPG Supply Disruption",
-        "Primary evidence: evidence use; prioritisation; trade-off reasoning; ethical and citizen-centred judgement; institutional execution; adaptation.",
-        "Secondary evidence: systems diagnosis; stakeholder communication and alignment strategy.",
-        "B1 Air Quality POE-R",
-        "Primary evidence: systems diagnosis; evidence use and critical analysis; decision quality after new evidence; adaptation under uncertainty. Causal reasoning is the elicitation mechanism rather than a separate scored competency.",
-        "Secondary evidence: strategic and system-level prioritisation; citizen impact.",
-        "B2 Public Grievance Reform POE-R",
-        "Primary evidence: systems diagnosis; evidence use and critical analysis; decision quality after new evidence; adaptation under uncertainty.",
-        "Secondary evidence: institutional awareness; incentives and execution; citizen-centred service quality.",
-        "Interpretation boundary",
-        "These are prospective simulations. They can provide evidence about judgement demonstrated in the task, but they do not prove how the officer behaves in the workplace. In particular, simulated stakeholder planning should not be treated as direct observation of actual influence, collaboration, or team leadership."
-      ]
-    },
-    {
-      "title": "7. What the prototype",
-      "paragraphs": [
-        "The first review should stay focused on a small number of design decisions rather than asking CBC to approve every wording detail.",
-        "Does either assessment format match the kind of evidence CBC wants from the problem-based assessments?",
-        "Does the fixed asynchronous decision challenge add useful evidence beyond the initial response and information-update stages?",
-        "Does POE-R add useful evidence about systems thinking and learning agility while remaining practical enough to administer asynchronously?",
-        "Which case types feel most authentic for the target officers, and where would CBC want subject matter review before piloting?"
-      ]
-    },
-    {
-      "title": "8. Design notes",
-      "paragraphs": [
-        "Case facts and simulated outcomes should receive subject matter review for plausibility. That review should confirm realism without turning the case into a domain-knowledge test.",
-        "Timing and word limits should be tested with a small set of representative users. They are not psychometric standards at this stage.",
-        "Raters for Format A need common rubric anchors and calibration examples so the same written evidence is interpreted consistently across A1 and A2.",
-        "Pilot responses should be used to refine rubric anchors and identify whether any prompt unintentionally cues the desired reasoning.",
-        "If both formats are retained, they should be treated as complementary sources of evidence rather than assumed to be interchangeable or equated without data."
-      ]
+      ],
+      "predictions": {
+        "cards": [
+          {
+            "id": "prediction1",
+            "label": "Prediction 1"
+          },
+          {
+            "id": "prediction2",
+            "label": "Prediction 2"
+          }
+        ],
+        "fields": [
+          {
+            "id": "prediction",
+            "label": "Prediction",
+            "prompt": "What do you expect to observe over the 90 days?",
+            "type": "text",
+            "required": true,
+            "maxWords": 35
+          },
+          {
+            "id": "why",
+            "label": "Why",
+            "prompt": "Why do you expect this? Explain the important mechanism, dependency, or interaction.",
+            "type": "text",
+            "required": true,
+            "maxWords": 60
+          },
+          {
+            "id": "confidence",
+            "label": "Confidence",
+            "prompt": "How confident are you in this prediction?",
+            "type": "choice",
+            "required": true,
+            "unscored": true,
+            "options": [
+              {
+                "id": "High",
+                "label": "High"
+              },
+              {
+                "id": "Medium",
+                "label": "Medium"
+              },
+              {
+                "id": "Low",
+                "label": "Low"
+              }
+            ]
+          }
+        ],
+        "comparisonOptions": [
+          "Supported",
+          "Partly supported",
+          "Not supported",
+          "Insufficient evidence"
+        ],
+        "comparisonPrompt": "How does the evidence relate to your original prediction?",
+        "evidencePrompt": "Which observation or observations most influenced your classification?",
+        "evidenceMaxWords": 35
+      }
     }
   ]
 }
