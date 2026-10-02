@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { ConfigSchema, createRun, emptyDraft, fieldsFor, submitStage, type Assessment, type Config, type Run, type Stage } from '../src/model';
 export const config = ConfigSchema.parse(JSON.parse(readFileSync('public/content/assessments.json', 'utf8')));
-// Reconstruct the preceding release's four-stage A2 to exercise real v2 migration.
-export const previousConfig = (() => {
-  const previous = structuredClone(config);
+// Exact preceding four-case release: migration and fact/MCQ preservation fixture.
+export const previousConfig = ConfigSchema.parse(JSON.parse(readFileSync('tests/fixtures/four-case-v2.json', 'utf8')));
+export const preAuditConfig = (() => {
+  const previous = structuredClone(previousConfig);
   previous.contentVersion = 'four-cases-2026-10-01';
-  const a2 = previous.assessments[1];
-  a2.contentVersion = 'four-cases-v2';
+  const a2 = previous.assessments[1]; a2.contentVersion = 'four-cases-v2';
   a2.stages[2].selectedResponses = a2.stages.pop()!.selectedResponses;
   return ConfigSchema.parse(previous);
 })();
@@ -32,4 +32,11 @@ export function started(index = 0, content: Config = config): Run {
   const a = content.assessments[index]; const run = beforeCase(index, content);
   run.sessions[a.id].startedAt = new Date().toISOString(); run.sessions[a.id].draft = emptyDraft(a, a.stages[0].id); return run;
 }
-export function completedBattery(content: Config = config): Run { return complete(content.assessments[3], beforeCase(3, content), content); }
+export function throughStage(index: number, count: number, content: Config = config): Run {
+  const a = content.assessments[index]; let run = started(index, content);
+  for (const s of a.stages.slice(0, count)) run = submitStage(content, run, a.id, s.id, validDraft(a, s));
+  return run;
+}
+export function completedBattery(content: Config = config): Run {
+  const last = content.assessments.length - 1; return complete(content.assessments[last], beforeCase(last, content), content);
+}

@@ -22,8 +22,26 @@ export class RunStore {
         this.view.run = restored.run;
         if (restored.migrated) {
           if (this.raw) storage.setItem(`${this.key}:backup:${restored.run.runId}`, this.raw);
+          // Reset cases must not recover an old journal, even if its timestamp is
+          // in the future. Preserve those journals alongside the existing backup.
+          const prior = JSON.parse((this.raw || legacy)!);
+          const obsoleteJournals: string[] = [];
+          if (prior.schemaVersion === 2) {
+            for (const [aid, session] of Object.entries(prior.sessions) as [string, Run['sessions'][string]][]) {
+              const next = restored.run.sessions[aid];
+              if (!next || next.contentVersion !== session.contentVersion || (session.startedAt && !next.startedAt)) {
+                const key = `${this.key}:draft:${prior.runId}:${aid}`; const journal = storage.getItem(key);
+                if (journal) { storage.setItem(`${this.key}:backup:${prior.runId}:draft:${aid}`, journal); obsoleteJournals.push(key); }
+              }
+            }
+            if (!batteryComplete(config, restored.run)) {
+              const key = `${this.key}:reflection:${prior.runId}`; const journal = storage.getItem(key);
+              if (journal) { storage.setItem(`${this.key}:backup:${prior.runId}:reflection`, journal); obsoleteJournals.push(key); }
+            }
+          }
           this.raw = JSON.stringify(restored.run);
           storage.setItem(this.key, this.raw);
+          for (const key of obsoleteJournals) storage.removeItem(key);
           this.view.notice = 'The assessment has been updated. Incompatible case progress has been restarted; your previous saved data is preserved separately on this browser.';
         }
       }
@@ -51,6 +69,9 @@ export class RunStore {
   private emit(next: Partial<StoreView>) { this.view = { ...this.view, ...next }; this.listeners.forEach(fn => fn()); }
   private schedule() { clearTimeout(this.timer); this.timer = setTimeout(() => { void this.flush().catch(() => {}); }, 500); }
   edit(aid: string, draft: Draft) {
+    // Journal writes are synchronous: check for a migrated/reset run even if a
+    // cross-tab storage event has not yet reached this page.
+    this.sync();
     const a = this.config.assessments.find(a => a.id === aid);
     if (!a || this.view.fatal || !assessmentAvailable(this.config, this.view.run, aid) || currentStage(a, this.view.run.sessions[aid])?.id !== draft.stageId) return;
     const copy = structuredClone(draft); copy.updatedAt = new Date().toISOString();
@@ -62,6 +83,7 @@ export class RunStore {
     this.schedule();
   }
   reflect(value: string) {
+    this.sync();
     if (this.view.fatal || !batteryComplete(this.config, this.view.run) || this.view.run.reflection.submittedAt) return;
     this.pending.reflection = value;
     const run = structuredClone(this.view.run); run.reflection.draft = value;
@@ -137,13 +159,13 @@ export class RunStore {
   }
   async continueAfterBreak() {
     await this.flush(); await this.transact(run => {
-      if (!intermissionDue(this.config, run)) throw new Error('Complete the first two cases before continuing.');
+      if (!intermissionDue(this.config, run)) throw new Error('Complete the preceding episode and its review before continuing.');
       run.intermission.continuedAt = new Date().toISOString(); return run;
     });
   }
   async submitReflection() {
     await this.flush(); await this.transact(run => {
-      if (!batteryComplete(this.config, run)) throw new Error('Complete all four cases first.');
+      if (!batteryComplete(this.config, run)) throw new Error('Complete every episode and review first.');
       if (wordCount(run.reflection.draft) > this.config.finalReview.reflection.maxWords!) throw new Error('Keep your reflection within the maximum word limit.');
       if (!run.reflection.submittedAt) {
         run.reflection.submitted = run.reflection.draft; run.reflection.submittedAt = new Date().toISOString();

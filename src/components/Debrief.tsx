@@ -4,6 +4,7 @@ import { batteryComplete, resumePath, wordCount, type Assessment } from '../mode
 import { AppLink } from './Shared';
 import { CaseFacts, SubmittedResponsePanel } from './Assessment';
 import { Modal, ResponseField } from './Forms';
+import { SelectedResponseFeedback } from './Feedback';
 import { downloadJson } from '../persistence';
 import styles from '../app.module.css';
 
@@ -12,14 +13,14 @@ function PredictionTrail({ a }: { a: Assessment }) {
   const predict = a.stages.find(s => s.kind === 'predict')!; const compare = a.stages.find(s => s.kind === 'compare')!;
   const original = session.submitted[predict.id]; const comparison = session.submitted[compare.id];
   return <>
+    <details className={styles.contextDetails}><summary>Simulated outcomes at 48 hours</summary><CaseFacts stage={compare}/></details>
+    {predict.fields.map(f => <div className={styles.answer} key={f.id}><h4>{f.label}</h4><p>{original.answers[f.id]}</p></div>)}
     {original.cardOrder.map(id => {
       const card = a.predictions!.cards.find(c => c.id === id)!;
-      return <details key={id} className={styles.submitted}><summary>{card.label} · prediction and evidence</summary><div className={styles.submittedBody}>
+      return <details key={id} className={styles.submitted}><summary>{card.label} · prediction and simulated outcomes</summary><div className={styles.submittedBody}>
         {a.predictions!.fields.map(f => <div key={f.id} className={styles.answer}><h4>{f.label}{f.unscored && ' (unscored)'}</h4><p>{original.answers[`${id}.${f.id}`]}</p>{f.maxWords && <small className={styles.wordCount}>{wordCount(original.answers[`${id}.${f.id}`])} / {f.maxWords} words · maximum</small>}</div>)}
-        {predict.fields.map(f => <div className={styles.answer} key={f.id}><h4>{f.label}</h4><p>{original.answers[f.id]}</p></div>)}
-        <CaseFacts stage={compare}/>
         <div className={styles.answer}><h4>Your classification (unscored)</h4><p>{comparison.answers[`${id}.classification`]}</p></div>
-        <div className={styles.answer}><h4>Evidence note</h4><p>{comparison.answers[`${id}.evidence`]}</p></div><span className={styles.locked}>▣ Submitted and locked</span>
+        <div className={styles.answer}><h4>Outcome note</h4><p>{comparison.answers[`${id}.evidence`]}</p></div><span className={styles.locked}>▣ Submitted and locked</span>
       </div></details>;
     })}
     {a.stages.filter(s => !['predict', 'compare'].includes(s.kind)).map(s => <SubmittedResponsePanel key={s.id} assessment={a} stage={s} snapshot={session.submitted[s.id]}/>)}
@@ -27,18 +28,12 @@ function PredictionTrail({ a }: { a: Assessment }) {
 }
 export function Debrief() {
   const { config, run, store, error } = useSession(); const [confirm, setConfirm] = useState(false); const [busy, setBusy] = useState(false);
-  if (!batteryComplete(config, run)) return <div className={styles.gate}><h1>Your final review is still locked</h1><p>Complete all four cases and their evidence checks to open your feedback and full reasoning trail.</p><AppLink to={resumePath(config, run)} className={styles.primary}>Continue assessment →</AppLink></div>;
+  if (!batteryComplete(config, run)) return <div className={styles.gate}><h1>Your final review is still locked</h1><p>Complete all {config.assessments.length} episodes and their review amendments to open your full reasoning trail.</p><AppLink to={resumePath(config, run)} className={styles.primary}>Continue assessment →</AppLink></div>;
   const commit = async () => { setBusy(true); try { await store.submitReflection(); setConfirm(false); } catch {} finally { setBusy(false); } };
   return <>
-    <AppLink to="/learner" className={styles.back}>← Assessment home</AppLink><p className={styles.eyebrow}>ALL FOUR CASES COMPLETE</p><h1 className={styles.debriefTitle}>{config.finalReview.heading}</h1>
+    <AppLink to="/learner" className={styles.back}>← Assessment home</AppLink><p className={styles.eyebrow}>ALL {config.assessments.length} EPISODES COMPLETE</p><h1 className={styles.debriefTitle}>{config.finalReview.heading}</h1>
     <div className={styles.debriefIntro}><p>{config.finalReview.intro}</p><p>{config.finalReview.explanation}</p></div>
-    <section aria-labelledby="feedback-heading"><h2 id="feedback-heading">Evidence-check feedback</h2>
-      {config.assessments.map(a => a.stages.flatMap(s => s.selectedResponses.map(q => {
-        const answer = run.sessions[a.id].submitted[s.id].answers[q.id]; const option = q.options.find(o => o.id === answer)!;
-        const best = q.options.find(o => o.id === q.correctOptionId)!;
-        return <article key={q.id} className={styles.feedbackResult} data-feedback-id={q.id}><p className={styles.sectionEyebrow}>{a.title} · {q.label}</p><h3>{q.prompt}</h3><p><strong>Your choice:</strong> {option.id}. {option.label}</p><p><strong>Best-supported answer:</strong> {best.id}. {best.label}</p><p>{q.feedbackByOption[answer]}</p></article>;
-      })))}
-    </section>
+    {config.assessments.map(a => <SelectedResponseFeedback key={a.id} assessment={a}/>)}
     <section className={styles.processNote}><h2>Reasoning across the cases</h2><p>{config.finalReview.guidance}</p></section>
     <section aria-labelledby="trail-heading"><h2 id="trail-heading">Your response trails</h2>
       {config.assessments.map(a => <details key={a.id} className={styles.responseTrail} data-trail-id={a.shortId}>

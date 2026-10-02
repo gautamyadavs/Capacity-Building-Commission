@@ -17,7 +17,7 @@ export function ResponseField({ field, value, onChange, error, disabled = false 
         <input type="radio" name={id} value={option.id} required={field.required} checked={value === option.id} onChange={() => onChange(option.id)} />{option.label}
       </label>)}</div>
     </fieldset> : <>
-      <div className={styles.fieldHeading}><label htmlFor={id}>{field.label}{!field.required && <span className={styles.optional}>Optional</span>}</label>
+      <div className={styles.fieldHeading}><label htmlFor={id}>{field.label}{field.unscored && <span className={styles.optional}>Unscored</span>}{!field.required && <span className={styles.optional}>Optional</span>}</label>
         {field.maxWords && <span id={`${id}-count`} role="status" aria-live="polite" aria-atomic="true" className={over ? styles.overLimit : styles.wordCount}>{count} / {field.maxWords} words · maximum</span>}</div>
       <p className={styles.help} id={`${id}-help`}>{field.prompt}</p>
       <textarea id={id} value={value} onChange={e => onChange(e.target.value)} rows={field.maxWords && field.maxWords > 150 ? 6 : 4}

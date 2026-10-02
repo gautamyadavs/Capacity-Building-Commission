@@ -1,6 +1,6 @@
-# Bharat KALP assessment
+# Bharat KALP learning assessment
 
-A browser-based learner experience for four simulated governance cases. Learners complete the cases in order: Flash Flood and Transport Disruption → LPG Supply Disruption → optional break → Air Quality Emergency → Public Grievance Reform → final review.
+A two-episode learning pilot for mixed-experience civil servants: Flash Flood and Transport Disruption → guided review and amendment → pause/continue → Air Quality Emergency → guided review and amendment → final review.
 
 ## Run and verify
 
@@ -10,51 +10,55 @@ Use Node >=22.12 and npm.
 npm ci
 npm run dev
 npm run check       # TypeScript and content/model/persistence/component tests
-npm run build       # Production static build
-npm run preview
 npx playwright install chromium
 npm run test:e2e    # Production browser flows under a project subpath
+BASE_PATH=/Capacity-Building-Commission/ npm run build
+npm run preview
 ```
 
-There is no separate lint command configured. Browser tests use isolated profiles and run accessibility checks with axe. If needed, use an installed Chrome executable with `BROWSER_EXECUTABLE` when running `npm run test:e2e`.
+There is no separate lint command configured. Browser tests use isolated profiles and run accessibility checks with axe. An installed Chrome can be selected with `BROWSER_EXECUTABLE` when running `npm run test:e2e`.
 
 ## Learner flow
 
-The landing page presents the four cases and saved progress. Only the next available case can be started. Submitting each stage locks its exact response before revealing the next stage. Earlier responses remain readable. Prediction stages use two identical cards; confidence, comparison classifications, and position choices are unscored metadata.
+The compact workspace explains the learning purpose, presents both episodes and saved progress, and offers a single start/resume action. Learners may pause at any stage and resume their saved draft on the same browser. Provisional times include review; existing response maxima are retained. Writing guidance is stated once. Ordinary browser spellcheck is allowed.
 
-After Case 2, learners can continue immediately or return to the home page and resume later. Case-completion screens contain a neutral acknowledgement. Evidence-check choices lock on submission, with all seven results and explanations deferred until all four cases are fully submitted. The final review contains four collapsible response trails, a brief reasoning-process note, and one optional reflection capped at 150 words. The reflection autosaves and can be submitted and locked. No assessment scores or automated evaluation of open responses are generated.
+Flash Flood retains initial judgement, execution, new information and a decision challenge. Air Quality retains two prediction cards, comparison with simulated outcomes, explanation, revision of the supplied 48-hour package, and three existing evidence checks. The package and outcomes are directly available at revision; full earlier briefings and locked responses are expandable references. Timelines and neutral resource tables retain the scenario facts, numbers, uncertainty and competing demands.
 
-The learner deployment has no reviewer toggle, preview workspace, or public reviewer content. Old pairwise debrief URLs redirect to the final review, which still checks full completion. The previous reviewer route redirects to the learner home.
+Submitting a stage locks the exact response before later information appears. Each case ends with **Review your reasoning**: original submissions, case-specific commentary with two defensible approaches and different trade-offs, and one required, unscored amendment capped at 100 words. Commentary is general guidance, not an automatic evaluation of the learner's individual response. The amendment is a separate immutable snapshot; it never overwrites the originals.
+
+Flood's amendment unlocks the pause/continue boundary. Continuing unlocks Air Quality. Air Quality's three existing selected-response explanations appear in its guided review only after all open reasoning and selected responses are locked. The final review requires both amendments and contains those three results exactly once, two response trails including the amendments, and the separate optional 150-word reflection. No automated scoring or feedback service is used.
+
+The learner deployment has no reviewer toggle, preview workspace or public reviewer content. Existing pairwise debrief URLs redirect to the gated final review; the former reviewer route redirects to the learner home.
 
 ## Content and architecture
 
-`public/content/assessments.json` is the current content source. It contains the supplied scenario facts, staged prompts, word maxima, times, prerequisite references, per-assessment prediction configuration, evidence checks with stable option IDs and deferred feedback, and final review copy. Zod validates it when the app loads. Stage presentation and progression use content configuration rather than case-ID branches.
+`public/content/assessments.json` is the current source. It defines two cases, tasks, stage rationale, facts, timelines, table row labels, focused references, prompts, word maxima, prerequisites, prediction cards, review commentary and selected-response feedback. Zod validates it on load. Case counts and continuation labels come from configuration. The stage model includes `review`; review must be final, require every preceding stage, and contain exactly one required, unscored, 100-word amendment.
 
-`src/model.ts` provides the configuration and state schemas, field expansion, validators, sequential case/stage availability, intermission eligibility, final-review eligibility, and immutable submission snapshots. `src/persistence.ts` manages browser saves and cross-tab synchronization. `src/components/Assessment.tsx` presents stage forms; `src/components/Debrief.tsx` now presents the single final review.
+`src/model.ts` handles schemas, field expansion, sequential gates, per-case feedback availability, completion and immutable snapshots. `src/persistence.ts` retains the existing browser saves, journals and cross-tab synchronization. `src/components/Assessment.tsx` presents the workspace and guided reviews. `src/components/Feedback.tsx` shares the guarded feedback renderer with the final review.
 
-The historical `docs/source-specification.md` and `scripts/extract_spec.py` describe the previous content version. The original importer does not generate the revised design and would overwrite the current JSON; do not run it to update this version. Edit the current configuration and its contract tests together.
+`tests/fixtures/four-case-v2.json` preserves the previous release for migration tests and exact scenario-fact and MCQ invariance checks. The historical `docs/source-specification.md` and `scripts/extract_spec.py` describe earlier content. Do not run the importer to update this pilot: it would overwrite the revised configuration. Edit current content and its contract tests together.
 
-## Local state
+The stage-by-stage rationale and human pilot protocol are in [docs/learning-pilot.md](docs/learning-pilot.md), with provisional matched pre/post tasks in [docs/pilot-transfer-tasks.md](docs/pilot-transfer-tasks.md). These are hypotheses requiring pilot validation, not a claim that the experience has demonstrated learning or leadership development.
 
-The state schema is version 2. Storage keys are scoped by deployment base path, schema version, and mode. Drafts update immediately, autosave after 500 ms, and flush on blur, navigation, page hiding, and tab closure. Synchronous, run-scoped journals retain the latest text and choices when reload happens before the debounce.
+## Local state and migration
 
-Submitted answers are deep-copied and persisted before navigation advances. Web Locks serialize saves across tabs where supported; storage events update other tabs. Stale drafts cannot overwrite locked submissions, and stale tabs cannot revive a reset run. Failed writes keep the current stage open and display a retryable error. Malformed current storage is preserved for download and explicit recovery.
+The state schema remains version 2. Keys remain scoped by deployment base path, schema version and mode. Drafts update immediately, autosave after 500 ms and flush on blur, navigation, page hiding and tab closure. Synchronous, run-scoped journals preserve edits when reload beats the debounce. Amendments reuse this same mechanism.
 
-The old version-1 questions have different response structures, so their submissions are incompatible. On upgrade, the new assessment begins safely and the old version-1 storage remains intact. For subsequent content changes, each case has its own content version: compatible completed cases are retained, while the changed case and any dependent later progress restart. A backup preserves the original version-2 data. Changes to prompts, fields, prerequisites, or answer options must increment the affected case's `contentVersion` and the overall content version.
+Submissions are deep-copied and persisted before navigation. Web Locks serialize saves where supported; storage events synchronize other tabs. Stale drafts cannot overwrite locked originals or amendments, and stale tabs cannot revive a reset run. Failed writes keep the response open with a retryable error. Malformed current storage is preserved for download and explicit recovery.
 
-The saved run includes all four sessions, drafts and locked snapshots, selected choices, predictions and confidence, comparisons, intermission state, and the separate optional reflection. A downloadable JSON copy is available on the final review page. Responses stay in this browser unless the learner downloads and shares them. Clearing browser data removes local progress; there is no cross-device synchronization, backend, authentication, analytics, or AI scoring.
+The overall content version is `learning-pilot-2026-10-01-v3`; both changed case versions advance from `four-cases-v2` to `four-cases-v3`. Old four-case progress is incompatible because both retained cases have revised prompts, context and review stages, so both restart. Existing dependency migration removes obsolete LPG and Grievance sessions, resets the intermission and reflection, and preserves the original run in the existing local backup. Incompatible or obsolete draft journals and the old reflection journal are also backed up before removal, preventing them from repopulating restarted stages. Compatible earlier case progress remains supported for later content-only upgrades. Version-1 storage remains intact under its original key.
 
-Client-side locks provide the staged experience; the static content file can still be inspected outside normal learner navigation.
+A saved pilot run contains the two sessions, drafts, locked originals and amendments, predictions and confidence, comparisons, choices, pause/continue state and optional reflection. A JSON download is available in the final review. Data stays in this browser unless the learner downloads and shares it. Clearing browser data removes local progress. There is no cross-device synchronization, backend, authentication, telemetry, external writing assistance or AI scoring.
 
-## Accessibility
+Client-side gates provide the staged experience; static content can still be inspected outside normal navigation.
 
-Forms use associated labels, radio fieldsets and legends, live accessible word counters, field-linked validation, visible focus, and a keyboard-accessible native confirmation dialog. Locked responses use text rather than editable controls. Progress and save states have text labels. Pages adapt to laptop, tablet, and narrow screens; suggested times have no countdown or automatic submission.
+## Accessibility and deployment
 
-## GitHub Pages
+Forms have associated labels, radio fieldsets, accessible word counters, field-linked errors, visible focus and a keyboard-accessible confirmation dialog. Locked responses are text. Tables have captions and row/column headers. The compact task header is sticky on sufficiently large desktop screens; forms remain in the page flow and mobile has one reading flow without competing scroll areas. There is no countdown or automatic submission.
 
-The existing `.github/workflows/pages.yml` workflow and Vite base-path configuration are unchanged. The workflow verifies types and tests, runs browser flows under a project subpath, builds the static site, and deploys the default branch through GitHub Pages. Hash routing avoids server-side path rewrites; assets and content load relative to `import.meta.env.BASE_URL`.
+The existing `.github/workflows/pages.yml` and Vite base configuration remain unchanged. The workflow verifies types/tests, runs browser flows under a project subpath, builds and deploys the default branch through GitHub Pages. Hash routing avoids server-side rewrites; assets and content use `import.meta.env.BASE_URL`.
 
-Learner route: [Bharat KALP assessment](https://gautamyadavs.github.io/Capacity-Building-Commission/#/learner).
+Learner route: [Bharat KALP learning pilot](https://gautamyadavs.github.io/Capacity-Building-Commission/#/learner).
 
 For a local check of the deployment path:
 
@@ -63,4 +67,4 @@ BASE_PATH=/Capacity-Building-Commission/ npm run build
 BASE_PATH=/Capacity-Building-Commission/ npm run preview
 ```
 
-Open `/Capacity-Building-Commission/#/learner`. The final review is at `#/learner/review` and is accessible only after all required submissions.
+Open `/Capacity-Building-Commission/#/learner`. Final review is at `#/learner/review`, after both episodes and their amendments.
