@@ -17,6 +17,7 @@ import {
   SubmittedResponsePanel,
 } from "./Shared";
 import { Modal, ResponseField } from "./Forms";
+import { RetryButton } from "./Trial";
 import styles from "../app.module.css";
 export function AssessmentIntro() {
   const { aid } = useParams(),
@@ -37,9 +38,7 @@ export function AssessmentIntro() {
       <p className={styles.eyebrow}>FICTIONAL CASE</p>
       <h1>{a.title}</h1>
       <p>
-        Two phases: {a.phases.map((p) => p.title.toLowerCase()).join(", then ")}
-        . Submit the initial response before the update appears. Your exact
-        initial response stays available for reference.
+        Start with the first question. Case information stays beside your response.
       </p>
       <button
         className={styles.primary}
@@ -173,6 +172,22 @@ export function AssessmentStage() {
               }}
             >
               <h2>Your response</h2>
+              <p className={styles.responseGuidance}>
+                Start with the first question. Use bullets or short paragraphs;
+                you can refine your draft before submitting.
+              </p>
+              <details className={styles.writingHelp}>
+                <summary>Resources and writing</summary>
+                <p>
+                  Use the supplied fictional facts and label assumptions. Notes,
+                  online resources and generative AI are allowed without penalty;
+                  research is optional.
+                </p>
+                <p>
+                  There is no timer or word limit. Writing polish is not assessed.
+                  Drafts save in this browser so you can pause and resume.
+                </p>
+              </details>
               {p.prompts.map((f) => (
                 <ResponseField
                   key={f.id}
@@ -188,7 +203,11 @@ export function AssessmentStage() {
                 />
               ))}
               <div className={styles.submitBar}>
-                <p>Submitted responses become read-only.</p>
+                <p>
+                  {p.kind === "initial"
+                    ? "Submit to receive new information. This response stays available and becomes read-only."
+                    : "You can keep sound reasoning or revise it. This update is saved separately and becomes read-only."}
+                </p>
                 <button
                   type="submit"
                   className={styles.primary}
@@ -270,6 +289,7 @@ export function AssessmentCompletion() {
         >
           {run.end ? "View submissions and feedback" : "Choose another case"} →
         </AppLink>
+        <RetryButton ids={[a.id]} openCase={a.id} label="Retry case" />
       </div>
     </section>
   );

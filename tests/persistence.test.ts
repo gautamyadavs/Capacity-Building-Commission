@@ -1,10 +1,109 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { RunStore } from "../src/persistence";
 import { ReviewerStore } from "../src/reviewer";
-import { emptyReviewBundle } from "../src/model";
+import { beginCase, createRun, emptyReviewBundle, parseRun, submitPhase } from "../src/model";
 import { config, MemoryStorage, completeRun, reviewRecord } from "./helpers";
 afterEach(() => vi.useRealTimers());
 describe("local run durability", () => {
+  it("retries a submitted case after completion, preserving other cases and previous feedback", async () => {
+    const storage = new MemoryStorage(), store = new RunStore(config, storage, "/");
+    const previous = completeRun("Previous exact response"), bundle = await emptyReviewBundle(previous);
+    bundle.records = [reviewRecord(previous)];
+    await store.importSession(JSON.stringify(previous));
+    await store.importReviews(JSON.stringify(bundle));
+    await store.retry(["A1"], "A1");
+    const next = store.exportSession();
+    expect(next.runId).not.toBe(previous.runId);
+    expect(next.config).toEqual(previous.config);
+    expect(next.end).toBeNull();
+    expect(next.sessions.A1.submitted).toEqual({});
+    expect(next.sessions.A1.draft?.answers["A.P1"]).toBe("");
+    expect(next.sessions.A1.revealedAt["A.U"]).toBeUndefined();
+    expect(next.sessions.B2).toEqual(previous.sessions.B2);
+    expect(next.submissionSequence).toHaveLength(6);
+    expect(parseRun(JSON.stringify(next))).toEqual(next);
+    expect(store.getSnapshot().reviews).toBeNull();
+    expect(store.previousAttempts().find(r => r.runId === previous.runId)).toEqual(previous);
+    expect(await store.reviewsFor(previous)).toEqual(bundle);
+    const reopened = new RunStore(config, storage, "/");
+    await reopened.loadReviews();
+    expect(reopened.exportSession()).toEqual(next);
+    expect(reopened.getSnapshot().reviews).toBeNull();
+    await expect(reopened.importReviews(JSON.stringify(bundle))).rejects.toThrow("different session");
+  });
+  it("retries a set after early end, retaining other drafts and preventing stale tabs from restoring old answers", async () => {
+    const storage = new MemoryStorage(), store = new RunStore(config, storage, "/");
+    await store.begin("A1");
+    await store.begin("B2");
+    const draft = store.exportSession().sessions.B2.draft!;
+    store.edit("B2", {...draft, answers: {...draft.answers, "B.P1": "Keep this other-set draft"}});
+    await store.end("Trial ended");
+    const previous = store.exportSession(), stale = new RunStore(config, storage, "/");
+    await store.retry(["A1", "A2"]);
+    const next = store.exportSession();
+    expect(next.end).toBeNull();
+    expect(next.sessions.A1.startedAt).toBeNull();
+    expect(next.sessions.A2.startedAt).toBeNull();
+    expect(next.sessions.B2).toEqual(previous.sessions.B2);
+    expect(parseRun(JSON.stringify(next))).toEqual(next);
+    await expect(stale.begin("A1")).rejects.toThrow("changed in another tab");
+    expect(stale.exportSession()).toEqual(next);
+  });
+  it("preserves a trial attempt if archiving or replacement fails", async () => {
+    const storage = new MemoryStorage(), store = new RunStore(config, storage, "/");
+    await store.importSession(JSON.stringify(completeRun()));
+    const previous = store.exportSession();
+    storage.fail = true;
+    await expect(store.retry(["A1"])).rejects.toThrow();
+    expect(store.exportSession()).toEqual(previous);
+    storage.fail = false;
+    const write = storage.setItem.bind(storage);
+    storage.setItem = (key, value) => {
+      if (key === store.key) throw new Error("Replacement failed");
+      write(key, value);
+    };
+    await expect(store.retry(["A1"])).rejects.toThrow("Replacement failed");
+    expect(store.exportSession()).toEqual(previous);
+    expect(JSON.parse(storage.getItem(store.key)!)).toEqual(previous);
+    expect(store.previousAttempts()).toEqual([]);
+  });
+  it("keeps retry history within its trial when a facilitator starts another participant", async () => {
+    const store = new RunStore(config, new MemoryStorage(), "/"),
+      previous = completeRun("Previous participant response");
+    await store.importSession(JSON.stringify(previous));
+    await store.retry(["A1"], "A1");
+    expect(store.previousAttempts()).toEqual([previous]);
+    await store.reset(config);
+    expect(store.previousAttempts()).toEqual([]);
+    const archivedRuns = Object.values(store.recoveryData()).flatMap((raw) => {
+      try { return [parseRun(raw)]; } catch { return []; }
+    });
+    expect(archivedRuns).toContainEqual(previous);
+    await store.importSession(JSON.stringify(completeRun("Another participant")));
+    expect(store.previousAttempts()).toEqual([]);
+  });
+  it("retries all cases with a new empty run and retains fixed-order captured-session validity", async () => {
+    const store = new RunStore(config, new MemoryStorage(), "/");
+    await store.importSession(JSON.stringify(completeRun()));
+    await store.retry(config.cases.map(a => a.id));
+    expect(store.exportSession().actualSequence).toEqual([]);
+    expect(store.exportSession().submissionSequence).toEqual([]);
+    expect(store.exportSession().end).toBeNull();
+    const fixed = {...structuredClone(config), caseOrderPolicy: "fixed" as const};
+    let run = createRun(fixed);
+    for (const a of fixed.cases) {
+      run = beginCase(run, a.id);
+      for (const p of a.phases) run = submitPhase(run, a.id, p.id, run.sessions[a.id].draft!);
+    }
+    await store.importSession(JSON.stringify(run));
+    await store.retry(["A2"], "A2");
+    const next = store.exportSession();
+    expect(next.sessions.A1).toEqual(run.sessions.A1);
+    expect(next.sessions.B1.startedAt).toBeNull();
+    expect(next.sessions.B2.startedAt).toBeNull();
+    expect(next.config).toEqual(fixed);
+    expect(parseRun(JSON.stringify(next))).toEqual(next);
+  });
   it("D18 journals a draft before debounce and restores it after reopen", async () => {
     vi.useFakeTimers();
     const storage = new MemoryStorage(),

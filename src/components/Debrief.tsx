@@ -4,6 +4,7 @@ import { resumePath } from "../model";
 import { AppLink, SubmittedResponsePanel } from "./Shared";
 import { LearnerFeedback } from "./Feedback";
 import { criterionLabel } from "../presentation";
+import { PreviousAttempts, RetryButton } from "./Trial";
 import styles from "../app.module.css";
 export function Debrief() {
   const { run, reviews } = useSession();
@@ -43,6 +44,9 @@ export function Debrief() {
           : "All four cases are submitted. Your responses have been saved."}
       </p>
       <p>No overall score or pass/fail result is assigned.</p>
+      <div className={styles.actions}>
+        <RetryButton ids={run.config.cases.map((a) => a.id)} label="Retry all cases" />
+      </div>
       {!records.length && (
         <p role="status" className={styles.pauseNote}>
           Awaiting review. Feedback will appear after a reviewer has read your
@@ -137,9 +141,11 @@ export function Debrief() {
                     ))}
                 </div>
               </details>
+              <RetryButton ids={[a.id]} openCase={a.id} label="Retry case" />
             </details>
           );
         })}
+      <PreviousAttempts />
     </div>
   );
 }

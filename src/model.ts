@@ -242,6 +242,28 @@ export function createRun(config: Config): Run {
     end: null,
   };
 }
+// Retain the captured tasks and untouched cases; each retry has its own review binding.
+export function retryCaseIds(run: Run, ids: string[]) {
+  if (!ids.length || ids.some((id) => !run.config.cases.some((a) => a.id === id)))
+    throw new Error("Choose a case to retry.");
+  if (run.config.caseOrderPolicy === "free") return [...new Set(ids)];
+  const first = run.config.cases.findIndex((a) => ids.includes(a.id));
+  return run.config.cases.slice(first).map((a) => a.id);
+}
+export function retryCases(run: Run, ids: string[]): Run {
+  const selected = retryCaseIds(run, ids),
+    fresh = createRun(run.config);
+  if (selected.length === run.config.cases.length) return fresh;
+  const next = structuredClone(run);
+  next.runId = fresh.runId;
+  next.end = null;
+  for (const id of selected) next.sessions[id] = fresh.sessions[id];
+  next.actualSequence = next.actualSequence.filter((id) => !selected.includes(id));
+  next.submissionSequence = next.submissionSequence.filter(
+    (s) => !selected.includes(s.caseId),
+  );
+  return next;
+}
 export function emptyDraft(phase: Phase): Draft {
   return {
     phaseId: phase.id,

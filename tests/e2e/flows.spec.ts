@@ -1,8 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { readFile } from "node:fs/promises";
-import { config, completeRun } from "../helpers";
-import { beginCase, createRun } from "../../src/model";
+import { config, completeRun, reviewRecord } from "../helpers";
+import { beginCase, createRun, emptyReviewBundle, endRun } from "../../src/model";
 const base = "/Capacity-Building-Commission/";
 const key = `bharat-kalp:${base}:v3:learner`;
 async function seed(
@@ -54,6 +54,79 @@ async function reflow(page: Page) {
     ),
   ).toBe(true);
 }
+test("trial retries preserve attempts and feedback while reopening cases and sets", async ({ page }) => {
+  const previous = completeRun("Previous trial response — exact wording"), bundle = await emptyReviewBundle(previous);
+  bundle.records = [reviewRecord(previous)];
+  await seed(page, previous);
+  await page.evaluate(({ key, bundle }) => localStorage.setItem(`${key}:reviews:${bundle.runId}`, JSON.stringify(bundle)), { key, bundle });
+  await page.reload();
+  await page.screenshot({ path: "test-results/trial-retries-desktop.png", fullPage: true });
+  const card = page.getByRole("article").filter({ has: page.getByRole("heading", { name: config.cases[0].title, exact: true }) });
+  await expect(card.getByRole("button", { name: "Retry case", exact: true })).toBeVisible();
+  await card.getByRole("button", { name: "Retry case", exact: true }).click();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).runId, key)).toBe(previous.runId);
+  await card.getByRole("button", { name: "Retry case", exact: true }).click();
+  await page.getByRole("button", { name: "Save previous attempt and retry", exact: true }).click();
+  await expect(page).toHaveURL(/A1\/stage\/A.I$/);
+  await expect(page.getByLabel("Choose and compare", { exact: true })).toHaveValue("");
+  await expect(page.getByText(config.cases[0].phases[1].facts[0], { exact: true })).toHaveCount(0);
+  const retried = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), key);
+  expect(retried.runId).not.toBe(previous.runId);
+  expect(retried.end).toBeNull();
+  expect(retried.sessions.B2).toEqual(previous.sessions.B2);
+  await page.getByText("Resources and writing", { exact: true }).click();
+  await expect(page.getByText(/generative AI are allowed without penalty/)).toBeVisible();
+  await checkAxe(page);
+  await page.getByRole("link", { name: "← All cases", exact: true }).click();
+  await page.getByText("Previous attempts (1)", { exact: true }).click();
+  await page.getByRole("link", { name: "View previous attempt 1", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Previous attempt");
+  await expect(page.getByText(bundle.records[0].primary.rationale, { exact: true })).toBeVisible();
+  await page.getByText("Initial response · Submitted and preserved", { exact: true }).first().click();
+  await expect(page.getByText("Previous trial response — exact wording", { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole("textbox")).toHaveCount(0);
+  await checkAxe(page);
+  await checkLearnerUI(page);
+  await page.getByRole("link", { name: "← All cases", exact: true }).click();
+  await page.setViewportSize({ width: 320, height: 1000 });
+  await page.getByRole("button", { name: "Retry set A", exact: true }).click();
+  await checkAxe(page);
+  await reflow(page);
+  await page.getByRole("button", { name: "Save previous attempt and retry", exact: true }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Reasoning through governance decisions");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("heading", { level: 1 })).toBeFocused();
+  const setRetry = await page.evaluate(key => JSON.parse(localStorage.getItem(key)!), key);
+  expect(setRetry.sessions.A1.startedAt).toBeNull();
+  expect(setRetry.sessions.A2.startedAt).toBeNull();
+  expect(setRetry.sessions.B2).toEqual(previous.sessions.B2);
+  await page.reload();
+  await checkAxe(page);
+  await reflow(page);
+  await page.screenshot({ path: "test-results/trial-retries-mobile.png", fullPage: true });
+  await page.getByRole("button", { name: "Retry all cases", exact: true }).click();
+  await page.getByRole("button", { name: "Save previous attempt and retry", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Start case →", exact: true })).toHaveCount(4);
+  await expect(page.getByText("Previous attempts (3)", { exact: true })).toBeVisible();
+});
+
+test("an early-ended trial can start an untouched case and retry without losing another draft", async ({ page }) => {
+  let run = beginCase(createRun(config), "B2");
+  run.sessions.B2.draft!.answers["B.P1"] = "Keep the unfinished grievance draft";
+  run = endRun(run, "Trial ended early");
+  await seed(page, run);
+  const flood = page.getByRole("article").filter({ has: page.getByRole("heading", { name: config.cases[0].title, exact: true }) });
+  await flood.getByRole("button", { name: "Start case", exact: true }).click();
+  await page.getByRole("button", { name: "Save previous attempt and retry", exact: true }).click();
+  await expect(page.getByLabel("Choose and compare", { exact: true })).toHaveValue("");
+  await page.getByRole("link", { name: "← All cases", exact: true }).click();
+  await page.getByRole("article").filter({ has: page.getByRole("heading", { name: config.cases[3].title, exact: true }) })
+    .getByRole("button", { name: "Resume case →", exact: true }).click();
+  await expect(page.getByLabel("Explain the causes", { exact: true })).toHaveValue("Keep the unfinished grievance draft");
+  await page.reload();
+  await expect(page.getByLabel("Explain the causes", { exact: true })).toHaveValue("Keep the unfinished grievance draft");
+});
 test("reviewers trace coverage and export the current design without participant responses", async ({ page }) => {
   await seed(page, completeRun("PRIVATE_SYNTHETIC_RESPONSE_DO_NOT_EXPORT"), "/coverage");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Teaching and assessment coverage");

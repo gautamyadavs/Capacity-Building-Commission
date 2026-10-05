@@ -47,16 +47,15 @@ describe("learner evidence flow", () => {
     expect(screen.getByText(/draft changed in another tab/)).toBeVisible();
     expect(store.getSnapshot().run.config).toEqual(captured);
   });
-  it("D01/D05 gives neutral purpose, four cases and assistance without extra controls", () => {
+  it("D01 gives a concise entry into four cases without extra controls", () => {
     show();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "Reasoning through governance decisions",
     );
     for (const a of config.cases)
       expect(screen.getByRole("heading", { name: a.title })).toBeVisible();
-    expect(
-      screen.getAllByText(/generative AI are allowed without penalty/)[0],
-    ).toBeVisible();
+    expect(screen.queryByRole("heading", { name: "Before you begin" })).not.toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: "Start case →" })).toHaveLength(4);
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
     expect(
       screen.queryByText(/maximum words|countdown|confidence rating/),
@@ -74,7 +73,7 @@ describe("learner evidence flow", () => {
       screen.queryByText(config.cases[0].phases[1].facts[0]),
     ).not.toBeInTheDocument();
   });
-  it("D02/D03 displays exact phase prompts and controlling facts", () => {
+  it("D02/D03/D05 displays exact phase prompts, controlling facts and help beside writing", async () => {
     show(
       beginCase(createRun(config), "A1"),
       "/learner/assessment/A1/stage/A.I",
@@ -93,6 +92,10 @@ describe("learner evidence flow", () => {
     ).toBeVisible();
     expect(screen.getByText(config.cases[0].phases[0].facts[0])).toBeVisible();
     expect(screen.getAllByRole("textbox")).toHaveLength(4);
+    expect(screen.getByText(/generative AI are allowed without penalty/)).not.toBeVisible();
+    await userEvent.setup().click(screen.getByText("Resources and writing"));
+    expect(screen.getByText(/generative AI are allowed without penalty/)).toBeVisible();
+    expect(screen.getByText(/no timer or word limit/i)).toBeVisible();
   });
   it("D19 cancelling confirmation leaves draft and reveal boundary intact", async () => {
     const user = userEvent.setup(),

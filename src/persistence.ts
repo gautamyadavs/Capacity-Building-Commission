@@ -8,6 +8,7 @@ import {
   mergeReviews,
   parseReviewBundle,
   parseRun,
+  retryCases,
   submitPhase,
   validAnswers,
   type Config,
@@ -288,6 +289,63 @@ export class RunStore {
       notice:
         "A new diagnostic is ready. Previous saved sessions remain available in Recovery and files.",
     });
+  }
+  async retry(ids: string[], openCase?: string) {
+    await this.flush();
+    await this.transact((run) => {
+      let next = retryCases(run, ids);
+      if (openCase) {
+        if (!ids.includes(openCase))
+          throw new Error("Choose a retried case to open.");
+        next = beginCase(next, openCase);
+      }
+      // Validate and archive before replacing the active record. A failed write keeps it intact.
+      parseRun(JSON.stringify(next));
+      this.storage.setItem(
+        `${this.key}:archive:${run.runId}:${Date.now()}`,
+        JSON.stringify(run),
+      );
+      this.storage.setItem(
+        `${this.key}:attempts:${next.runId}`,
+        JSON.stringify([...this.attemptHistory(run.runId), run.runId]),
+      );
+      return next;
+    });
+    this.emit({
+      reviews: null,
+      notice: "Previous attempt saved. Your retry is ready.",
+    });
+  }
+  private attemptHistory(runId: string): string[] {
+    try {
+      const raw = this.storage.getItem(`${this.key}:attempts:${runId}`);
+      const ids: unknown = raw ? JSON.parse(raw) : [];
+      return Array.isArray(ids) && ids.every((id) => typeof id === "string")
+        ? [...new Set(ids)]
+        : [];
+    } catch {
+      return [];
+    }
+  }
+  previousAttempts(): Run[] {
+    const history = this.attemptHistory(this.view.run.runId),
+      runs = new Map<string, Run>();
+    for (let i = 0; i < this.storage.length; i++) {
+      const key = this.storage.key(i);
+      if (!key?.startsWith(`${this.key}:archive:`)) continue;
+      try {
+        const run = parseRun(this.storage.getItem(key)!);
+        if (run.actualSequence.length && history.includes(run.runId))
+          runs.set(run.runId, run);
+      } catch {
+        // Unreadable archives remain available through recovery.
+      }
+    }
+    return history.flatMap((id) => runs.has(id) ? [runs.get(id)!] : []).reverse();
+  }
+  async reviewsFor(run: Run) {
+    const raw = this.storage.getItem(`${this.key}:reviews:${run.runId}`);
+    return raw ? parseReviewBundle(raw, run) : null;
   }
   async recoverNew(config: Config) {
     clearTimeout(this.timer);

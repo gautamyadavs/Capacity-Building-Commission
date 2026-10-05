@@ -21,6 +21,7 @@ import { ErrorBox } from "./components/Shared";
 import { Files } from "./components/Files";
 import { Reviewer } from "./components/Reviewer";
 import { Coverage } from "./components/Coverage";
+import { PreviousAttempt } from "./components/Trial";
 import { learnerReviewText } from "./presentation";
 import styles from "./app.module.css";
 function Layout() {
@@ -39,7 +40,7 @@ function Layout() {
       window.scrollTo(0, 0);
     });
     return () => cancelAnimationFrame(frame);
-  }, [location.pathname]);
+  }, [location.pathname, run.runId]);
   return (
     <div className={styles.app}>
       <a
@@ -172,6 +173,7 @@ export default function App({
               element={<AssessmentCompletion />}
             />
             <Route path="/learner/review" element={<Debrief />} />
+            <Route path="/learner/attempt/:rid" element={<PreviousAttempt />} />
             <Route path="/learner/files" element={<Files />} />
             <Route
               path="/learner/intermission"

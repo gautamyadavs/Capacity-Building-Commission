@@ -215,6 +215,24 @@
 .caseMain {
   min-width: 0;
 }
+.caseRetry {
+  margin-top: 16px;
+}
+.trialRetries {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.responseGuidance {
+  color: #435b4d;
+  margin-bottom: 12px;
+}
+.writingHelp {
+  margin: 0 0 24px;
+  color: #435b4d;
+}
+.writingHelp summary {
+  font-weight: 600;
+}
 .caseMain h3 {
   font-size: 21px;
   line-height: 1.4;

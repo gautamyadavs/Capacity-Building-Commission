@@ -4,6 +4,7 @@ import { useSession } from "../context";
 import { caseAvailable, caseComplete, resumePath, casePath } from "../model";
 import { AppLink } from "./Shared";
 import { Modal } from "./Forms";
+import { PreviousAttempts, RetryButton } from "./Trial";
 import styles from "../app.module.css";
 export function Home() {
   const { config, run, store, error } = useSession(),
@@ -36,10 +37,11 @@ export function Home() {
   return (
     <div className={styles.workspace}>
       <section className={styles.workspaceIntro}>
+        <p className={styles.eyebrow}>TRIAL · RETRIES AVAILABLE</p>
         <h1>Reasoning through governance decisions</h1>
         <p>
-          Explore four fictional cases. Explain your reasoning, then review it
-          when new information arrives.
+          Choose a fictional case and start with the first question. Then revisit
+          your reasoning when new information arrives.
         </p>
         <p>
           {
@@ -56,28 +58,6 @@ export function Home() {
           </AppLink>
         )}
       </section>
-      {!run.end && (
-        <section
-          aria-label="Assessment instructions"
-          className={styles.writingGuidance}
-        >
-          <h2>Before you begin</h2>
-          <p>
-            Use the supplied fictional facts and label assumptions. Notes,
-            online resources and generative AI are allowed without penalty;
-            research is optional.
-          </p>
-          <p>
-            Explain your reasoning in bullets or paragraphs. There is no timer
-            or word limit, and writing polish is not assessed.
-          </p>
-          <p>
-            You can pause and resume in this browser. Submit your initial
-            response to receive new information; your submitted response stays
-            available and cannot be edited.
-          </p>
-        </section>
-      )}
       <h2 className={styles.sectionHeader}>Your cases</h2>
       {!run.end && (
         <p className={styles.sequenceNote}>
@@ -96,6 +76,7 @@ export function Home() {
               <div className={styles.caseMain}>
                 <h3>{a.title}</h3>
                 <p>
+                  Set {a.set} ·{" "}
                   {done
                     ? "Submitted"
                     : run.end
@@ -106,23 +87,21 @@ export function Home() {
                           ? "Ready to start"
                           : "Not yet available"}
                 </p>
-                {available && !run.end ? (
-                  done ? (
-                    <AppLink
-                      className={styles.cardLink}
-                      to={`/learner/assessment/${a.id}/complete`}
-                    >
-                      View saved responses →
-                    </AppLink>
-                  ) : (
-                    <button
-                      className={styles.cardLink}
-                      disabled={busy}
-                      onClick={() => void openCase(a.id)}
-                    >
-                      {s.startedAt ? "Resume case" : "Start case"} →
-                    </button>
-                  )
+                {done ? (
+                  <AppLink
+                    className={styles.cardLink}
+                    to={`/learner/assessment/${a.id}/complete`}
+                  >
+                    View saved responses →
+                  </AppLink>
+                ) : available && !run.end ? (
+                  <button
+                    className={styles.cardLink}
+                    disabled={busy}
+                    onClick={() => void openCase(a.id)}
+                  >
+                    {s.startedAt ? "Resume case" : "Start case"} →
+                  </button>
                 ) : run.end ? (
                   <AppLink to="/learner/review">
                     View submissions and feedback
@@ -130,11 +109,38 @@ export function Home() {
                 ) : (
                   <p>Complete the preceding case to continue.</p>
                 )}
+                {(s.startedAt || (run.end && available)) && (
+                  <div className={styles.caseRetry}>
+                    <RetryButton
+                      ids={[a.id]}
+                      openCase={a.id}
+                      label={s.startedAt ? "Retry case" : "Start case"}
+                    />
+                  </div>
+                )}
               </div>
             </article>
           );
         })}
       </div>
+      {run.actualSequence.length > 0 && (
+        <section aria-label="Trial retries" className={styles.trialRetries}>
+          <p>Try a case or a whole set again. Previous attempts stay saved in this browser.</p>
+          <div className={styles.actions}>
+            {(["A", "B"] as const).map((set) =>
+              config.cases.some((a) => a.set === set && run.sessions[a.id].startedAt) && (
+                <RetryButton
+                  key={set}
+                  ids={config.cases.filter((a) => a.set === set).map((a) => a.id)}
+                  label={`Retry set ${set}`}
+                />
+              ),
+            )}
+            <RetryButton ids={config.cases.map((a) => a.id)} label="Retry all cases" />
+          </div>
+        </section>
+      )}
+      <PreviousAttempts />
       {!run.end && (
         <div className={styles.actions}>
           <button className={styles.secondary} onClick={() => setEnd(true)}>

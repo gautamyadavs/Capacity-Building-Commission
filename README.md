@@ -32,6 +32,7 @@ The browser suite builds and serves the actual Pages subpath. `BROWSER_EXECUTABL
 ## Routes and facilitator handover
 
 - Learner entry: `#/learner`; completion and feedback: `#/learner/review`.
+- Trial retries: retry a case, Set A, Set B or all cases from the learner entry; case completion and feedback also offer retries. Previous attempts, drafts and imported feedback remain readable under Previous attempts (`#/learner/attempt/:runId`). Each retry receives a new session identity; old feedback stays attached to its original responses.
 - Facilitator files, support notes, reset and recovery: `#/learner/files`.
 - Human-review workspace: `#/reviewer`.
 - Current teaching/framework coverage and crosswalk export: `#/coverage`.
@@ -39,6 +40,8 @@ The browser suite builds and serves the actual Pages subpath. `BROWSER_EXECUTABL
 Facilitator tools have no links in learner screens. After the learner completes or ends the session, the facilitator exports the session from Files, imports it into the reviewer workspace, records actual feedback, exports reviews and imports that file through Files in the participant's browser. The learner then returns to completion and feedback. The compact document explains this demonstration.
 
 Direct routes provide interface separation, without authentication. Data stays in browser storage until explicitly exported; there is no backend or telemetry. Use a separate browser profile or a deliberate facilitator reset for each participant. Clearing browser data removes local work.
+
+The trial entry leads directly into a case. Resource and writing guidance is available beside the response fields; submission explains when the update appears and why the initial answer is preserved. Retries retain the captured task/rubric content and unaffected case work. Learner history includes only retries from the current trial; facilitator resets/imports keep unrelated archives in facilitator recovery. Older fixed-order sessions also restart following cases, with that scope explained before retrying. Repeated exposure is a trial convenience, not a fresh baseline or evidence of learning gains.
 
 ## Deploy
 
