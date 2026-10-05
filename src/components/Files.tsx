@@ -2,6 +2,8 @@ import { useId, useState } from "react";
 import { useSession } from "../context";
 import { downloadJson } from "../persistence";
 import { Modal } from "./Forms";
+import { AppLink } from "./Shared";
+import { resumePath } from "../model";
 import styles from "../app.module.css";
 export function FileInput({
   label,
@@ -53,18 +55,133 @@ export function FileInput({
   );
 }
 export function Files() {
-  const { run, store, latestConfig, fatal } = useSession();
+  const { run, store, latestConfig, fatal, reviews } = useSession();
   const [newSession, setNew] = useState(false),
     [busy, setBusy] = useState(false),
-    [pending, setPending] = useState<string | null>(null);
+    [pending, setPending] = useState<string | null>(null),
+    [notes, setNotes] = useState(run.supportNotes),
+    [supportSaved, setSupportSaved] = useState(false);
   return (
     <section className={styles.workspace}>
       <h1 className={styles.debriefTitle}>Recovery and files</h1>
+      <p className={styles.eyebrow}>FACILITATOR TOOLS</p>
       <p>
         Sessions and review records stay in this browser unless you export and
         share them. Clearing browser data removes local progress. Keep an
         exported copy for transfer or recovery.
       </p>
+      <div className={styles.actions}>
+        {!fatal && (
+          <AppLink className={styles.primary} to={resumePath(run)}>
+            {run.end
+              ? "Show learner submissions and feedback"
+              : "Return to learner assessment"}
+          </AppLink>
+        )}
+        <AppLink className={styles.secondary} to="/reviewer">
+          Reviewer workspace
+        </AppLink>
+      </div>
+      {!fatal && run.end && (
+        <section className={styles.recoverySection}>
+          <h2>Review and feedback</h2>
+          <button
+            className={styles.primary}
+            onClick={() =>
+              downloadJson(
+                store.exportSession(),
+                `kalp-session-${run.runId}.json`,
+              )
+            }
+          >
+            Export session for review
+          </button>
+          <FileInput
+            label="Import human-review feedback"
+            onFile={(raw) => store.importReviews(raw)}
+          />
+          {reviews && (
+            <button
+              className={styles.secondary}
+              onClick={() =>
+                downloadJson(reviews, `kalp-reviews-${run.runId}.json`)
+              }
+            >
+              Export review records
+            </button>
+          )}
+          <p>
+            Import feedback in the participant's browser, then return to the
+            learner view. Review files must match this ended session and its
+            captured content.
+          </p>
+          <p>
+            Actual case sequence:{" "}
+            {run.actualSequence.join(" → ") || "No case started"}.{" "}
+            {run.end.kind === "early" && `Reason: ${run.end.reason}`}
+          </p>
+          <details className={styles.references}>
+            <summary>Incomplete opportunities</summary>
+            {run.end.incomplete.map((m) => (
+              <p key={`${m.caseId}/${m.phaseId}/${m.promptId}`}>
+                {m.caseId} / {m.phaseId} / {m.promptId}: {m.opportunity}
+              </p>
+            ))}
+          </details>
+        </section>
+      )}
+      {!fatal && (
+        <details className={styles.references}>
+          <summary>Access or support notes</summary>
+          <p>
+            Record an accessibility adaptation or support condition that changes
+            what the task elicits. Open-book or AI use needs no disclosure.
+            Notes are locked when the session ends.
+          </p>
+          <label htmlFor="support-notes">Access or support condition</label>
+          <textarea
+            id="support-notes"
+            value={notes}
+            onChange={(e) => {
+              setNotes(e.target.value);
+              setSupportSaved(false);
+            }}
+            disabled={!!run.end}
+          />
+          {!run.end && (
+            <button
+              className={styles.secondary}
+              onClick={async () => {
+                try {
+                  await store.support(notes);
+                  setSupportSaved(true);
+                } catch {}
+              }}
+            >
+              Save support notes
+            </button>
+          )}
+          {supportSaved && <p role="status">Support notes saved.</p>}
+        </details>
+      )}
+      <details className={styles.references}>
+        <summary>Session design and source information</summary>
+        <p>
+          {run.config.packageVersion} · {run.config.frameworkVersion} · Task{" "}
+          {run.config.taskVersion} · Rubric {run.config.rubricVersion}
+        </p>
+        <p>
+          Current release: {latestConfig.packageVersion}. Captured sessions
+          retain their original content and progression.
+        </p>
+        <ul>
+          {run.config.sources.map((source) => (
+            <li key={source.id}>
+              <a href={source.url}>{source.title}</a>
+            </li>
+          ))}
+        </ul>
+      </details>
       <section className={styles.recoverySection}>
         <h2>Back up</h2>
         <p>

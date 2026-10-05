@@ -508,8 +508,8 @@ export function Reviewer() {
       <p>
         Import an explicitly completed or early-ended diagnostic session. Read
         its captured facts, prompts, submitted responses and rubric before
-        recording criterion feedback. Export the review file for the officer to
-        import.
+        recording criterion feedback. Export the review file for a facilitator
+        to import in the participant's browser using Recovery and files.
       </p>
       <p>
         This static prototype has no authentication or secure concealment.

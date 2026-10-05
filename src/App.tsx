@@ -8,7 +8,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import type { Config } from "./model";
-import { RunStore, downloadJson } from "./persistence";
+import { RunStore } from "./persistence";
 import { AppContext, useApp, useSession } from "./context";
 import { Home } from "./components/Home";
 import {
@@ -17,14 +17,16 @@ import {
   AssessmentStage,
 } from "./components/Assessment";
 import { Debrief } from "./components/Debrief";
-import { AppLink, ErrorBox } from "./components/Shared";
+import { ErrorBox } from "./components/Shared";
 import { Files } from "./components/Files";
 import { Reviewer } from "./components/Reviewer";
+import { learnerReviewText } from "./presentation";
 import styles from "./app.module.css";
 function Layout() {
   const { run, store, saveStatus, error, notice, fatal } = useSession(),
     location = useLocation(),
-    isReviewer = location.pathname === "/reviewer";
+    isReviewer = location.pathname === "/reviewer",
+    isFacilitator = isReviewer || location.pathname === "/learner/files";
   useEffect(() => {
     document.title = "Bharat KALP · Developmental diagnostic";
     const frame = requestAnimationFrame(() => {
@@ -50,33 +52,19 @@ function Layout() {
         Skip to content
       </a>
       <header className={styles.header}>
-        <AppLink to="/learner" className={styles.brand}>
-          <span className={styles.brandMark} aria-hidden="true">
-            क
-          </span>
-          <span>
-            <strong>BHARAT KALP</strong>
-            <small>Developmental diagnostic prototype</small>
-          </span>
-        </AppLink>
-        <nav aria-label="Main navigation">
-          <AppLink to="/learner">Diagnostic home</AppLink>
-          <AppLink to="/learner/files">Recovery and files</AppLink>
-          {run.end && (
-            <AppLink to="/learner/review">Submissions and feedback</AppLink>
-          )}
-        </nav>
+        <div className={styles.brand}>
+          <strong>BHARAT KALP</strong>
+        </div>
       </header>
-      {!isReviewer && (
+      {!isFacilitator && !run.end && (
         <section aria-label="Local saving status" className={styles.saveStrip}>
-          <span>Progress in this browser</span>
           <span
             role="status"
             className={
               saveStatus === "Not saved" ? styles.overLimit : styles.saveStatus
             }
           >
-            {saveStatus}
+            Progress: {saveStatus}
           </span>
         </section>
       )}
@@ -86,47 +74,40 @@ function Layout() {
         className={styles.main}
         onBlurCapture={() => void store.flush().catch(() => {})}
       >
-        {notice && !isReviewer && (
-          <p role="status" className={styles.note}>
-            {notice}
-          </p>
-        )}
+        {notice &&
+          (isFacilitator ||
+            notice.startsWith("The draft changed in another tab.")) && (
+            <p role="status" className={styles.note}>
+              {notice}
+            </p>
+          )}
         {error && !fatal && !isReviewer && (
           <div role="alert" className={styles.errorBox}>
             <h2>Progress needs attention</h2>
-            <p>{error}</p>
+            <p>
+              {isFacilitator
+                ? error
+                : saveStatus === "Not saved"
+                  ? "Your progress could not be saved. Keep this page open and retry, or ask the facilitator for help."
+                  : learnerReviewText(error, run.config)}
+            </p>
             <button onClick={() => void store.flush().catch(() => {})}>
               Retry save
             </button>
-            <button
-              onClick={() =>
-                downloadJson(store.exportSession(), "kalp-unsaved-session.json")
-              }
-            >
-              Download current session and drafts
-            </button>
           </div>
         )}
-        {fatal && !isReviewer && location.pathname !== "/learner/files" ? (
+        {fatal && !isFacilitator ? (
           <section className={styles.gate}>
-            <h1>Saved progress needs recovery</h1>
-            <p>{error}</p>
+            <h1>Your saved progress could not be opened</h1>
             <p>
-              The stored data has been preserved. Use Recovery and files to
-              download it or preserve it and start a new session.
+              Your stored work has been preserved. Keep this page open and ask
+              the facilitator for help.
             </p>
-            <AppLink className={styles.primary} to="/learner/files">
-              Open recovery and files
-            </AppLink>
           </section>
         ) : (
           <Outlet key={location.pathname} />
         )}
       </main>
-      <footer className={styles.footer}>
-        <span>BHARAT KALP · Diagnostic design review</span>
-        <AppLink to="/reviewer">Reviewer workspace</AppLink>
-      </footer>
     </div>
   );
 }

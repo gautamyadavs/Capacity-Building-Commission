@@ -28,6 +28,21 @@ async function submit(page: Page) {
     .getByRole("button", { name: /Submit initial response|Submit update/ })
     .click();
 }
+async function checkLearnerUI(page: Page) {
+  await expect(
+    page.getByRole("navigation", { name: "Main navigation" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: /Reviewer workspace|Recovery and files/ }),
+  ).toHaveCount(0);
+  await expect(page.locator('input[type="file"]')).toHaveCount(0);
+  const labels = await page
+    .locator("h1,h2,h3,h4,label,summary,a,button")
+    .allTextContents();
+  expect(labels.join("\n")).not.toMatch(
+    /\b(?:[AB][12]|[AB]-LO\d|[AB]-R\d|[AB]\.P\d|[AB]\.[IU]|KALP-ALIGN)\b/,
+  );
+}
 async function checkAxe(page: Page) {
   const result = await new AxeBuilder({ page }).analyze();
   expect(result.violations).toEqual([]);
@@ -47,6 +62,10 @@ test("all four cases and eight phase submissions under the actual Pages subpath"
     "Reasoning through governance decisions",
   );
   await checkAxe(page);
+  await page.screenshot({
+    path: "test-results/home-pilot.png",
+    fullPage: true,
+  });
   for (const a of config.cases) {
     await page.goto(`${base}#/learner/assessment/${a.id}`);
     await page.getByRole("button", { name: "Begin or resume case →" }).click();
@@ -65,6 +84,7 @@ test("all four cases and eight phase submissions under the actual Pages subpath"
           ).toBeVisible();
       }
       expect(await page.getByRole("textbox").count()).toBe(p.prompts.length);
+      await checkLearnerUI(page);
       if (p.kind === "initial") {
         await expect(
           page.getByText(a.phases[1].facts[0], { exact: true }),
@@ -107,6 +127,7 @@ test("all four cases and eight phase submissions under the actual Pages subpath"
     "Submissions and feedback",
   );
   await expect(page.getByText(/Awaiting review/)).toHaveCount(1);
+  await checkLearnerUI(page);
   await expect(page.locator("details[data-format][open]")).toHaveCount(0);
   await expect(page.locator("[data-review-id]")).toHaveCount(0);
   await checkAxe(page);
@@ -224,17 +245,13 @@ test("early end retains drafts and missing opportunities without invented rating
   await page
     .getByLabel("Choose and compare", { exact: true })
     .fill("Draft retained for recovery");
-  await page
-    .getByRole("link", { name: "Diagnostic home", exact: true })
-    .click();
+  await page.getByRole("link", { name: "← All cases", exact: true }).click();
   await page.getByRole("button", { name: "End diagnostic early" }).click();
   await page
     .getByRole("button", { name: "End diagnostic and preserve record" })
     .click();
-  await expect(page.getByText(/ENDED EARLY/)).toBeVisible();
-  await expect(
-    page.getByText(/Evidence availability: Not elicited/),
-  ).toHaveCount(15);
+  await expect(page.getByText(/You ended this session early/)).toBeVisible();
+  await expect(page.getByText(/Evidence availability/)).toHaveCount(0);
   await expect(page.getByText("Developing", { exact: true })).toHaveCount(0);
   const run = await page.evaluate(
     (key) => JSON.parse(localStorage.getItem(key)!),
@@ -251,9 +268,7 @@ test("human-review form export/import, supplementary attribution and immutable r
 }) => {
   const run = completeRun("Submitted reasons for software verification");
   await seed(page, run);
-  await page
-    .getByRole("link", { name: "Reviewer workspace", exact: true })
-    .click();
+  await page.goto(`${base}#/reviewer`);
   await page.getByLabel("Import ended diagnostic session").setInputFiles({
     name: "session.json",
     mimeType: "application/json",
@@ -357,20 +372,24 @@ test("human-review form export/import, supplementary attribution and immutable r
   expect(bundle.records[0].primary.judgement).toBe("Emerging");
   expect(bundle.records[0].supplementary[0].judgement).toBe("Proficient");
   await page.getByRole("link", { name: "Return to learner workspace" }).click();
-  await page.goto(`${base}#/learner/review`);
+  await page.goto(`${base}#/learner/files`);
   await page.getByLabel("Import human-review feedback").setInputFiles(path!);
+  await page
+    .getByRole("link", { name: "Show learner submissions and feedback" })
+    .click();
   await expect(page.locator("[data-review-id]")).toHaveCount(1);
   await expect(
-    page.getByText("Initial primary judgement", { exact: true }),
+    page.getByRole("heading", { name: "Initial response", exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText(
-      "Later supplementary evidence — initial judgement retained",
+      "After new information — your initial feedback is retained",
       { exact: true },
     ),
   ).toBeVisible();
   await expect(page.getByText("Emerging", { exact: true })).toBeVisible();
   await expect(page.getByText("Proficient", { exact: true })).toBeVisible();
+  await checkLearnerUI(page);
   await page.reload();
   await expect(page.locator("[data-review-id]")).toHaveCount(1);
   await checkAxe(page);
@@ -404,12 +423,11 @@ test("save failure stays truthful and retry preserves work without reveal", asyn
   await expect(
     page.getByRole("status").filter({ hasText: "Not saved" }),
   ).toBeVisible();
-  await expect(
-    page.getByText(/could not be saved|Simulated failure/).first(),
-  ).toBeVisible();
+  await expect(page.getByText(/could not be saved/).first()).toBeVisible();
+  await expect(page.getByText(/Keep this page open and retry/)).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Download current session and drafts" }),
-  ).toBeVisible();
+  ).toHaveCount(0);
   await expect(
     page.getByText(config.cases[0].phases[1].facts[0], { exact: true }),
   ).toHaveCount(0);
@@ -420,6 +438,15 @@ test("save failure stays truthful and retry preserves work without reveal", asyn
     path: "test-results/save-failure.png",
     fullPage: true,
   });
+  // A facilitator can back up the same tab's in-memory draft even while
+  // storage is failing; no file controls appear in the learner workspace.
+  await page.goto(`${base}#/learner/files`);
+  const backupPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download current session and drafts" }).click();
+  const backupPath = await (await backupPromise).path();
+  const backup = JSON.parse(await readFile(backupPath!, "utf8"));
+  expect(backup.sessions.A1.draft.answers["A.P1"]).toBe("Unsaved recovery draft");
+  await page.goto(`${base}#/learner/assessment/A1/stage/A.I`);
   await page.evaluate(() => {
     (
       window as unknown as { restoreTestStorage: () => void }
@@ -517,9 +544,7 @@ test("missing-evidence and uncertain human-review statuses with retained revisio
 }) => {
   const run = completeRun("");
   await seed(page, run);
-  await page
-    .getByRole("link", { name: "Reviewer workspace", exact: true })
-    .click();
+  await page.goto(`${base}#/reviewer`);
   await page.getByLabel("Import ended diagnostic session").setInputFiles({
     name: "blank-session.json",
     mimeType: "application/json",
@@ -629,25 +654,19 @@ test("B2-first case choice, interleaved drafts, latest resume and different comp
   await page
     .getByLabel("Explain the causes", { exact: true })
     .fill("B2 draft preserved across cases");
-  await page
-    .getByRole("link", { name: "Diagnostic home", exact: true })
-    .click();
+  await page.getByRole("link", { name: "← All cases", exact: true }).click();
   await card("A2").getByRole("button", { name: "Start case →" }).click();
   await page
     .getByLabel("Choose and compare", { exact: true })
     .fill("A2 independent draft");
   await page.reload();
-  await page
-    .getByRole("link", { name: "Diagnostic home", exact: true })
-    .click();
+  await page.getByRole("link", { name: "← All cases", exact: true }).click();
   await page.getByRole("link", { name: "Resume diagnostic →" }).click();
   await expect(page).toHaveURL(/A2\/stage\/A.I$/);
   await expect(
     page.getByLabel("Choose and compare", { exact: true }),
   ).toHaveValue("A2 independent draft");
-  await page
-    .getByRole("link", { name: "Diagnostic home", exact: true })
-    .click();
+  await page.getByRole("link", { name: "← All cases", exact: true }).click();
   await card("B2").getByRole("button", { name: "Resume case →" }).click();
   await expect(
     page.getByLabel("Explain the causes", { exact: true }),
@@ -659,9 +678,7 @@ test("B2-first case choice, interleaved drafts, latest resume and different comp
   await expect(
     page.getByRole("table", { name: "Reported results" }),
   ).toBeVisible();
-  await page
-    .getByRole("link", { name: "Diagnostic home", exact: true })
-    .click();
+  await page.getByRole("link", { name: "← All cases", exact: true }).click();
   await card("A2").getByRole("button", { name: "Resume case →" }).click();
   await submit(page);
   await submit(page);
@@ -754,9 +771,7 @@ test("older captured sessions retain fixed progression and paragraph briefing", 
     page.getByText(captured.cases[0].phases[0].facts[1], { exact: true }),
   ).toBeVisible();
   await expect(page.getByRole("table")).toHaveCount(0);
-  await page
-    .getByRole("link", { name: "Diagnostic home", exact: true })
-    .click();
+  await page.getByRole("link", { name: "← All cases", exact: true }).click();
   await expect(
     page.getByText("Complete the preceding case to continue."),
   ).toHaveCount(3);
@@ -779,9 +794,7 @@ test("learner backup, cancelled restore and corrupt-storage recovery preserve ar
   await page
     .getByLabel("Explain the causes", { exact: true })
     .fill("Backup draft — exact line\nSecond line.");
-  await page
-    .getByRole("link", { name: "Recovery and files", exact: true })
-    .click();
+  await page.goto(`${base}#/learner/files`);
   await expect(
     page.getByRole("heading", { name: "Back up", exact: true }),
   ).toBeVisible();
@@ -825,9 +838,7 @@ test("learner backup, cancelled restore and corrupt-storage recovery preserve ar
     key,
   );
   expect(newId).not.toBe(backup.runId);
-  await page
-    .getByRole("link", { name: "Recovery and files", exact: true })
-    .click();
+  await page.goto(`${base}#/learner/files`);
   await page
     .getByLabel("Import a captured diagnostic session", { exact: true })
     .setInputFiles(backupPath!);
@@ -857,16 +868,14 @@ test("learner backup, cancelled restore and corrupt-storage recovery preserve ar
   await page.reload();
   await expect(
     page.getByRole("heading", {
-      name: "Saved progress needs recovery",
+      name: "Your saved progress could not be opened",
       exact: true,
     }),
   ).toBeVisible();
   expect(await page.evaluate((key) => localStorage.getItem(key), key)).toBe(
     "malformed original data",
   );
-  await page
-    .getByRole("link", { name: "Open recovery and files", exact: true })
-    .click();
+  await page.goto(`${base}#/learner/files`);
   await expect(
     page.getByRole("button", {
       name: "Download all preserved browser data",
