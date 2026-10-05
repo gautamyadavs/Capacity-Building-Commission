@@ -817,6 +817,9 @@ test("learner backup, cancelled restore and corrupt-storage recovery preserve ar
       exact: true,
     })
     .click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Reasoning through governance decisions",
+  );
   const newId = await page.evaluate(
     (key) => JSON.parse(localStorage.getItem(key)!).runId,
     key,
