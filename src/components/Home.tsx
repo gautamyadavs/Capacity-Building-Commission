@@ -1,33 +1,221 @@
-import { useSession } from '../context';
-import { assessmentAvailable, assessmentComplete, batteryComplete, currentStage, resumePath } from '../model';
-import { AppLink, Paragraphs } from './Shared';
-import styles from '../app.module.css';
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSession } from "../context";
+import {
+  caseAvailable,
+  caseComplete,
+  currentPhase,
+  resumePath,
+} from "../model";
+import { AppLink, Paragraphs } from "./Shared";
+import { Modal } from "./Forms";
+import styles from "../app.module.css";
 export function Home() {
-  const { config, run } = useSession();
-  const completed = config.assessments.filter(a => assessmentComplete(a, run.sessions[a.id])).length;
-  const started = config.assessments.some(a => !!run.sessions[a.id].startedAt);
-  const done = batteryComplete(config, run);
-  return <div className={styles.workspace}>
-    <section className={styles.workspaceIntro} aria-label="About the assessment">
-      <p className={styles.eyebrow}>BHARAT KALP · LEARNING ASSESSMENT</p><h1>Practise governance decisions</h1>
-      <p>Make a defensible decision, examine what new information changes, and improve your reasoning through guided self-review. Different actions can be defensible when their reasons and trade-offs support them.</p>
-      <div className={styles.workspaceActions}><AppLink to={resumePath(config, run)} className={styles.primary}>{done ? 'Review assessment' : started ? 'Continue assessment' : 'Start assessment'} →</AppLink><span>{completed} / {config.assessments.length} episodes complete</span></div>
-      <p className={styles.pauseNote}>You can pause at any stage and resume your saved draft on this browser. Each episode ends with a review and a separate amendment.</p>
-    </section>
-    <div className={styles.sectionHeader}><h2>Your learning episodes</h2></div>
-    <p className={styles.sequenceNote}>Work through these episodes in order. Review your reasoning in the first, then bring one lesson into the next. Each episode can be a separate session.</p>
-    <div className={styles.batteryCases}>{config.assessments.map((a, index) => {
-      const session = run.sessions[a.id]; const complete = assessmentComplete(a, session); const current = currentStage(a, session);
-      const available = assessmentAvailable(config, run, a.id);
-      return <article data-format={a.format} key={a.id} className={styles.caseCard}>
-        <div className={styles.caseIndex}>{index + 1}</div><div className={styles.caseMain}>
-          <div className={styles.caseMeta}><span>{a.suggestedTime} · provisional</span><span>{complete ? 'Complete · responses locked' : current ? 'In progress' : available ? 'Ready to start' : 'Not yet available'}</span></div>
-          <h3>{a.title}</h3><p>{Object.keys(session.submitted).length} of {a.stages.length} stages submitted</p>
-          {available ? <AppLink to={complete ? `/learner/assessment/${a.id}/complete` : current ? `/learner/assessment/${a.id}/stage/${current.id}` : `/learner/assessment/${a.id}`} className={styles.cardLink}>{complete ? 'View saved responses' : current ? 'Resume case' : 'Start case'} →</AppLink> : <p className={styles.help}>Complete the preceding episode and review to continue.</p>}
+  const { config, run, reviews, store, error } = useSession(),
+    navigate = useNavigate();
+  const [end, setEnd] = useState(false),
+    [busy, setBusy] = useState(false),
+    [reason, setReason] = useState(""),
+    [notes, setNotes] = useState(run.supportNotes),
+    [support, setSupport] = useState(false);
+  const finish = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await store.end(
+        reason || "Officer explicitly ended the diagnostic early",
+      );
+      setEnd(false);
+      navigate("/learner/review");
+    } catch {
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className={styles.workspace}>
+      <section className={styles.workspaceIntro}>
+        <p className={styles.eyebrow}>
+          DEVELOPMENTAL DIAGNOSTIC · {config.packageVersion}
+        </p>
+        <h1>Reasoning through governance decisions</h1>
+        <p>
+          Four fictional cases explore strategic choices, duties and citizen
+          impacts, feasible implementation, adaptation, causal explanation,
+          prediction, evidence interpretation and justified updating.
+        </p>
+        <p>
+          This is one diagnostic occasion under assisted conditions. Criterion
+          feedback follows human review. It has no overall score or pass/fail
+          result.
+        </p>
+        <div className={styles.workspaceActions}>
+          <AppLink className={styles.primary} to={resumePath(run)}>
+            {run.end
+              ? "View submissions and review"
+              : run.actualSequence.length
+                ? "Resume diagnostic"
+                : "Start diagnostic"}{" "}
+            →
+          </AppLink>
+          <span>
+            {run.submissionSequence.length} of 8 phases submitted
+            {run.end?.kind === "early" ? " · Ended early" : ""}
+          </span>
         </div>
-      </article>;
-    })}</div>
-    <section className={styles.writingGuidance} aria-label="Response guidance"><h2>Response guidance</h2><Paragraphs lines={config.guidance}/></section>
-  </div>;
+      </section>
+      <section
+        aria-label="Diagnostic instructions"
+        className={styles.writingGuidance}
+      >
+        <h2>Before you begin</h2>
+        <Paragraphs lines={config.instructions} />
+        <p>
+          Pause and resume on this browser. There is no timer or word ceiling.
+          Initial responses are preserved before updates appear; update
+          responses are saved separately. Substantive feedback is withheld until
+          all four cases finish or you explicitly end early.
+        </p>
+      </section>
+      <h2 className={styles.sectionHeader}>Your cases</h2>
+      <p className={styles.sequenceNote}>
+        Proposed starting order: A1, A2, B1, B2. Your actual sequence is
+        recorded.
+      </p>
+      <div className={styles.batteryCases}>
+        {config.cases.map((a) => {
+          const s = run.sessions[a.id],
+            done = caseComplete(a, s),
+            p = currentPhase(a, s),
+            available = caseAvailable(run, a.id);
+          return (
+            <article key={a.id} data-format={a.set} className={styles.caseCard}>
+              <span className={styles.caseIndex}>{a.id}</span>
+              <div className={styles.caseMain}>
+                <h3>{a.title}</h3>
+                <p>
+                  {done
+                    ? reviews?.records.some((r) => r.caseId === a.id)
+                      ? "Submitted · Human review records available"
+                      : "Submitted · Awaiting review"
+                    : run.end
+                      ? "Diagnostic ended · Incomplete opportunities recorded"
+                      : s.startedAt
+                        ? "In progress"
+                        : available
+                          ? "Ready to start"
+                          : "Not yet available"}
+                </p>
+                <p>{Object.keys(s.submitted).length} of 2 phases submitted</p>
+                {available && !run.end ? (
+                  <AppLink
+                    className={styles.cardLink}
+                    to={
+                      done
+                        ? `/learner/assessment/${a.id}/complete`
+                        : `/learner/assessment/${a.id}${p ? `/stage/${p.id}` : ""}`
+                    }
+                  >
+                    {done
+                      ? "View saved responses"
+                      : s.startedAt
+                        ? "Resume case"
+                        : "Open case"}{" "}
+                    →
+                  </AppLink>
+                ) : run.end ? (
+                  <AppLink to="/learner/review">View record</AppLink>
+                ) : (
+                  <p>Complete the preceding case to continue.</p>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      <details className={styles.references}>
+        <summary>General objectives and criteria</summary>
+        {config.objectives.map((o) => (
+          <section key={o.id}>
+            <h3>
+              {o.id} · {o.title}
+            </h3>
+            <p>{o.text}</p>
+            <p>{o.mapping}</p>
+          </section>
+        ))}
+        <p>
+          Different defensible choices and justified retention can meet the
+          criteria. Writing polish, framework names, confidence and source
+          quantity are not scored.
+        </p>
+      </details>
+      <details className={styles.references}>
+        <summary>Access or support notes (optional)</summary>
+        <p>
+          Record an accessibility adaptation or support condition that changes
+          what the task elicits. Open-book or AI use needs no disclosure or
+          justification.
+        </p>
+        <label htmlFor="support-notes">Access or support condition</label>
+        <textarea
+          id="support-notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          disabled={!!run.end}
+        />
+        {!run.end && (
+          <button
+            className={styles.secondary}
+            onClick={async () => {
+              try {
+                await store.support(notes);
+                setSupport(true);
+              } catch {}
+            }}
+          >
+            Save support notes
+          </button>
+        )}
+        {support && <p role="status">Support notes saved.</p>}
+      </details>
+      {!run.end && (
+        <section className={styles.writingGuidance}>
+          <h2>End before completing all four cases</h2>
+          <p>
+            You can end deliberately. Submitted answers remain preserved, drafts
+            remain available for recovery, and unfinished opportunities are
+            recorded without assigning performance levels.
+          </p>
+          <button className={styles.secondary} onClick={() => setEnd(true)}>
+            End diagnostic early
+          </button>
+        </section>
+      )}
+      {end && (
+        <Modal
+          title="End this diagnostic early?"
+          cancel={() => setEnd(false)}
+          confirm={finish}
+          confirmLabel="End diagnostic and preserve record"
+          busy={busy}
+          error={error}
+        >
+          <p>
+            This closes further submissions and releases the record for human
+            review. Missing evidence does not become Developing. Download and
+            start a new session for a new diagnostic occasion.
+          </p>
+          <label htmlFor="end-reason">
+            Reason or technical limitation (optional)
+          </label>
+          <textarea
+            id="end-reason"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        </Modal>
+      )}
+    </div>
+  );
 }

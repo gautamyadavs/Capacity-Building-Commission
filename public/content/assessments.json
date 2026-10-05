@@ -1,898 +1,576 @@
 {
-  "schemaVersion": 2,
-  "contentVersion": "learning-pilot-2026-10-01-v3",
-  "confirmation": "This response will be saved and locked. You can return to read it, but you cannot edit it. Your review amendment is saved separately from your original reasoning.",
-  "guidance": [
-    "You may answer in bullet points. Writing style is not assessed.",
-    "Use the supplied facts for this simulated case. Sector-specific knowledge and external research are not required.",
-    "The word limits are provisional maxima, not targets. A concise response is welcome."
-  ],
-  "intermission": {
-    "afterAssessmentId": "A1_FLOOD",
-    "heading": "Your first learning episode is complete.",
-    "body": "You have made a decision, responded to change, and reviewed your reasoning. Take a break now or continue to the Air Quality case. Bring one lesson from your review into your next attempt. You can also pause at any stage and resume your saved draft on this browser."
-  },
-  "completionAcknowledgement": "Your original reasoning and review amendment have been saved separately and locked.",
-  "finalReview": {
-    "heading": "Your learning review",
-    "intro": "You have completed the decision and prediction episodes. Compare your original reasoning with the separate amendment you made after each guided review.",
-    "explanation": "The evidence checks ask for a best-supported interpretation. The open decisions can have more than one defensible answer. The case commentary supports your self-review; it has not automatically assessed or scored your writing.",
-    "guidance": "Look for a change in how you connect facts to a decision: clearer priorities, an explicit causal explanation, a serious alternative, or a condition for reconsidering. Carry that change into a new situation. Improvement on these cases alone does not establish that the approach will transfer to a different problem.",
-    "reflection": {
-      "id": "reflection",
-      "label": "Optional final reflection",
-      "prompt": "What lesson from the flood case did you use in the air-quality case, and what would you test in a new situation?",
-      "type": "text",
-      "required": false,
-      "maxWords": 150
-    }
-  },
-  "assessments": [
+  "schemaVersion": 3,
+  "packageVersion": "KALP-ALIGN-04",
+  "frameworkVersion": "Focused Framework V5",
+  "taskVersion": "KALP-ALIGN-04:03",
+  "rubricVersion": "KALP-ALIGN-04:04",
+  "sourceReadDate": "2026-10-04",
+  "sources": [
     {
-      "id": "A1_FLOOD",
-      "shortId": "A1",
-      "format": "A",
-      "title": "Flash Flood and Transport Disruption",
-      "contentVersion": "four-cases-v3",
-      "suggestedTime": "35 minutes including review",
-      "instructions": [
-        "Act as the Secretary-level lead for emergency transport coordination in a metropolitan region affected by flooding. Make a defensible decision, plan its execution, and reconsider it when the situation changes.",
-        "You will commit your reasoning before later information appears. After the decision challenge, a guided review will help you improve one part of your response."
+      "id": "1uEQpCgCZnsaWN2A47WJOM85nqP-4q2cXTY6EYHGY9IU",
+      "title": "01 Bharat KALP Framework - Focused Revision V5",
+      "url": "https://docs.google.com/spreadsheets/d/1uEQpCgCZnsaWN2A47WJOM85nqP-4q2cXTY6EYHGY9IU/edit",
+      "revision": "Focused Framework V5 / KALP-ALIGN-04"
+    },
+    {
+      "id": "1rlHVPj1ebs6HjJAWm2iQm_gGjp1GV7UOrQ_0drIIe8Y",
+      "title": "02 Bharat KALP - Learning Objectives and Assessment Alignment",
+      "url": "https://docs.google.com/document/d/1rlHVPj1ebs6HjJAWm2iQm_gGjp1GV7UOrQ_0drIIe8Y/edit",
+      "revision": "ANLCKQll1wgObhog1xdMUmWU4AutKUl_1QJdWRVX1TLfOZg9I3Du7U0K2YIhqDhugaB_zr0pzUUUTA_0ExiKzPVE7w8g18b6xk-AhkiFYRg"
+    },
+    {
+      "id": "15e-IvwpU2gaKgwOGFr743qcdXPQ7VDj9PjVjoGxCiTg",
+      "title": "03 Bharat KALP - Assessment Activities and Evidence Alignment",
+      "url": "https://docs.google.com/document/d/15e-IvwpU2gaKgwOGFr743qcdXPQ7VDj9PjVjoGxCiTg/edit",
+      "revision": "AHj4eMQ2HDuSxCZTJHjD2dgsjmPJoWUuXIfay1qTHWq4SHTv0m2ThPevfLjrW3jqiVVg6ZCsAV8qJukLQkcV1_HaoO6YOn-hTPNmE--UpfE"
+    },
+    {
+      "id": "1xTYx5R4LCdXsV4MT0KkSUkZ_TkwDfhIVEAdKjtT7sEs",
+      "title": "04 Bharat KALP - Task-specific Rubrics",
+      "url": "https://docs.google.com/document/d/1xTYx5R4LCdXsV4MT0KkSUkZ_TkwDfhIVEAdKjtT7sEs/edit",
+      "revision": "ANLCKQn3ZWDInxz9DScaqprgE5_E2Wn9yA_tNqZSP-9CpgjMdWuvSTMCA1btUvcEVi9oPL5lNA-TprdOVmfq1L2m9otnZYgYLk0Fh8kyg3s"
+    },
+    {
+      "id": "1kzGTXPMnMSTuWUmwGvuPM0KWlgnzdWFbhnyQXmR1IVg",
+      "title": "05 Bharat KALP - Response Examples and Rater Calibration",
+      "url": "https://docs.google.com/document/d/1kzGTXPMnMSTuWUmwGvuPM0KWlgnzdWFbhnyQXmR1IVg/edit",
+      "revision": "AHj4eMQLwxRhOOSg1gKdtEbmb0Qv6I9YH7JTSiuJtJhegt3EW5iwDYCu7wp5AM-CvRTXVyDSfv-ttJPX2-lXc02-0RnK0FUQkpQHZgUgtpE"
+    },
+    {
+      "id": "1TEPo-hVVs4wFPZCuKl6sUq-MsCn-ZOGILnfp7OjMdgA",
+      "title": "06 Bharat KALP - Learning Principles and Implementation Checks",
+      "url": "https://docs.google.com/document/d/1TEPo-hVVs4wFPZCuKl6sUq-MsCn-ZOGILnfp7OjMdgA/edit",
+      "revision": "ANLCKQlIWsAh0l7CwTFDpwUHkiRwC2QRM_zCxat_JF8JJg-ub64Jra8YX8O2IjTNeAIrjHNtPnEYJfX_kp2Szx8bz0tWX6B30L-_2FurctI"
+    }
+  ],
+  "instructions": [
+    "Use the supplied facts as the controlling facts of the fictional case. Necessary institutional and sector information is provided. You may use notes, online resources and generative AI without penalty. External research is optional and must not replace the case facts. The work will be interpreted as performance under these assisted conditions.",
+    "Bullets or short paragraphs are welcome. Explain enough to make your reasoning assessable; writing polish, response length, framework names and number of sources are not scored. Different actions can be defensible. If you make an assumption, identify it rather than presenting it as a case fact.",
+    "You will submit an initial response before receiving further case information. That response remains available for reference. Later information calls for an update, which can retain a sound decision or explanation. You do not need to change your answer merely because a new phase has begun."
+  ],
+  "objectives": [
+    {
+      "id": "A-LO1",
+      "title": "Strategic choice",
+      "text": "Select and justify a governance response by weighing alternatives, constraints, and near- and longer-term consequences.",
+      "metrics": "Strategic Thinking; Decision Quality & Justification",
+      "evidence": "Explains why the selected response serves the stated public goal better than a credible alternative, using relevant case evidence and consequences across time horizons.",
+      "mapping": "A-R1: Comparative strategic choice. Primary A.P1; supplementary comparative evidence A.P5. No preferred policy answer.",
+      "boundary": "A chosen action without comparative reasons does not establish this objective. Grammar and confidence are not scored."
+    },
+    {
+      "id": "A-LO2",
+      "title": "Ethical and citizen-centred justification",
+      "text": "Justify a governance choice when public duties and citizen interests conflict, accounting for who benefits, who bears harm, and relevant safeguards.",
+      "metrics": "Ethical Reasoning; Public Service Orientation (Seva Bhav)",
+      "evidence": "Identifies the material ethical tension, explains effects on affected citizen groups, and gives a public-interest rationale with proportionate safeguards.",
+      "mapping": "A-R2: Ethical deliberation; A-R3: Citizen impacts and safeguards. Primary A.P2; supplementary A.P6. Different defensible choices can meet the criteria.",
+      "boundary": "Naming a value, claiming good intentions or agreeing with the assessor is insufficient. This does not establish intrinsic motivation or stable personal integrity."
+    },
+    {
+      "id": "A-LO3",
+      "title": "Implementation feasibility",
+      "text": "Develop a feasible implementation approach that accounts for institutional responsibilities, coordination needs, and likely barriers.",
+      "metrics": "Institutional Awareness",
+      "evidence": "Assigns actions to actors with relevant authority, explains dependencies and foreseeable resistance, and proposes a workable response to a material barrier.",
+      "mapping": "A-R4: Institutional feasibility. Primary A.P3; supplementary A.P6. Judge implementation reasoning, not procedural detail.",
+      "boundary": "A plan is evidence of planning, not actual stakeholder influence, team leadership or workplace delivery. Provide necessary mandate information when specialist knowledge is not the target."
+    },
+    {
+      "id": "A-LO4",
+      "title": "Adaptive judgement",
+      "text": "Distinguish a problem addressable through established procedures from a challenge requiring learning or experimentation, and adjust the response as new evidence emerges.",
+      "metrics": "Adaptive Leadership",
+      "evidence": "Justifies what can be addressed procedurally and what remains uncertain or requires stakeholder learning, then explains which parts of the response should be retained, revised or investigated.",
+      "mapping": "A-R5: Challenge diagnosis (primary A.P4; supplementary A.P5); A-R6: Adaptation from new information (A.P5-A.P6 compared with initial response). Justified retention can be strong.",
+      "boundary": "Changing an answer alone is not adaptive leadership. A technical or mixed response may be appropriate; do not reward ambiguity or experimentation regardless of need."
+    },
+    {
+      "id": "B-LO1",
+      "title": "Causal explanation",
+      "text": "Explain a governance problem using a plausible causal account that distinguishes symptoms from drivers and includes relevant interdependencies.",
+      "metrics": "Quality of Analysis; Systems Thinking",
+      "evidence": "Links observed conditions to plausible mechanisms and explains how relevant actors, incentives or feedback affect the problem.",
+      "mapping": "B-R1: Causal account and systems coherence. Primary B.P1. Judge relevance and plausibility, not counts of causes or arrows.",
+      "boundary": "Listing stakeholders or asserting a root cause without a causal account is insufficient. A plausible account remains a hypothesis until tested."
+    },
+    {
+      "id": "B-LO2",
+      "title": "Testable prediction",
+      "text": "Predict how a proposed intervention will affect a governance system, stating the mechanism, assumptions, and observable evidence that would test the prediction.",
+      "metrics": "Systems Thinking",
+      "evidence": "States an expected change, explains the causal pathway, identifies a material assumption and specifies a meaningful observation that could support or challenge the prediction.",
+      "mapping": "B-R2: Testable causal prediction. Primary B.P2. Prediction accuracy alone is insufficient.",
+      "boundary": "A lucky correct prediction or vague claim that things will improve is insufficient. Do not add specialist forecasting demands that the case does not support."
+    },
+    {
+      "id": "B-LO3",
+      "title": "Evidence interpretation",
+      "text": "Evaluate whether observed results support a proposed causal explanation, considering alternative explanations and limits in the data.",
+      "metrics": "Critical Analysis",
+      "evidence": "Compares the claim with relevant results, distinguishes observation from causal inference, and evaluates a credible alternative explanation or measurement limitation.",
+      "mapping": "B-R3: Evidence-to-claim reasoning. Primary B.P3, compared with B.P2. Interpretation differs from original model plausibility.",
+      "boundary": "A change in an indicator does not alone establish policy success or causation. When relevant, examine denominators, timeframes, selection effects or incentives."
+    },
+    {
+      "id": "B-LO4",
+      "title": "Justified revision",
+      "text": "Revise or retain a causal explanation and proposed intervention in light of new evidence, explaining the decision and remaining uncertainty.",
+      "metrics": "Learning Agility",
+      "evidence": "Identifies which prior assumption the evidence bears on, makes a warranted revision or explains why retention is justified, and states what further evidence is needed.",
+      "mapping": "B-R4: Justified model and action update. Primary B.P4, compared with B.P1-B.P2 and the supplied intervention. Judge warranted revision/retention, not size of change.",
+      "boundary": "A revised answer demonstrates reasoning within this task, not a stable learning-agility trait or programme-level leadership growth. If B-LO3 is weak, still examine the updating evidence directly rather than automatically duplicating that penalty."
+    }
+  ],
+  "criteria": [
+    {
+      "id": "A-R1",
+      "objectiveId": "A-LO1",
+      "title": "Comparative strategic choice",
+      "primaryPhase": "A.I",
+      "primaryPrompts": [
+        "A.P1"
       ],
-      "stages": [
+      "supplementaryPrompts": [
+        "A.P5"
+      ],
+      "comparisonPrompts": [],
+      "alignment": "Alignment: A-LO1; Strategic Thinking; Decision Quality & Justification. Evidence: A.P1; relevant comparative evidence in A.P5.",
+      "descriptors": {
+        "Developing": "Justifies a choice using a single demand or assertion of priority; the offered comparison overlooks a material constraint or consequence, so preference is not supported by the case.",
+        "Emerging": "Uses relevant goals and constraints to compare a credible alternative, but a material trade-off or consequence across the case's time horizons remains insufficiently explained.",
+        "Proficient": "Explains why the choice better serves the public goal than a credible alternative, weighing material constraints and immediate and longer consequences. Identifies the consequential trade-off or uncertainty affecting that preference."
+      },
+      "boundary": "Judge the comparison and strategic rationale, not a preferred allocation or a numerical optimisation. An answer may be concise and use conditional decisions."
+    },
+    {
+      "id": "A-R2",
+      "objectiveId": "A-LO2",
+      "title": "Ethical deliberation",
+      "primaryPhase": "A.I",
+      "primaryPrompts": [
+        "A.P2"
+      ],
+      "supplementaryPrompts": [
+        "A.P6"
+      ],
+      "comparisonPrompts": [],
+      "alignment": "Alignment: A-LO2; Ethical Reasoning. Evidence: A.P2; relevant changes in A.P6.",
+      "descriptors": {
+        "Developing": "Treats a material conflict of duties as if only one duty matters, or invokes a value without explaining why it warrants the choice in the case.",
+        "Emerging": "Recognises competing duties and gives a relevant reason for the choice, but does not adequately explain how the competing duty constrains the response or what ethical cost is accepted.",
+        "Proficient": "Explains the material competing duties and a defensible public-interest basis for the choice, including how the competing duty is accommodated or why the residual ethical cost is justified."
+      },
+      "boundary": "Judge reasoning about duties, not virtue, declared intentions, named ethical frameworks or agreement with the assessor. Concrete harm and safeguards are judged under A-R3."
+    },
+    {
+      "id": "A-R3",
+      "objectiveId": "A-LO2",
+      "title": "Citizen impacts and safeguards",
+      "primaryPhase": "A.I",
+      "primaryPrompts": [
+        "A.P2"
+      ],
+      "supplementaryPrompts": [
+        "A.P6"
+      ],
+      "comparisonPrompts": [],
+      "alignment": "Alignment: A-LO2; Public Service Orientation (Seva Bhav). Evidence: A.P2; relevant changes in A.P6.",
+      "descriptors": {
+        "Developing": "Assumes an apparently uniform response affects citizens equally or dismisses a material affected group; proposed safeguards do not address the harm created by the choice.",
+        "Emerging": "Explains a relevant differential citizen impact and proposes a related safeguard, but a material access barrier, burden or practical safeguard limitation remains unresolved in the reasoning.",
+        "Proficient": "Explains who benefits and who bears a material burden, including relevant access differences, and justifies feasible, proportionate safeguards that address those effects while recognising remaining limits."
+      },
+      "boundary": "Judge attention to citizen effects demonstrated in the response. Do not require every conceivable group or infer intrinsic motivation. Safeguards can differ across defensible policies."
+    },
+    {
+      "id": "A-R4",
+      "objectiveId": "A-LO3",
+      "title": "Institutional feasibility",
+      "primaryPhase": "A.I",
+      "primaryPrompts": [
+        "A.P3"
+      ],
+      "supplementaryPrompts": [
+        "A.P6"
+      ],
+      "comparisonPrompts": [],
+      "alignment": "Alignment: A-LO3; Institutional Awareness. Evidence: A.P3; relevant changes in A.P6.",
+      "descriptors": {
+        "Developing": "Proposes delivery through actors without the supplied authority or relies on resources or coordination that contradict a material case constraint, making the proposed approach unworkable.",
+        "Emerging": "Assigns relevant responsibilities and identifies a real dependency or barrier, but a material coordination step, authority issue or response to the barrier is too incomplete to establish feasibility.",
+        "Proficient": "Assigns actions consistently with the supplied responsibilities, explains material dependencies, and provides a feasible way to handle a likely barrier through coordination, sequencing or appropriate escalation."
+      },
+      "boundary": "Do not reward procedural detail for its own sake. Judge the plan, not actual implementation, influence or stakeholder engagement."
+    },
+    {
+      "id": "A-R5",
+      "objectiveId": "A-LO4",
+      "title": "Challenge diagnosis",
+      "primaryPhase": "A.I",
+      "primaryPrompts": [
+        "A.P4"
+      ],
+      "supplementaryPrompts": [
+        "A.P5"
+      ],
+      "comparisonPrompts": [],
+      "alignment": "Alignment: A-LO4; Adaptive Leadership, sampled diagnostic aspect. Evidence: A.P4; changes to diagnosis in A.P5.",
+      "descriptors": {
+        "Developing": "Treats a material trust, expectation or participation challenge as solvable solely by an instruction or technical fix, or proposes learning when an established procedural response would address the identified issue without explaining why.",
+        "Emerging": "Distinguishes an operational issue from a challenge requiring people to learn or change, but the explanation of why they differ or how the response matches that diagnosis is incomplete.",
+        "Proficient": "Explains what existing expertise or procedures can address and what requires learning or changed behaviour, and connects each to an appropriate response. Recognises mixed challenges where the case warrants them."
+      },
+      "boundary": "Technical and adaptive labels are not required. Naming a category without reasoning is insufficient; experimentation is not inherently superior to established practice."
+    },
+    {
+      "id": "A-R6",
+      "objectiveId": "A-LO4",
+      "title": "Adaptation from new information",
+      "primaryPhase": "A.U",
+      "primaryPrompts": [
+        "A.P5",
+        "A.P6"
+      ],
+      "supplementaryPrompts": [],
+      "comparisonPrompts": [
+        "A.P1",
+        "A.P2",
+        "A.P3",
+        "A.P4"
+      ],
+      "alignment": "Alignment: A-LO4; Adaptive Leadership, sampled response aspect. Evidence: A.P5; implications and reconsideration evidence in A.P6.",
+      "descriptors": {
+        "Developing": "Changes or retains the response for reasons that ignore or contradict the material update; reconsideration conditions do not bear on the decision.",
+        "Emerging": "Links a change or retention to relevant new information, but leaves an important implication for the plan unexplained or gives a reconsideration condition too vague to guide action.",
+        "Proficient": "Explains proportionate revision, retention or investigation in light of the material update and prior reasoning; carries the relevant implications into the response and identifies evidence that would warrant reconsideration."
+      },
+      "boundary": "Rate the update process directly. Do not reward size of change or automatically repeat an initial-decision weakness. Challenge diagnosis is judged separately under A-R5."
+    },
+    {
+      "id": "B-R1",
+      "objectiveId": "B-LO1",
+      "title": "Causal account and systems coherence",
+      "primaryPhase": "B.I",
+      "primaryPrompts": [
+        "B.P1"
+      ],
+      "supplementaryPrompts": [],
+      "comparisonPrompts": [],
+      "alignment": "Alignment: B-LO1; Quality of Analysis; Systems Thinking. Evidence: B.P1.",
+      "descriptors": {
+        "Developing": "Explains the problem through an unsupported association or asserted cause; the account cannot explain a material relationship between actors, incentives or observed conditions in the case.",
+        "Emerging": "Provides a plausible mechanism connecting relevant conditions to the problem, but an important interdependency or distinction between symptom and driver is underdeveloped.",
+        "Proficient": "Distinguishes the observed problem from plausible drivers and explains a coherent mechanism, including material interdependencies or feedback where relevant to the case. Treats untested causal claims as hypotheses."
+      },
+      "boundary": "Judge relevance and coherence, not the number of causes, arrows or stakeholders. A short narrative is sufficient. Do not require a feedback loop if it is immaterial to the explanation."
+    },
+    {
+      "id": "B-R2",
+      "objectiveId": "B-LO2",
+      "title": "Testable causal prediction",
+      "primaryPhase": "B.I",
+      "primaryPrompts": [
+        "B.P2"
+      ],
+      "supplementaryPrompts": [],
+      "comparisonPrompts": [],
+      "alignment": "Alignment: B-LO2; Systems Thinking, sampled predictive aspect. Evidence: B.P2.",
+      "descriptors": {
+        "Developing": "Predicts improvement or deterioration without a mechanism connecting the intervention to that effect, or proposes an observation that cannot meaningfully support or challenge the prediction or test a material assumption.",
+        "Emerging": "Links an expected effect to a plausible mechanism and gives a relevant assumption or observation, but the connection between the assumption, prediction and potential test is incomplete.",
+        "Proficient": "Connects an expected effect to a plausible mechanism, states a material assumption and identifies an observation that could support or challenge the prediction. Addresses a material indirect effect when warranted by the account."
+      },
+      "boundary": "Do not require exact numerical forecasts or reward a lucky correct outcome. The test must be informative for the stated claim, not necessarily a complete evaluation design."
+    },
+    {
+      "id": "B-R3",
+      "objectiveId": "B-LO3",
+      "title": "Evidence-to-claim reasoning",
+      "primaryPhase": "B.U",
+      "primaryPrompts": [
+        "B.P3"
+      ],
+      "supplementaryPrompts": [],
+      "comparisonPrompts": [
+        "B.P2"
+      ],
+      "alignment": "Alignment: B-LO3; Critical Analysis. Evidence: B.P3, compared with the B.P2 prediction.",
+      "descriptors": {
+        "Developing": "Treats the reported result as proving the intervention's causal success or failure despite a material alternative explanation or mismatch between the indicator and public goal.",
+        "Emerging": "Compares results with the prediction and identifies a credible limitation or alternative, but does not sufficiently explain how it changes the conclusion that the evidence warrants.",
+        "Proficient": "Explains how results bear on the prediction, weighs a material alternative explanation or measurement limit, and states a conclusion proportionate to what the observations can and cannot establish."
+      },
+      "boundary": "Do not reward generic scepticism. A specific supported conclusion can be strong; a before/after difference alone is not attribution. Statistical significance calculations are not required."
+    },
+    {
+      "id": "B-R4",
+      "objectiveId": "B-LO4",
+      "title": "Justified model and action update",
+      "primaryPhase": "B.U",
+      "primaryPrompts": [
+        "B.P4"
+      ],
+      "supplementaryPrompts": [],
+      "comparisonPrompts": [
+        "B.P1",
+        "B.P2"
+      ],
+      "alignment": "Alignment: B-LO4; Learning Agility, sampled task-level aspect. Evidence: B.P4, compared with B.P1/B.P2 and the case's supplied intervention.",
+      "descriptors": {
+        "Developing": "Replaces or retains the explanation or action without a warranted connection to the new evidence; the proposed next step repeats the same untested assumption rather than addressing the relevant uncertainty.",
+        "Emerging": "Identifies a relevant assumption to revise or retain and proposes a plausible next action, but the evidence-to-update connection or the next informative test remains incomplete.",
+        "Proficient": "Identifies the assumption or causal pathway affected by the evidence, justifies revision or retention of the model and action, and proposes a next test or observation directed at a consequential remaining uncertainty."
+      },
+      "boundary": "Retention can be Proficient. Judge the updating demonstrated, not personality, programme growth, admission of error or the amount rewritten. The action target is the supplied intervention; do not require an earlier officer-authored plan that B.P1/B.P2 did not elicit. Do not automatically carry the B-R3 rating into this criterion."
+    }
+  ],
+  "rubricRules": [
+    "Record a descriptive judgement for each criterion in each case, with a response excerpt or precise location and a short rationale. Read the relevant evidence across the indicated prompts; do not treat each prompt as an additional score. A1 and A2 each produce six criterion observations; B1 and B2 each produce four. Twenty observations are possible when all four cases yield usable evidence, but completion does not guarantee evidence for every criterion.",
+    "Developing describes an observable weakness in the targeted reasoning. Emerging describes relevant reasoning with a material unresolved link. Proficient describes a supported reasoning relationship under the case conditions. The actual criterion descriptors below govern the judgement. Do not rate by prose length, counts of facts mentioned or minor omissions that do not affect the reasoning.",
+    "For mixed evidence, identify which central reasoning relationship is supported and which remains unresolved. Select the descriptor that best explains the material evidence and record the boundary issue. If a defensible choice between levels is unavailable, mark review status Uncertain, record the competing interpretations and seek review. Uncertain is neither a proficiency level nor a low-performance judgement; do not invent a midpoint or use an automatic lowest-level rule.",
+    "Use Insufficient evidence when the submitted evidence, including relevant reasoning elsewhere in the same phase, does not reveal the criterion. Use Not elicited when a task, reveal or technical failure prevented the opportunity. These are evidence statuses, not fourth proficiency levels. An attempted response demonstrating a specific misconception can be Developing; a blank field alone cannot. If a prior response needed for comparison is unavailable, record the affected limitation and appropriate status rather than inventing prior reasoning.",
+    "Phase attribution: A-R1-A-R5 use the stated initial prompt as primary evidence; relevant A.P5/A.P6 evidence is supplementary. B-R1 and B-R2 use B.P1 and B.P2. A-R6 uses A.P5/A.P6 compared with the initial response; B-R3 uses B.P3 compared with B.P2; B-R4 uses B.P4 compared with B.P1/B.P2 and the supplied intervention. Keep the initial judgement visible when later evidence adds, repairs or contradicts reasoning, and identify the later prompt and phase in the same criterion profile. Do not average phases, silently replace the initial judgement or create extra prompt scores. If material conflict prevents a defensible overall description, use Uncertain review status. The primary prompt mapping identifies the intended elicitation location, not an exclusive evidence box. Relevant reasoning elsewhere in the same phase can contribute if the actual prompt/location is recorded. Keep attribution to the phase in which it appeared; do not infer an initial capability from an update or count repeated wording as independent evidence."
+  ],
+  "feedbackRule": "Use a compact record: case and criterion; task/rubric version and prompt/phase; observed evidence; descriptor-based judgement or evidence status and any Uncertain review status; a specific strength or unresolved reasoning link; and a relevant next opportunity where available. Preserve material differences between initial and later evidence. Do not describe the officer's character. Deliver feedback after diagnostic completion or explicit end, following documents 03 and 06. When evidence is insufficient or was not elicited, explain the limitation and offer another opportunity to elicit the reasoning; do not invent a deficit. When judgement is Uncertain, arrange review of the competing interpretations. Targeted practice is optional and pending; do not promise an unavailable task or generate placeholder coaching.",
+  "cases": [
+    {
+      "id": "A1",
+      "set": "A",
+      "title": "Flood response and essential movement",
+      "taskVersion": "KALP-ALIGN-04:03",
+      "phases": [
         {
-          "id": "A1_initial",
-          "title": "Initial judgement",
-          "kind": "open",
-          "suggestedTime": "10 minutes",
-          "fields": [
-            {
-              "id": "response",
-              "label": "Initial judgement",
-              "prompt": "What is the central problem you need to address? State your first priorities for the next 6 hours and the direction you would set for the following 72 hours. Explain why those priorities follow from the case facts.",
-              "type": "text",
-              "required": true,
-              "maxWords": 200
-            }
+          "id": "A.I",
+          "kind": "initial",
+          "title": "Initial decision",
+          "version": "KALP-ALIGN-04:A1.I",
+          "facts": [
+            "Role and goal: you coordinate the metropolitan emergency transport response. Protect life and essential access over the next six hours and recommend a credible continuity direction for the next 72 hours. You can coordinate bus redeployment; districts run evacuation and shelters, the transport authority controls services, police secure routes, and health authorities organise hospital fuel. Transport asset reopening requires the relevant agency's safety clearance. Your role does not authorise overriding that clearance.",
+            "Initial facts: flooding has disrupted normal routes for about 140,000 commuters. About 11,000 residents are under evacuation advisory. There are 600 buses available for emergency redeployment. Districts request 420 for evacuation and shelter movement; the rail authority requests 260 for stranded passengers. These requests exceed available capacity.",
+            "Two major public hospitals have about eight hours of backup-generator fuel. Police can secure only two priority corridors at a time. Mobile connectivity is degraded in 40% of the affected area. Flooded metro assets await inspection. The weather service estimates a 60% chance of additional heavy rain over the next 12 hours.",
+            "Some residents are reluctant to evacuate because they distrust conflicting official messages and fear losing possessions. Districts can arrange property-security patrols and shelter assistance, but must coordinate with police and local representatives. The case does not assume that issuing another evacuation instruction will resolve the reluctance."
           ],
-          "information": [
-            "Your immediate objective is to protect life and maintain essential movement over the next 6 hours while establishing a credible 72-hour continuity plan."
-          ],
-          "groups": [
+          "task": "complete A.P1 through A.P4. You may prioritise requests, sequence deployment or propose another feasible response. There is no requirement to split capacity equally or satisfy every request immediately.",
+          "prompts": [
             {
-              "title": "People and essential services",
-              "paragraphs": [
-                "Approximately 140,000 commuters are displaced from their normal routes.",
-                "About 11,000 residents in low-lying wards are under evacuation advisory.",
-                "Two major public hospitals are operating on backup power. Current fuel is estimated to support approximately eight more hours of backup generation."
-              ],
-              "rowLabels": [
-                "Commuters",
-                "Evacuation advisory",
-                "Hospital power"
-              ]
+              "id": "A.P1",
+              "label": "choose and compare",
+              "text": "What response do you recommend? Explain why it serves the stated public goal better than a credible alternative, considering constraints and consequences over the case's immediate and longer time horizons."
             },
             {
-              "title": "Transport capacity",
-              "paragraphs": [
-                "22 metro stations are inaccessible, three bus depots are affected, two intercity rail terminals have restricted access, and 18 major arterial roads are closed or intermittently passable.",
-                "There are 600 buses available for emergency redeployment. The rail authority requests 260 buses for stranded passengers. District administrations collectively request 420 buses for evacuation and movement to shelters.",
-                "Police can secure only a limited number of priority road corridors at one time."
-              ],
-              "rowLabels": [
-                "Transport network",
-                "Buses and requests",
-                "Road access"
-              ]
+              "id": "A.P2",
+              "label": "citizen impacts and duties",
+              "text": "What material tension between public duties and citizen interests does your choice involve? Explain who benefits, who may bear harm and the safeguards you would use."
             },
             {
-              "title": "Infrastructure",
-              "paragraphs": [
-                "Drainage pumps are functioning intermittently because of power instability. Structural inspections of some flooded metro assets are incomplete."
-              ]
+              "id": "A.P3",
+              "label": "implementation",
+              "text": "How would the response be carried out? Identify relevant actors and responsibilities, important coordination dependencies and a feasible response to a likely barrier."
             },
             {
-              "title": "Information environment",
-              "paragraphs": [
-                "Mobile connectivity is degraded in roughly 40 percent of the affected area.",
-                "A false social-media message claiming an upstream dam has failed is spreading quickly. There is currently no evidence of a dam failure.",
-                "Different agencies have issued inconsistent public messages about when transport services may reopen."
-              ]
-            },
-            {
-              "title": "Weather",
-              "paragraphs": [
-                "The weather service estimates a 60 percent chance of another 90 to 130 mm of rain over the next 12 hours."
-              ]
-            },
-            {
-              "title": "Citizens and coordination",
-              "paragraphs": [
-                "Several of the low-lying wards under evacuation advisory include households with limited access to private transport.",
-                "The 600 buses are drawn from both metropolitan and state transport fleets. District administrations manage evacuation and shelters, police control priority-road access, and the rail authority manages the terminals. No single agency controls all resources needed for the response."
-              ]
-            }
-          ],
-          "note": [],
-          "selectedResponses": [],
-          "requires": [],
-          "priorResponses": [],
-          "contextStageIds": [],
-          "task": "Frame the problem and decide what to do first over the next 6 hours, with a 72-hour planning horizon.",
-          "rationale": "Practise framing a problem and connecting priorities to the facts.",
-          "timeline": [
-            {
-              "label": "Current time",
-              "text": "07:00, after seven hours of intense rainfall."
-            },
-            {
-              "label": "Immediate window",
-              "text": "Next 6 hours: lead emergency transport coordination."
-            },
-            {
-              "label": "Planning horizon",
-              "text": "Following 72 hours: set direction for continuity."
+              "id": "A.P4",
+              "label": "challenge diagnosis",
+              "text": "Which part can be addressed using established procedures or available expertise? Which part, if any, requires people to learn or change how they act? Explain the diagnosis and how your approach addresses it."
             }
           ]
         },
         {
-          "id": "A1_execution",
-          "title": "Make it executable",
-          "kind": "open",
-          "suggestedTime": "6 minutes",
-          "fields": [
-            {
-              "id": "response",
-              "label": "Make it executable",
-              "prompt": "How would you allocate the available transport capacity for the next 6 hours, and coordinate the institutions that control it? Explain the principle guiding your choices and how you would make the plan workable.",
-              "type": "text",
-              "required": true,
-              "maxWords": 150
-            }
-          ],
-          "information": [],
-          "groups": [],
-          "note": [],
-          "selectedResponses": [],
-          "requires": [
-            "A1_initial"
-          ],
-          "priorResponses": [
-            "A1_initial"
-          ],
-          "contextStageIds": [
-            "A1_initial"
-          ],
-          "task": "Turn your initial priorities into a workable allocation and coordination plan for the next 6 hours.",
-          "rationale": "Practise translating priorities into resource choices and responsibilities.",
-          "focusContext": [
-            {
-              "stageId": "A1_initial",
-              "groupTitles": [
-                "Transport capacity",
-                "Citizens and coordination"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "A1_update",
-          "title": "New information",
+          "id": "A.U",
           "kind": "update",
-          "suggestedTime": "8 minutes",
-          "fields": [
+          "title": "Updated decision",
+          "version": "KALP-ALIGN-04:A1.U",
+          "facts": [
+            "Update, revealed after initial submission: three hours later, the rail request falls from 260 to 180 buses because an unaffected terminal has added trains. One flooded metro tunnel will remain closed today. The largest shelter district will reach capacity within two hours unless additional space is opened. The chance of further heavy rain falls to 35%; it has not fallen to zero. Local representatives report that carers are avoiding shelters because arrangements for dependants are unclear."
+          ],
+          "task": "complete A.P5 and A.P6 using this update and your preserved initial response.",
+          "prompts": [
             {
-              "id": "response",
-              "label": "New information",
-              "prompt": "For the remaining emergency response and the following 72 hours, what would you change and what would you deliberately retain? Explain which new facts justify your decisions.",
-              "type": "text",
-              "required": true,
-              "maxWords": 160
-            }
-          ],
-          "information": [
-            "Three hours later, the following developments are confirmed:",
-            "A structural inspection confirms major water ingress in one central metro tunnel. It will not reopen today.",
-            "A substation failure has stopped several drainage pumps. Estimated restoration time is four hours.",
-            "The weather forecast improves. There is now a 35 percent chance of 60 to 90 mm of additional rain over the next 12 hours.",
-            "The largest shelter district reports that current shelter capacity will be reached in approximately two hours unless additional space is opened.",
-            "The rail authority now says it needs only 180 of the 260 buses originally requested because special trains have been added at an unaffected terminal.",
-            "Major media outlets are asking the government to announce a single citywide reopening time within the next 30 minutes."
-          ],
-          "groups": [],
-          "note": [],
-          "selectedResponses": [],
-          "requires": [
-            "A1_initial",
-            "A1_execution"
-          ],
-          "priorResponses": [
-            "A1_initial",
-            "A1_execution"
-          ],
-          "contextStageIds": [
-            "A1_initial"
-          ],
-          "task": "Reconsider your 6-hour response and 72-hour direction using the new information.",
-          "rationale": "Practise changing a decision in proportion to new information."
-        },
-        {
-          "id": "A1_challenge",
-          "title": "Decision challenge",
-          "kind": "challenge",
-          "suggestedTime": "6 minutes",
-          "fields": [
-            {
-              "id": "position",
-              "label": "Your position",
-              "prompt": "How does your position change?",
-              "type": "choice",
-              "required": true,
-              "unscored": true,
-              "options": [
-                {
-                  "id": "Maintain",
-                  "label": "Maintain"
-                },
-                {
-                  "id": "Modify",
-                  "label": "Modify"
-                },
-                {
-                  "id": "Reverse",
-                  "label": "Reverse"
-                }
-              ]
+              "id": "A.P5",
+              "label": "justified update",
+              "text": "What should you retain, revise or investigate now? Link those decisions to specific new facts and your earlier reasoning. Explain whether the kind of challenge you diagnosed has changed."
             },
             {
-              "id": "response",
-              "label": "Decision challenge",
-              "prompt": "What would you decide for the remaining emergency response and the 72-hour continuity plan? Respond to the official’s strongest argument. Explain your most important trade-off or obligation, and name one change in conditions that would make you reconsider.",
-              "type": "text",
-              "required": true,
-              "maxWords": 170
+              "id": "A.P6",
+              "label": "consequences of the update",
+              "text": "Explain any material change to citizen impacts, safeguards, responsibilities or coordination. State what further evidence would make you reconsider your current approach. If these elements remain sound, explain why."
             }
-          ],
-          "information": [
-            "At the next coordination review, a senior official argues that the improved rainfall forecast and the addition of special trains mean the government should now redirect most emergency bus capacity toward restoring normal commuter movement. The official also argues for announcing a single citywide reopening target to reassure the public and reduce economic disruption."
-          ],
-          "groups": [],
-          "note": [],
-          "selectedResponses": [],
-          "requires": [
-            "A1_initial",
-            "A1_execution",
-            "A1_update"
-          ],
-          "priorResponses": [
-            "A1_initial",
-            "A1_execution",
-            "A1_update"
-          ],
-          "contextStageIds": [
-            "A1_initial",
-            "A1_update"
-          ],
-          "task": "Respond to the official’s proposed change in bus priorities and reopening communication.",
-          "rationale": "Practise engaging a counterargument and stating a condition for reconsidering."
-        },
-        {
-          "id": "A1_review",
-          "title": "Review your reasoning",
-          "kind": "review",
-          "suggestedTime": "5 minutes",
-          "task": "Compare your locked reasoning with the case commentary, then improve one part in a separate amendment.",
-          "rationale": "Practise applying review to improve an explanation while preserving your first attempt.",
-          "information": [
-            "This commentary is for guided self-review. It describes possible reasoning in this case and has not automatically evaluated your response. Open your locked responses as you compare."
-          ],
-          "groups": [
-            {
-              "title": "Check the connection between facts and priorities",
-              "paragraphs": [
-                "A defensible response connects the people at risk, the available buses, hospital power, and access constraints to its priorities. A list of urgent actions is harder to judge if it does not explain what receives capacity first and why.",
-                "Execution also depends on institutions: districts manage evacuation and shelters, police control priority-road access, and the rail authority manages terminals. A workable plan identifies who must coordinate; it does not assume one agency controls every resource.",
-                "Compare your update with your first decision. The lower rail request, shelter pressure, closed tunnel, and pump outage affect different parts of the plan. An improved rainfall forecast alone does not resolve those constraints. A strong challenge response engages the reopening argument and states what would justify a further change."
-              ]
-            },
-            {
-              "title": "One defensible approach: protect urgent movement first",
-              "paragraphs": [
-                "Prioritise evacuation and essential-service access while coordinating enough rail movement to avoid unsafe queues. Expand shelter arrangements and review bus allocation as needs change. This approach accepts slower commuter recovery and the associated disruption.",
-                "Its limitation is that a prolonged restriction can itself cause harm. State how you would monitor shelter capacity, essential access, and transport demand, and what would allow safe capacity to return to other uses."
-              ]
-            },
-            {
-              "title": "Another defensible approach: restore movement in stages",
-              "paragraphs": [
-                "Protect evacuation and essential access, then reopen selected corridors as access and structural checks permit. Use the reduced rail bus request and added trains to reconsider the allocation. This approach accepts uneven reopening and a greater coordination and communication burden.",
-                "Its limitation is that available buses do not guarantee safe roads, shelter space, or cleared infrastructure. Explain the safeguards and who can confirm them. A single citywide reopening promise needs conditions the case has not established."
-              ]
-            },
-            {
-              "title": "Carry a lesson into your next case",
-              "paragraphs": [
-                "Both approaches can be defended if their conditions and trade-offs are explicit. Compare the reasons, rather than copying an allocation. In the air-quality case, test whether a changed indicator warrants changing the whole response or only part of it."
-              ]
-            }
-          ],
-          "note": [],
-          "selectedResponses": [],
-          "timeline": [],
-          "fields": [
-            {
-              "id": "amendment",
-              "label": "Your review amendment",
-              "prompt": "Choose one part of your submitted response that you would improve after this review. Rewrite that part, then state briefly what changed in your reasoning.",
-              "type": "text",
-              "required": true,
-              "unscored": true,
-              "maxWords": 100
-            }
-          ],
-          "requires": [
-            "A1_initial",
-            "A1_execution",
-            "A1_update",
-            "A1_challenge"
-          ],
-          "priorResponses": [
-            "A1_initial",
-            "A1_execution",
-            "A1_update",
-            "A1_challenge"
-          ],
-          "contextStageIds": [
-            "A1_initial",
-            "A1_update"
           ]
         }
       ]
     },
     {
-      "id": "B1_AIR_POE",
-      "shortId": "B1",
-      "format": "B",
-      "title": "Air Quality Emergency",
-      "contentVersion": "four-cases-v3",
-      "suggestedTime": "40–45 minutes including review",
-      "instructions": [
-        "Chair a 14-day intergovernmental response group in a fictional metropolitan region with severe air pollution. A 48-hour response package is supplied. Predict what it will produce, compare those predictions with simulated outcomes, and then reconsider the package.",
-        "Use a lesson from your flood-case review in this attempt. Your forecasts are commitments to examine, not a test of guessing the future. After the evidence checks, review and improve one part of your reasoning."
-      ],
-      "stages": [
+      "id": "A2",
+      "set": "A",
+      "title": "LPG continuity under uneven scarcity",
+      "taskVersion": "KALP-ALIGN-04:03",
+      "phases": [
         {
-          "id": "B1_predict",
-          "title": "Predict",
-          "kind": "predict",
-          "suggestedTime": "10 minutes",
-          "fields": [
-            {
-              "id": "assumption",
-              "label": "Critical assumption or dependency",
-              "prompt": "Which assumption or dependency matters most to your 48-hour predictions, and what observation would make you question it?",
-              "type": "text",
-              "required": true,
-              "maxWords": 60
-            }
+          "id": "A.I",
+          "kind": "initial",
+          "title": "Initial decision",
+          "version": "KALP-ALIGN-04:A2.I",
+          "facts": [
+            "Role and goal: you coordinate a fictional national LPG continuity response. Maintain essential access over the next seven days and recommend a feasible 30-day strategy. Supply companies allocate available stock and manage dispatch; states coordinate local distribution and complaints. Emergency price or subsidy changes require finance and legal approval. The case provides the authority needed for reasoning; recall of actual LPG rules is not expected.",
+            "Initial facts: an import disruption may last two to five weeks. Usable national inventory equals about 18 days of normal consumption. Eight highly affected states have about seven days of stock, while less affected states have about 25 days. Redistribution is possible, but freight capacity limits how quickly stock can move.",
+            "Hospitals and community kitchens depend on LPG for essential services. Many low-income households have no safe alternative fuel and cannot readily pay more. A uniform refill restriction is administratively simple but would apply to both essential and discretionary use. Allocating stock mainly through higher prices could reduce demand but may exclude households unable to pay.",
+            "Reports of shortages have led some households to seek early refills. Supply companies can publish verified availability; local distributors and states would need to coordinate explanations and complaints handling. Current dispatch procedures alone do not address expectations or trust. Unsafe substitution must not be treated as an acceptable solution."
           ],
-          "information": [],
-          "groups": [
+          "task": "complete A.P1 through A.P4. You may prioritise essential uses, redistribute stock, manage demand or combine approaches. Explain a credible alternative to your choice rather than assuming one allocation policy is mandatory.",
+          "prompts": [
             {
-              "title": "Air quality and health",
-              "paragraphs": [
-                "Respiratory emergency-department visits are 31 percent above the recent baseline.",
-                "Paediatric respiratory visits are 42 percent above baseline."
-              ],
-              "rowLabels": [
-                "Respiratory visits",
-                "Paediatric visits"
-              ]
+              "id": "A.P1",
+              "label": "choose and compare",
+              "text": "What response do you recommend? Explain why it serves the stated public goal better than a credible alternative, considering constraints and consequences over the case's immediate and longer time horizons."
             },
             {
-              "title": "Source uncertainty",
-              "paragraphs": [
-                "Model A estimates road transport 28 percent, construction and dust 22 percent, industry 16 percent, regional or upwind sources 26 percent, and other sources 8 percent.",
-                "Model B estimates regional or upwind contribution at 41 percent, with correspondingly lower local contributions.",
-                "Both models have material uncertainty."
-              ],
-              "rowLabels": [
-                "Model A",
-                "Model B",
-                "Uncertainty"
-              ]
+              "id": "A.P2",
+              "label": "citizen impacts and duties",
+              "text": "What material tension between public duties and citizen interests does your choice involve? Explain who benefits, who may bear harm and the safeguards you would use."
             },
             {
-              "title": "Construction",
-              "paragraphs": [
-                "Registered large construction sites are estimated to be 76 percent compliant with current controls.",
-                "Informal-site compliance is unknown.",
-                "Stronger construction restrictions would affect a substantial daily-wage workforce."
-              ]
+              "id": "A.P3",
+              "label": "implementation",
+              "text": "How would the response be carried out? Identify relevant actors and responsibilities, important coordination dependencies and a feasible response to a likely barrier."
             },
             {
-              "title": "Mobility",
-              "paragraphs": [
-                "Bus ridership is already 17 percent above normal.",
-                "The bus system is close to peak operating capacity."
-              ],
-              "rowLabels": [
-                "Bus ridership",
-                "Operating capacity"
-              ]
-            },
-            {
-              "title": "Protection",
-              "paragraphs": [
-                "High-filtration mask stocks available to public facilities are estimated to last approximately nine days at current distribution rates."
-              ],
-              "rowLabels": [
-                "Mask stocks"
-              ]
-            },
-            {
-              "title": "Regional coordination",
-              "paragraphs": [
-                "Neighbouring jurisdictions have not agreed to binding regional emission reductions."
-              ]
-            },
-            {
-              "title": "48-hour response package",
-              "paragraphs": [
-                "Intensify enforcement at registered large construction sites.",
-                "Restrict heavy goods vehicles in the central zone during daytime hours.",
-                "Add approximately 20 percent bus capacity where vehicles and staff can be redeployed.",
-                "Prioritise high-filtration masks for clinics, schools, and high-exposure public workers.",
-                "Request neighbouring jurisdictions to reduce major point-source emissions."
-              ]
-            }
-          ],
-          "note": [
-            "Citywide air-quality readings can change because of both emissions and atmospheric conditions. Changes in exposure may not immediately appear in health-service data. Source-contribution estimates are uncertain and may change as additional evidence becomes available."
-          ],
-          "selectedResponses": [],
-          "requires": [],
-          "priorResponses": [],
-          "contextStageIds": [],
-          "responseInstruction": "Make two specific predictions about what you expect to observe over the next 48 hours if the supplied package is used. Choose patterns you would use to judge its effects; you do not need to predict every possible effect.",
-          "task": "Make two observable predictions about the supplied 48-hour response package.",
-          "rationale": "Practise making causal expectations and a critical assumption explicit.",
-          "timeline": [
-            {
-              "label": "Recent conditions",
-              "text": "AQI has ranged from 430 to 490 for the last 72 hours and is currently 462."
-            },
-            {
-              "label": "Supplied package",
-              "text": "Predict its effects over the next 48 hours."
-            },
-            {
-              "label": "Your role",
-              "text": "Chair the 14-day intergovernmental response group."
+              "id": "A.P4",
+              "label": "challenge diagnosis",
+              "text": "Which part can be addressed using established procedures or available expertise? Which part, if any, requires people to learn or change how they act? Explain the diagnosis and how your approach addresses it."
             }
           ]
         },
         {
-          "id": "B1_compare",
-          "title": "Compare simulated outcomes",
-          "kind": "compare",
-          "suggestedTime": "6 minutes",
-          "fields": [],
-          "information": [],
-          "groups": [
+          "id": "A.U",
+          "kind": "update",
+          "title": "Updated decision",
+          "version": "KALP-ALIGN-04:A2.U",
+          "facts": [
+            "Update, revealed after initial submission: the import disruption is now expected to last four more weeks. A freight disruption cuts inter-state redistribution capacity for the coming week. Community kitchens report that blanket restrictions are reducing meal provision. Distributors report repeated early-refill requests despite stable delivery schedules in some districts; other districts report genuine missed deliveries. These reports require different responses."
+          ],
+          "task": "complete A.P5 and A.P6 using this update and your preserved initial response.",
+          "prompts": [
             {
-              "title": "Simulated outcomes",
-              "paragraphs": [
-                "Registered-site compliance rises from 76 percent to 91 percent.",
-                "Heavy-goods traffic in the central zone falls approximately 14 percent during restriction hours.",
-                "Selected roadside monitoring sites inside the restricted zone show modest improvement during restriction hours. The improvement is not consistent across the metropolitan region.",
-                "Citywide AQI remains between 455 and 480, with no sustained citywide improvement.",
-                "A revised source analysis places regional or upwind contribution at approximately 38 to 46 percent, with moderate confidence. Material uncertainty remains.",
-                "Neighbouring jurisdictions have not yet adopted comparable controls.",
-                "Atmospheric dispersion remained unfavorable during much of the period. Stronger dispersion may occur during the next 36 to 48 hours, with moderate confidence.",
-                "Respiratory emergency-department visits are now 39 percent above the recent baseline.",
-                "Bus ridership rises another 9 percent, leaving the system close to operational capacity.",
-                "Labour officials report significant income distress among casual workers affected by construction restrictions."
-              ],
-              "rowLabels": [
-                "Site compliance",
-                "Heavy-goods traffic",
-                "Roadside readings",
-                "Citywide AQI",
-                "Source analysis",
-                "Regional controls",
-                "Atmospheric conditions",
-                "Respiratory visits",
-                "Bus ridership",
-                "Worker incomes"
-              ]
-            }
-          ],
-          "note": [],
-          "selectedResponses": [],
-          "requires": [
-            "B1_predict"
-          ],
-          "priorResponses": [
-            "B1_predict"
-          ],
-          "contextStageIds": [
-            "B1_predict"
-          ],
-          "task": "Compare each locked prediction with the simulated outcomes at 48 hours.",
-          "rationale": "Practise separating what occurred from what you expected.",
-          "focusContext": [
-            {
-              "stageId": "B1_predict",
-              "groupTitles": [
-                "48-hour response package"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "B1_explain",
-          "title": "Explain",
-          "kind": "explain",
-          "suggestedTime": "8 minutes",
-          "fields": [
-            {
-              "id": "pattern",
-              "label": "Pattern or mismatch",
-              "prompt": "What is the most important pattern or mismatch between your 48-hour forecast and the simulated outcomes? State what those outcomes support and what they do not yet establish.",
-              "type": "text",
-              "required": true,
-              "maxWords": 120
+              "id": "A.P5",
+              "label": "justified update",
+              "text": "What should you retain, revise or investigate now? Link those decisions to specific new facts and your earlier reasoning. Explain whether the kind of challenge you diagnosed has changed."
             },
             {
-              "id": "explanation",
-              "label": "Explanation and alternatives",
-              "prompt": "What is your leading explanation for the 48-hour pattern? Give one serious alternative explanation, and identify the additional observation that would best distinguish between them.",
-              "type": "text",
-              "required": true,
-              "maxWords": 150
+              "id": "A.P6",
+              "label": "consequences of the update",
+              "text": "Explain any material change to citizen impacts, safeguards, responsibilities or coordination. State what further evidence would make you reconsider your current approach. If these elements remain sound, explain why."
             }
-          ],
-          "information": [],
-          "groups": [],
-          "note": [],
-          "selectedResponses": [],
-          "requires": [
-            "B1_predict",
-            "B1_compare"
-          ],
-          "priorResponses": [
-            "B1_predict",
-            "B1_compare"
-          ],
-          "contextStageIds": [
-            "B1_predict",
-            "B1_compare"
-          ],
-          "task": "Explain the 48-hour pattern and consider a serious alternative explanation.",
-          "rationale": "Practise distinguishing a plausible explanation from a demonstrated cause.",
-          "focusContext": [
-            {
-              "stageId": "B1_predict",
-              "groupTitles": [
-                "48-hour response package"
-              ]
-            },
-            {
-              "stageId": "B1_compare",
-              "groupTitles": [
-                "Simulated outcomes"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "B1_revise",
-          "title": "Revise",
-          "kind": "revise",
-          "suggestedTime": "8 minutes",
-          "fields": [
-            {
-              "id": "response",
-              "label": "Reconsider the supplied package",
-              "prompt": "For the next 72 hours, which parts of the supplied 48-hour response package would you change and which would you retain? Explain how your decision follows from the simulated outcomes, name the most important trade-off you accept, and identify one indicator or threshold that would trigger another material change.",
-              "type": "text",
-              "required": true,
-              "maxWords": 180
-            }
-          ],
-          "information": [],
-          "groups": [],
-          "note": [],
-          "selectedResponses": [],
-          "requires": [
-            "B1_predict",
-            "B1_compare",
-            "B1_explain"
-          ],
-          "priorResponses": [
-            "B1_predict",
-            "B1_compare",
-            "B1_explain"
-          ],
-          "contextStageIds": [
-            "B1_predict",
-            "B1_compare"
-          ],
-          "task": "Reconsider the supplied 48-hour response package for the next 72 hours.",
-          "rationale": "Practise converting an explanation into a proportionate decision and monitoring condition.",
-          "focusContext": [
-            {
-              "stageId": "B1_predict",
-              "groupTitles": [
-                "48-hour response package"
-              ]
-            },
-            {
-              "stageId": "B1_compare",
-              "groupTitles": [
-                "Simulated outcomes"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "B1_checks",
-          "title": "Evidence checks",
-          "kind": "evidence",
-          "suggestedTime": "4–5 minutes",
-          "fields": [],
-          "information": [],
-          "groups": [],
-          "note": [],
-          "selectedResponses": [
-            {
-              "id": "B1_check1",
-              "label": "Evidence check 1",
-              "prompt": "Which conclusion is best supported by the 48-hour observations?",
-              "options": [
-                {
-                  "id": "A",
-                  "label": "The local controls were ineffective because citywide AQI did not improve during the period"
-                },
-                {
-                  "id": "B",
-                  "label": "The local controls changed some local indicators, but their effect on citywide AQI cannot yet be isolated"
-                },
-                {
-                  "id": "C",
-                  "label": "Regional sources explain the citywide result because their estimated contribution increased in the revised analysis"
-                }
-              ],
-              "correctOptionId": "B",
-              "feedbackByOption": {
-                "B": "Correct. The observations show changes in implementation and some local indicators while citywide AQI stayed high. The evidence therefore supports a mixed effect, not a clean estimate of the package's citywide impact.",
-                "A": "Not quite. Citywide AQI stayed high, but several local indicators changed. The evidence therefore does not support concluding that the local controls had no effect.",
-                "C": "Not quite. The revised regional estimate increases the plausibility of a regional contribution but does not establish the cause of the citywide result."
-              },
-              "deferFeedbackUntilBatteryComplete": false
-            },
-            {
-              "id": "B1_check2",
-              "label": "Evidence check 2",
-              "prompt": "Which additional evidence would best distinguish whether the controls changed emissions but the citywide signal was obscured, versus whether the controls had little effect on emissions?",
-              "options": [
-                {
-                  "id": "A",
-                  "label": "Matched roadside, background, and upwind monitor trends across changing weather conditions"
-                },
-                {
-                  "id": "B",
-                  "label": "Neighborhood perception surveys collected before and after the response package"
-                },
-                {
-                  "id": "C",
-                  "label": "Respiratory emergency-department trends separated by age group and neighborhood"
-                }
-              ],
-              "correctOptionId": "A",
-              "feedbackByOption": {
-                "A": "Correct. Comparing roadside, background, and upwind monitoring across changing weather conditions would help separate local emission changes from regional or atmospheric masking.",
-                "B": "Not quite. Perception surveys describe experienced conditions but do not directly distinguish the competing emission mechanisms.",
-                "C": "Not quite. Health-service trends matter for impact but are delayed and nonspecific for distinguishing these competing emission mechanisms."
-              },
-              "deferFeedbackUntilBatteryComplete": false
-            },
-            {
-              "id": "B1_check3",
-              "label": "Evidence check 3",
-              "prompt": "Which interpretation of the respiratory emergency-department data is best supported at this point?",
-              "options": [
-                {
-                  "id": "A",
-                  "label": "The rise shows the package worsened respiratory harm during the 48-hour period"
-                },
-                {
-                  "id": "B",
-                  "label": "The rise shows the package produced no meaningful health benefit during the period"
-                },
-                {
-                  "id": "C",
-                  "label": "The rise is concerning, but it does not isolate the package's health effect over 48 hours"
-                }
-              ],
-              "correctOptionId": "C",
-              "feedbackByOption": {
-                "C": "Correct. The rise is important, but health-service use can lag exposure and other influences remain active. The 48-hour data therefore cannot isolate the package's health effect.",
-                "A": "Not quite. A rise during the intervention does not establish that the intervention caused the rise.",
-                "B": "Not quite. Continued elevated visits do not establish that the package produced no health benefit. The observation window is too short for that inference."
-              },
-              "deferFeedbackUntilBatteryComplete": false
-            }
-          ],
-          "requires": [
-            "B1_predict",
-            "B1_compare",
-            "B1_explain",
-            "B1_revise"
-          ],
-          "priorResponses": [
-            "B1_predict",
-            "B1_compare",
-            "B1_explain",
-            "B1_revise"
-          ],
-          "contextStageIds": [
-            "B1_predict",
-            "B1_compare"
-          ],
-          "task": "Choose the best-supported interpretations of the simulated outcomes at 48 hours.",
-          "rationale": "Check the limits of the conclusions that the simulated outcomes support.",
-          "focusContext": [
-            {
-              "stageId": "B1_predict",
-              "groupTitles": [
-                "48-hour response package"
-              ]
-            },
-            {
-              "stageId": "B1_compare",
-              "groupTitles": [
-                "Simulated outcomes"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "B1_review",
-          "title": "Review your reasoning",
-          "kind": "review",
-          "suggestedTime": "5 minutes",
-          "task": "Compare your locked reasoning with the case commentary, then improve one part in a separate amendment.",
-          "rationale": "Practise applying review to improve an explanation while preserving your first attempt.",
-          "information": [
-            "This commentary is for guided self-review. It describes possible reasoning in this case and has not automatically evaluated your response. Open your locked responses as you compare."
-          ],
-          "groups": [
-            {
-              "title": "Use outcomes as evidence, without treating them as proof",
-              "paragraphs": [
-                "These are simulated outcomes within a fictional case. They provide evidence for interpreting that case; they do not demonstrate that a real policy would produce the same effects.",
-                "Higher compliance and lower heavy-goods traffic show changes in implementation. The roadside pattern can support a local interpretation. Persistently high citywide AQI does not, by itself, show that every local measure failed. Regional sources and atmospheric dispersion remain plausible influences.",
-                "Review whether your explanation considered a serious alternative and identified an observation that could distinguish it. Respiratory visits, capacity pressure, and worker incomes matter to the decision even when they do not establish the cause of the AQI pattern."
-              ]
-            },
-            {
-              "title": "One defensible approach: retain local measures and strengthen coordination",
-              "paragraphs": [
-                "Retain local measures whose implementation or local outcomes support them, strengthen regional coordination, and adapt protection and transport arrangements to the reported pressures. This accepts continuing restrictions and income costs while citywide improvement remains uncertain.",
-                "Its limitation is that local implementation gains may be too small to meet the wider objective. Set a monitoring condition for reconsidering their scope, and explain how you would respond to the worker-income and capacity concerns."
-              ]
-            },
-            {
-              "title": "Another defensible approach: make restrictions more selective",
-              "paragraphs": [
-                "Retain protective provision and targeted controls, while reconsidering the scope of restrictions that create income distress. Seek regional action and observations that better distinguish local effects from atmospheric conditions. This accepts the risk that easing a useful measure could worsen exposure.",
-                "Its limitation is that the case does not establish which restriction can safely be eased. Explain the safeguards, the additional observations needed, and the indicator that would trigger restoring or tightening it."
-              ]
-            },
-            {
-              "title": "Compare the reasoning, then amend your own response",
-              "paragraphs": [
-                "Neither approach is a single correct policy answer. Use the evidence-check explanations and your original forecast, explanation, and revised package to identify a specific improvement. A more polished response alone is not evidence of better reasoning."
-              ]
-            }
-          ],
-          "note": [],
-          "selectedResponses": [],
-          "timeline": [],
-          "fields": [
-            {
-              "id": "amendment",
-              "label": "Your review amendment",
-              "prompt": "Choose one part of your submitted response that you would improve after this review. Rewrite that part, then state briefly what changed in your reasoning.",
-              "type": "text",
-              "required": true,
-              "unscored": true,
-              "maxWords": 100
-            }
-          ],
-          "requires": [
-            "B1_predict",
-            "B1_compare",
-            "B1_explain",
-            "B1_revise",
-            "B1_checks"
-          ],
-          "priorResponses": [
-            "B1_predict",
-            "B1_compare",
-            "B1_explain",
-            "B1_revise",
-            "B1_checks"
-          ],
-          "contextStageIds": [
-            "B1_predict",
-            "B1_compare"
           ]
         }
-      ],
-      "predictions": {
-        "cards": [
-          {
-            "id": "prediction1",
-            "label": "Prediction 1"
-          },
-          {
-            "id": "prediction2",
-            "label": "Prediction 2"
-          }
-        ],
-        "fields": [
-          {
-            "id": "prediction",
-            "label": "Prediction",
-            "prompt": "What do you expect to observe over the next 48 hours?",
-            "type": "text",
-            "required": true,
-            "maxWords": 35
-          },
-          {
-            "id": "why",
-            "label": "Why",
-            "prompt": "Why do you expect this? Explain the causal chain or interaction behind your prediction.",
-            "type": "text",
-            "required": true,
-            "maxWords": 60
-          },
-          {
-            "id": "confidence",
-            "label": "Confidence",
-            "prompt": "How confident are you in this prediction?",
-            "type": "choice",
-            "required": true,
-            "unscored": true,
-            "options": [
-              {
-                "id": "High",
-                "label": "High"
-              },
-              {
-                "id": "Medium",
-                "label": "Medium"
-              },
-              {
-                "id": "Low",
-                "label": "Low"
-              }
-            ]
-          }
-        ],
-        "comparisonOptions": [
-          "Supported",
-          "Partly supported",
-          "Not supported",
-          "Insufficient evidence"
-        ],
-        "comparisonPrompt": "How do the simulated outcomes at 48 hours relate to your original prediction?",
-        "evidencePrompt": "Which simulated outcome or outcomes most influenced your classification?",
-        "evidenceMaxWords": 35
-      }
+      ]
+    },
+    {
+      "id": "B1",
+      "set": "B",
+      "title": "Air quality and freight restrictions",
+      "taskVersion": "KALP-ALIGN-04:03",
+      "phases": [
+        {
+          "id": "B.I",
+          "kind": "initial",
+          "title": "Explanation and prediction",
+          "version": "KALP-ALIGN-04:B1.I",
+          "facts": [
+            "Role and problem: you advise a city on reducing residents' exposure to fine-particle air pollution. PM2.5 is a measure of fine-particle concentration; lower values indicate less pollution at the monitor. Traffic contributes to pollution, but weather and other sources also affect measured concentrations. Exposure depends on where people live and spend time.",
+            "Initial facts: two central zones have high monitor readings and heavy diesel freight traffic. Nearby residential roads could receive diverted trucks. The proposed intervention restricts daytime diesel freight access in the two zones, with essential-service exemptions and enforcement by the transport authority. It does not reduce the total amount of freight that must move.",
+            "The city will observe central-zone monitor readings, comparison-zone readings and truck counts on nearby residential roads. The comparison zones will not receive the restriction, but differ in traffic and land use. Initial seven-day average PM2.5 values are 120 units in the intervention zones and 100 in the comparison zones. No claim is made that these zones are equivalent."
+          ],
+          "task": "complete B.P1 and B.P2. Predict consequences for the stated goal of reducing resident exposure, rather than treating an improvement at one monitor as the whole goal.",
+          "prompts": [
+            {
+              "id": "B.P1",
+              "label": "causal account",
+              "text": "Explain how the problem is produced. Distinguish observed symptoms from plausible drivers and show relevant links between actors, incentives or feedback. A short causal narrative is sufficient; a diagram is optional and receives no extra credit."
+            },
+            {
+              "id": "B.P2",
+              "label": "prediction and test",
+              "text": "What effects do you expect from the proposed intervention, and through what mechanism? State a material assumption and an observation that would support or challenge the prediction. Explain a relevant indirect effect where your causal account warrants one. Precise numerical forecasting is not required."
+            }
+          ]
+        },
+        {
+          "id": "B.U",
+          "kind": "update",
+          "title": "Results and revision",
+          "version": "KALP-ALIGN-04:B1.U",
+          "facts": [
+            "Results, revealed after initial submission: during the next seven days, central-zone PM2.5 averages 84 units and comparison-zone PM2.5 averages 80. Stronger winds occur across the city during this period. Daytime diesel truck counts in central zones fall, while truck counts on nearby residential roads rise by 20%. The city has no pollution monitor on those residential roads and has not measured residents' personal exposure. The intervention was not randomly assigned."
+          ],
+          "task": "complete B.P3 and B.P4. You need not calculate a causal effect. Use the reported patterns and measurement limits to assess the claim and identify the next useful test.",
+          "prompts": [
+            {
+              "id": "B.P3",
+              "label": "interpret the evidence",
+              "text": "How do these results compare with your prediction? Explain what they support and what they do not establish. Consider a credible alternative explanation or a material limitation in the data."
+            },
+            {
+              "id": "B.P4",
+              "label": "update the model and action",
+              "text": "Which part of your original causal account should be revised or retained, and why? What should now be retained, revised or tested in the proposed intervention? Connect both decisions to the results, state remaining uncertainty and identify the next useful evidence or test."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "B2",
+      "set": "B",
+      "title": "Grievance closure and service resolution",
+      "taskVersion": "KALP-ALIGN-04:03",
+      "phases": [
+        {
+          "id": "B.I",
+          "kind": "initial",
+          "title": "Explanation and prediction",
+          "version": "KALP-ALIGN-04:B2.I",
+          "facts": [
+            "Role and problem: you advise a department seeking to resolve citizens' service grievances. Closing a ticket is an administrative status; resolving the underlying problem is the public goal. Citizens may submit again if a grievance is closed without resolution.",
+            "Initial facts: the department has a backlog. A proposed reform introduces a dashboard ranking offices by the proportion of tickets closed within seven days. Supervisors will review that ranking each week. Staff can close a ticket after recording an action, even when the citizen has not confirmed that the issue is resolved. Citizen follow-up is feasible but currently separate from the dashboard.",
+            "Before reform, 2,000 tickets are registered in a month and 60% are closed within seven days. An independent random follow-up sample of 200 citizens finds that 56% report their underlying problem resolved. The dashboard measures speed and status, not verified resolution."
+          ],
+          "task": "complete B.P1 and B.P2. Explain how the proposed incentive might affect staff behaviour, citizens and recorded performance. Consider that faster handling could help as well as create unintended incentives.",
+          "prompts": [
+            {
+              "id": "B.P1",
+              "label": "causal account",
+              "text": "Explain how the problem is produced. Distinguish observed symptoms from plausible drivers and show relevant links between actors, incentives or feedback. A short causal narrative is sufficient; a diagram is optional and receives no extra credit."
+            },
+            {
+              "id": "B.P2",
+              "label": "prediction and test",
+              "text": "What effects do you expect from the proposed intervention, and through what mechanism? State a material assumption and an observation that would support or challenge the prediction. Explain a relevant indirect effect where your causal account warrants one. Precise numerical forecasting is not required."
+            }
+          ]
+        },
+        {
+          "id": "B.U",
+          "kind": "update",
+          "title": "Results and revision",
+          "version": "KALP-ALIGN-04:B2.U",
+          "facts": [
+            "Results, revealed after initial submission: in the next month, 2,600 tickets are registered and 85% are closed within seven days. An independent random follow-up sample of 200 citizens finds 58% reporting resolution. Registration channels were expanded during that month, so more registered tickets do not necessarily mean more underlying problems. Some citizens report being asked to submit a new ticket if the issue persists after closure. The department has no comparison group or multi-month trend for this reform."
+          ],
+          "task": "complete B.P3 and B.P4. Evaluate which claims the dashboard and follow-up evidence support, then propose a warranted revision or retention of the reform.",
+          "prompts": [
+            {
+              "id": "B.P3",
+              "label": "interpret the evidence",
+              "text": "How do these results compare with your prediction? Explain what they support and what they do not establish. Consider a credible alternative explanation or a material limitation in the data."
+            },
+            {
+              "id": "B.P4",
+              "label": "update the model and action",
+              "text": "Which part of your original causal account should be revised or retained, and why? What should now be retained, revised or tested in the proposed intervention? Connect both decisions to the results, state remaining uncertainty and identify the next useful evidence or test."
+            }
+          ]
+        }
+      ]
     }
   ]
 }

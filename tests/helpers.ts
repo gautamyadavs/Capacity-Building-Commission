@@ -1,42 +1,109 @@
-import { readFileSync } from 'node:fs';
-import { ConfigSchema, createRun, emptyDraft, fieldsFor, submitStage, type Assessment, type Config, type Run, type Stage } from '../src/model';
-export const config = ConfigSchema.parse(JSON.parse(readFileSync('public/content/assessments.json', 'utf8')));
-// Exact preceding four-case release: migration and fact/MCQ preservation fixture.
-export const previousConfig = ConfigSchema.parse(JSON.parse(readFileSync('tests/fixtures/four-case-v2.json', 'utf8')));
-export const preAuditConfig = (() => {
-  const previous = structuredClone(previousConfig);
-  previous.contentVersion = 'four-cases-2026-10-01';
-  const a2 = previous.assessments[1]; a2.contentVersion = 'four-cases-v2';
-  a2.stages[2].selectedResponses = a2.stages.pop()!.selectedResponses;
-  return ConfigSchema.parse(previous);
-})();
-export function validDraft(a: Assessment, stage: Stage) {
-  const draft = emptyDraft(a, stage.id);
-  for (const f of fieldsFor(a, stage)) draft.answers[f.id] = f.type === 'choice' ? f.options![0].id : `  My original reasoning for ${f.label}.\nA second line remains intact.  `;
-  return draft;
+import data from "../public/content/assessments.json" with { type: "json" };
+import {
+  ConfigSchema,
+  beginCase,
+  createRun,
+  emptyDraft,
+  submitPhase,
+  type Draft,
+  type ReviewRecord,
+  type Run,
+} from "../src/model";
+export const config = ConfigSchema.parse(data);
+export class MemoryStorage implements Storage {
+  data = new Map<string, string>();
+  fail = false;
+  get length() {
+    return this.data.size;
+  }
+  key(i: number) {
+    return [...this.data.keys()][i] || null;
+  }
+  getItem(k: string) {
+    return this.data.get(k) ?? null;
+  }
+  setItem(k: string, v: string) {
+    if (this.fail) throw new Error("Storage unavailable");
+    this.data.set(k, v);
+  }
+  removeItem(k: string) {
+    this.data.delete(k);
+  }
+  clear() {
+    this.data.clear();
+  }
 }
-export function complete(a: Assessment, run: Run, content: Config = config): Run {
-  run.sessions[a.id].startedAt ||= new Date().toISOString();
-  for (const s of a.stages) run = submitStage(content, run, a.id, s.id, validDraft(a, s));
-  return run;
+export function response(
+  run: Run,
+  id: string,
+  phaseId: string,
+  value = "A defensible response with reasons",
+): Draft {
+  const phase = run.config.cases
+    .find((a) => a.id === id)!
+    .phases.find((p) => p.id === phaseId)!;
+  return {
+    ...emptyDraft(phase),
+    answers: Object.fromEntries(phase.prompts.map((p) => [p.id, value])),
+  };
 }
-export function beforeCase(index: number, content: Config = config): Run {
-  let run = createRun(content, 'learner');
-  for (const a of content.assessments.slice(0, index)) {
-    run = complete(a, run, content);
-    if (a.id === content.intermission.afterAssessmentId) run.intermission.continuedAt = new Date().toISOString();
+export function completeRun(value = "A defensible response with reasons") {
+  let run = createRun(config);
+  for (const a of config.cases) {
+    run = beginCase(run, a.id);
+    for (const p of a.phases)
+      run = submitPhase(run, a.id, p.id, response(run, a.id, p.id, value));
   }
   return run;
 }
-export function started(index = 0, content: Config = config): Run {
-  const a = content.assessments[index]; const run = beforeCase(index, content);
-  run.sessions[a.id].startedAt = new Date().toISOString(); run.sessions[a.id].draft = emptyDraft(a, a.stages[0].id); return run;
-}
-export function throughStage(index: number, count: number, content: Config = config): Run {
-  const a = content.assessments[index]; let run = started(index, content);
-  for (const s of a.stages.slice(0, count)) run = submitStage(content, run, a.id, s.id, validDraft(a, s));
-  return run;
-}
-export function completedBattery(content: Config = config): Run {
-  const last = content.assessments.length - 1; return complete(content.assessments[last], beforeCase(last, content), content);
+export function reviewRecord(
+  run: Run,
+  caseId = "A1",
+  criterionId = "A-R1",
+): ReviewRecord {
+  const c = run.config.criteria.find((c) => c.id === criterionId)!;
+  return {
+    id: crypto.randomUUID(),
+    caseId,
+    criterionId,
+    reviewer: "Human rater 1",
+    reviewedAt: new Date().toISOString(),
+    packageVersion: run.config.packageVersion,
+    taskVersion: run.config.taskVersion,
+    rubricVersion: run.config.rubricVersion,
+    supersedes: null,
+    primary: {
+      judgement: "Emerging",
+      reviewStatus: "Reviewed",
+      evidence: [
+        {
+          phaseId: c.primaryPhase,
+          promptId: c.primaryPrompts[0],
+          location: "Whole submitted response",
+          excerpt:
+            run.sessions[caseId].submitted[c.primaryPhase]?.answers[
+              c.primaryPrompts[0]
+            ] || "",
+        },
+      ],
+      rationale:
+        "Relevant reasons are present, but a material consequence remains unresolved under the captured descriptor.",
+      strengthOrGap:
+        "The comparison is stated; the longer horizon requires further explanation.",
+      nextOpportunity:
+        "In a fresh elicitation, explain the consequence that changes the preference.",
+      competingInterpretations: "",
+    },
+    comparisonEvidence: c.comparisonPrompts.length
+      ? [
+          {
+            phaseId: `${caseId[0]}.I`,
+            promptId: c.comparisonPrompts[0],
+            location: "Whole prior response",
+            excerpt: "",
+          },
+        ]
+      : [],
+    supplementary: [],
+  };
 }

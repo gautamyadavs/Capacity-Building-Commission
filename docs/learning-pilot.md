@@ -1,3 +1,5 @@
+> Historical reference: superseded for the active diagnostic by KALP-ALIGN-04 and the six live Drive originals. These earlier tasks, limits and learning/transfer proposals do not govern current delivery. See [current verification](diagnostic-verification.md). Do not run the historical extractor to replace diagnostic content.
+
 # Two-case learning pilot: rationale and evaluation protocol
 
 ## Status and intended use

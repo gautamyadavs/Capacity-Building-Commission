@@ -1,53 +1,186 @@
-import { useState } from 'react';
-import { useSession } from '../context';
-import { batteryComplete, resumePath, wordCount, type Assessment } from '../model';
-import { AppLink } from './Shared';
-import { CaseFacts, SubmittedResponsePanel } from './Assessment';
-import { Modal, ResponseField } from './Forms';
-import { SelectedResponseFeedback } from './Feedback';
-import { downloadJson } from '../persistence';
-import styles from '../app.module.css';
-
-function PredictionTrail({ a }: { a: Assessment }) {
-  const { run } = useSession(); const session = run.sessions[a.id];
-  const predict = a.stages.find(s => s.kind === 'predict')!; const compare = a.stages.find(s => s.kind === 'compare')!;
-  const original = session.submitted[predict.id]; const comparison = session.submitted[compare.id];
-  return <>
-    <details className={styles.contextDetails}><summary>Simulated outcomes at 48 hours</summary><CaseFacts stage={compare}/></details>
-    {predict.fields.map(f => <div className={styles.answer} key={f.id}><h4>{f.label}</h4><p>{original.answers[f.id]}</p></div>)}
-    {original.cardOrder.map(id => {
-      const card = a.predictions!.cards.find(c => c.id === id)!;
-      return <details key={id} className={styles.submitted}><summary>{card.label} · prediction and simulated outcomes</summary><div className={styles.submittedBody}>
-        {a.predictions!.fields.map(f => <div key={f.id} className={styles.answer}><h4>{f.label}{f.unscored && ' (unscored)'}</h4><p>{original.answers[`${id}.${f.id}`]}</p>{f.maxWords && <small className={styles.wordCount}>{wordCount(original.answers[`${id}.${f.id}`])} / {f.maxWords} words · maximum</small>}</div>)}
-        <div className={styles.answer}><h4>Your classification (unscored)</h4><p>{comparison.answers[`${id}.classification`]}</p></div>
-        <div className={styles.answer}><h4>Outcome note</h4><p>{comparison.answers[`${id}.evidence`]}</p></div><span className={styles.locked}>▣ Submitted and locked</span>
-      </div></details>;
-    })}
-    {a.stages.filter(s => !['predict', 'compare'].includes(s.kind)).map(s => <SubmittedResponsePanel key={s.id} assessment={a} stage={s} snapshot={session.submitted[s.id]}/>)}
-  </>;
-}
+import { useSession } from "../context";
+import { criteriaFor, evidenceAvailability, resumePath } from "../model";
+import { AppLink, CaseFacts, SubmittedResponsePanel } from "./Shared";
+import { ReviewFeedback } from "./Feedback";
+import { FileInput } from "./Files";
+import { downloadJson } from "../persistence";
+import styles from "../app.module.css";
 export function Debrief() {
-  const { config, run, store, error } = useSession(); const [confirm, setConfirm] = useState(false); const [busy, setBusy] = useState(false);
-  if (!batteryComplete(config, run)) return <div className={styles.gate}><h1>Your final review is still locked</h1><p>Complete all {config.assessments.length} episodes and their review amendments to open your full reasoning trail.</p><AppLink to={resumePath(config, run)} className={styles.primary}>Continue assessment →</AppLink></div>;
-  const commit = async () => { setBusy(true); try { await store.submitReflection(); setConfirm(false); } catch {} finally { setBusy(false); } };
-  return <>
-    <AppLink to="/learner" className={styles.back}>← Assessment home</AppLink><p className={styles.eyebrow}>ALL {config.assessments.length} EPISODES COMPLETE</p><h1 className={styles.debriefTitle}>{config.finalReview.heading}</h1>
-    <div className={styles.debriefIntro}><p>{config.finalReview.intro}</p><p>{config.finalReview.explanation}</p></div>
-    {config.assessments.map(a => <SelectedResponseFeedback key={a.id} assessment={a}/>)}
-    <section className={styles.processNote}><h2>Reasoning across the cases</h2><p>{config.finalReview.guidance}</p></section>
-    <section aria-labelledby="trail-heading"><h2 id="trail-heading">Your response trails</h2>
-      {config.assessments.map(a => <details key={a.id} className={styles.responseTrail} data-trail-id={a.shortId}>
-        <summary>{a.shortId} {a.predictions ? 'Prediction' : 'Decision'} trail <span>{a.title}</span></summary>
-        <div className={styles.trailBody}>{a.predictions ? <PredictionTrail a={a}/> : a.stages.map(s => <SubmittedResponsePanel key={s.id} assessment={a} stage={s} snapshot={run.sessions[a.id].submitted[s.id]}/>)}</div>
-      </details>)}
-    </section>
-    <section className={styles.reflections}><h2>Looking back</h2><p className={styles.help}>Optional and unscored. You may leave this reflection blank.</p>
-      {run.reflection.submittedAt ? <div className={styles.answer}><h3>{config.finalReview.reflection.prompt}</h3><p>{run.reflection.submitted || 'No reflection provided.'}</p><small className={styles.wordCount}>{wordCount(run.reflection.submitted || '')} / {config.finalReview.reflection.maxWords} words · maximum</small><p role="status" className={styles.locked}>▣ Reflection saved and locked</p></div> : <form onSubmit={e => { e.preventDefault(); if (wordCount(run.reflection.draft) <= config.finalReview.reflection.maxWords!) setConfirm(true); }}>
-        <ResponseField field={config.finalReview.reflection} value={run.reflection.draft} onChange={value => store.reflect(value)} disabled={busy}/>
-        <button className={styles.primary} type="submit" disabled={busy}>Submit optional reflection</button>
-      </form>}
-      <div className={styles.actions}><button className={styles.secondary} onClick={() => downloadJson(store.exportSession(), 'bharat-kalp-assessment.json')}>Download your responses</button><AppLink className={styles.secondary} to="/learner">Assessment home</AppLink></div>
-    </section>
-    {confirm && <Modal title="Save and lock your reflection?" cancel={() => setConfirm(false)} confirm={commit} confirmLabel="Save and lock reflection" busy={busy} error={error}><p>Your optional reflection will be preserved exactly as submitted.</p></Modal>}
-  </>;
+  const { run, reviews, store } = useSession();
+  if (!run.end)
+    return (
+      <section className={styles.gate}>
+        <h1>The diagnostic is still in progress</h1>
+        <p>
+          Complete all four cases or explicitly end early to release submissions
+          for human review.
+        </p>
+        <AppLink className={styles.primary} to={resumePath(run)}>
+          Continue diagnostic →
+        </AppLink>
+      </section>
+    );
+  return (
+    <div className={styles.workspace}>
+      <AppLink className={styles.back} to="/learner">
+        ← Diagnostic home
+      </AppLink>
+      <p className={styles.eyebrow}>
+        {run.config.packageVersion} ·{" "}
+        {run.end.kind === "early" ? "ENDED EARLY" : "FOUR CASES SUBMITTED"}
+      </p>
+      <h1 className={styles.debriefTitle}>Submissions and human review</h1>
+      <p>
+        Submitted responses are preserved. Criterion feedback appears only from
+        actual imported human-review records. Practice is optional and pending.
+      </p>
+      <p>
+        Actual case sequence:{" "}
+        {run.actualSequence.join(" → ") || "No case started"}.{" "}
+        {run.end.kind === "early" && `Reason: ${run.end.reason}`}
+      </p>
+      {run.supportNotes && (
+        <p>Recorded support conditions: {run.supportNotes}</p>
+      )}
+      <div className={styles.actions}>
+        <button
+          className={styles.primary}
+          onClick={() =>
+            downloadJson(
+              store.exportSession(),
+              `kalp-session-${run.runId}.json`,
+            )
+          }
+        >
+          Export session for review
+        </button>
+        {reviews && (
+          <button
+            className={styles.secondary}
+            onClick={() =>
+              downloadJson(reviews, `kalp-reviews-${run.runId}.json`)
+            }
+          >
+            Export review records
+          </button>
+        )}
+      </div>
+      <FileInput
+        label="Import human-review feedback"
+        onFile={(raw) => store.importReviews(raw)}
+      />
+      {!reviews?.records.length && (
+        <p role="status" className={styles.pauseNote}>
+          Awaiting review. No criterion performance levels have been assigned.
+        </p>
+      )}
+      {run.config.cases.map((a) => (
+        <section key={a.id} data-format={a.set}>
+          <h2>
+            {a.id} · {a.title}
+          </h2>
+          <div className={styles.profileList}>
+            {criteriaFor(run, a.id).map((c) => {
+              const records =
+                reviews?.records.filter(
+                  (r) => r.caseId === a.id && r.criterionId === c.id,
+                ) || [];
+              return (
+                <section key={c.id} className={styles.profile}>
+                  <h3>
+                    {c.id} · {c.title}
+                  </h3>
+                  {records.length ? (
+                    <>
+                      {records
+                        .filter(
+                          (r) =>
+                            !records.some((later) => later.supersedes === r.id),
+                        )
+                        .map((r) => (
+                          <ReviewFeedback key={r.id} record={r} />
+                        ))}
+                      {records.some((r) =>
+                        records.some((later) => later.supersedes === r.id),
+                      ) && (
+                        <details>
+                          <summary>Preserved earlier review judgements</summary>
+                          {records
+                            .filter((r) =>
+                              records.some(
+                                (later) => later.supersedes === r.id,
+                              ),
+                            )
+                            .map((r) => (
+                              <ReviewFeedback key={r.id} record={r} />
+                            ))}
+                        </details>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <p>Awaiting review</p>
+                      {evidenceAvailability(run, a.id, c) !==
+                        "Awaiting review" && (
+                        <p>
+                          Evidence availability:{" "}
+                          {evidenceAvailability(run, a.id, c)} ·{" "}
+                          {evidenceAvailability(run, a.id, c) === "Not elicited"
+                            ? "A required phase or prior comparison opportunity is unavailable."
+                            : "No submitted reasoning is available in the primary phase."}{" "}
+                          A human reviewer checks the limitation and other
+                          relevant same-phase evidence.
+                        </p>
+                      )}
+                    </>
+                  )}
+                </section>
+              );
+            })}
+          </div>
+          <details className={styles.responseTrail}>
+            <summary>
+              Facts, submitted responses and incomplete opportunities
+            </summary>
+            <div className={styles.trailBody}>
+              {a.phases.map((p) => (
+                <section key={p.id}>
+                  {run.sessions[a.id].revealedAt[p.id] ? (
+                    <CaseFacts phase={p} />
+                  ) : (
+                    <p>{p.title}: not revealed during this diagnostic.</p>
+                  )}
+                  {run.sessions[a.id].submitted[p.id] ? (
+                    <SubmittedResponsePanel
+                      phase={p}
+                      snapshot={run.sessions[a.id].submitted[p.id]}
+                      expanded
+                    />
+                  ) : (
+                    <p>
+                      {p.title}: unsubmitted. Drafts remain in the session
+                      export and are not judged as submitted evidence.
+                    </p>
+                  )}
+                </section>
+              ))}
+              {run.end?.incomplete
+                .filter((m) => m.caseId === a.id)
+                .map((m) => (
+                  <p key={m.promptId}>
+                    {m.phaseId} / {m.promptId}: {m.opportunity}
+                  </p>
+                ))}
+            </div>
+          </details>
+        </section>
+      ))}
+      <p className={styles.note}>
+        This prototype supports design review. Subject-matter review,
+        representative-officer responses, example review and rater calibration
+        remain pending before operational interpretation. Programme-learning
+        claims require actual teaching exposure and further evidence.
+      </p>
+    </div>
+  );
 }
