@@ -50,7 +50,7 @@ export function ErrorBox({ message }: { message: string }) {
     <section role="alert" className={styles.gate}>
       <h1>Unable to open this view</h1>
       <p>{message}</p>
-      <AppLink to="/learner">Return to diagnostic home</AppLink>
+      <AppLink to="/learner">Return to all cases</AppLink>
     </section>
   );
 }
@@ -138,10 +138,7 @@ export function SubmittedResponsePanel({
           <section className={styles.answer} key={p.id}>
             <h3>{p.label}</h3>
             <p>{p.text}</p>
-            <p>
-              {snapshot.answers[p.id] ||
-                "Blank response submitted. No performance level is inferred."}
-            </p>
+            <p>{snapshot.answers[p.id] || "No response submitted."}</p>
           </section>
         ))}
       </div>

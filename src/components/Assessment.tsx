@@ -32,9 +32,9 @@ export function AssessmentIntro() {
   return (
     <section className={styles.intro}>
       <AppLink className={styles.back} to="/learner">
-        ← Diagnostic home
+        ← All cases
       </AppLink>
-      <p className={styles.eyebrow}>{a.id} · FICTIONAL CASE</p>
+      <p className={styles.eyebrow}>FICTIONAL CASE</p>
       <h1>{a.title}</h1>
       <p>
         Two phases: {a.phases.map((p) => p.title.toLowerCase()).join(", then ")}
@@ -109,11 +109,11 @@ export function AssessmentStage() {
   return (
     <div className={styles.workspace} data-format={a.set}>
       <AppLink className={styles.back} to="/learner">
-        ← Diagnostic home
+        ← All cases
       </AppLink>
       <div className={styles.stageHeading}>
         <div>
-          <p className={styles.eyebrow}>{a.id} · FICTIONAL CASE</p>
+          <p className={styles.eyebrow}>FICTIONAL CASE</p>
           <h1>{a.title}</h1>
         </div>
       </div>
@@ -146,15 +146,15 @@ export function AssessmentStage() {
             <>
               <SubmittedResponsePanel phase={p} snapshot={snap} expanded />
               <AppLink className={styles.primary} to={resumePath(run)}>
-                Continue to diagnostic record →
+                Continue →
               </AppLink>
             </>
           ) : run.end ? (
             <section>
-              <h2>Phase left unsubmitted</h2>
+              <h2>This response was not submitted</h2>
               <p>
-                The diagnostic ended. This draft is retained for recovery; it is
-                not submitted evidence.
+                The session ended. Your draft is saved separately from your
+                submitted responses.
               </p>
               {p.prompts.map((f) => (
                 <section className={styles.answer} key={f.id}>
@@ -231,9 +231,8 @@ export function AssessmentStage() {
           </p>
           {draft && Object.values(draft.answers).some((x) => !x.trim()) && (
             <p>
-              Some responses are blank. They will stay blank; no performance
-              level is inferred. Human review checks relevant reasoning
-              elsewhere in the same phase.
+              Some responses are blank. You can go back to answer them or submit
+              them as they are.
             </p>
           )}
         </Modal>
@@ -251,11 +250,11 @@ export function AssessmentCompletion() {
     );
   return (
     <section className={styles.completion}>
-      <p className={styles.eyebrow}>{a.id} · SUBMITTED</p>
+      <p className={styles.eyebrow}>SUBMITTED</p>
       <h1>Case submitted</h1>
       <p>
-        Criterion judgements await human review. Substantive feedback becomes
-        available after all four cases finish or an explicit early end.
+        Your responses have been saved. Feedback will follow human review after
+        you finish the cases or end the session early.
       </p>
       {a.phases.map((p) => (
         <SubmittedResponsePanel
@@ -270,9 +269,6 @@ export function AssessmentCompletion() {
           to={run.end ? "/learner/review" : "/learner"}
         >
           {run.end ? "View submissions and feedback" : "Choose another case"} →
-        </AppLink>
-        <AppLink className={styles.secondary} to="/learner">
-          Diagnostic home
         </AppLink>
       </div>
     </section>
