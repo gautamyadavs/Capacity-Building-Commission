@@ -1,4 +1,4 @@
-import type { Judgement, ReviewRecord } from "../model";
+import type { Config, Judgement, ReviewRecord } from "../model";
 import styles from "../app.module.css";
 function JudgementView({
   judgement,
@@ -51,15 +51,22 @@ function JudgementView({
     </section>
   );
 }
-export function ReviewFeedback({ record }: { record: ReviewRecord }) {
+export function ReviewFeedback({
+  record,
+  config,
+}: {
+  record: ReviewRecord;
+  config: Config;
+}) {
+  const criterion = config.criteria.find((c) => c.id === record.criterionId)!;
   return (
     <article className={styles.feedbackResult} data-review-id={record.id}>
       <h3>
-        {record.caseId} / {record.criterionId} · Review by {record.reviewer}
+        {record.caseId} · {criterion.title}
       </h3>
       <p>
-        {record.packageVersion} · Task {record.taskVersion} · Rubric{" "}
-        {record.rubricVersion} · {new Date(record.reviewedAt).toLocaleString()}
+        <strong>What this criterion considers:</strong>{" "}
+        {criterion.descriptors.Proficient}
       </p>
       {record.comparisonEvidence.length > 0 && (
         <section>
@@ -94,6 +101,23 @@ export function ReviewFeedback({ record }: { record: ReviewRecord }) {
           title="Later supplementary evidence — initial judgement retained"
         />
       ))}
+      <details className={styles.references}>
+        <summary>Reviewer, version and criterion details</summary>
+        <p>
+          Review by {record.reviewer} ·{" "}
+          {new Date(record.reviewedAt).toLocaleString()}
+        </p>
+        <p>
+          {record.caseId} / {record.criterionId} · {record.packageVersion} ·
+          Task {record.taskVersion} · Rubric {record.rubricVersion}
+        </p>
+        <p>{criterion.boundary}</p>
+        {Object.entries(criterion.descriptors).map(([level, text]) => (
+          <p key={level}>
+            <strong>{level}:</strong> {text}
+          </p>
+        ))}
+      </details>
       {record.supersedes && (
         <p>
           This revision identifies prior review {record.supersedes}. The

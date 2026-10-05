@@ -65,9 +65,14 @@ export function Files() {
         share them. Clearing browser data removes local progress. Keep an
         exported copy for transfer or recovery.
       </p>
-      <div className={styles.actions}>
+      <section className={styles.recoverySection}>
+        <h2>Back up</h2>
+        <p>
+          Download your responses and drafts to keep a copy or move to another
+          browser.
+        </p>
         <button
-          className={styles.secondary}
+          className={styles.primary}
           onClick={() =>
             downloadJson(
               store.exportSession(),
@@ -77,6 +82,38 @@ export function Files() {
         >
           Download current session and drafts
         </button>
+      </section>
+      <section className={styles.recoverySection}>
+        <h2>Restore</h2>
+        <p>
+          Choose a saved session. After confirmation, your current session is
+          archived before the saved one replaces it.
+        </p>
+        <FileInput
+          label="Import a captured diagnostic session"
+          onFile={async (raw) => {
+            setPending(raw);
+            return false;
+          }}
+        />
+      </section>
+      <section className={styles.recoverySection}>
+        <h2>Start again</h2>
+        <p>
+          Start a new diagnostic with the current design. Your previous saved
+          session is archived first.
+        </p>
+        <button className={styles.secondary} onClick={() => setNew(true)}>
+          Start a new diagnostic
+        </button>
+      </section>
+      <details className={styles.references} open={fatal || undefined}>
+        <summary>Advanced recovery and storage help</summary>
+        <p>
+          If normal backup is unavailable, preserve all stored data for
+          investigation. This download includes original storage values, earlier
+          sessions and draft journals.
+        </p>
         <button
           className={styles.secondary}
           onClick={() => {
@@ -89,26 +126,12 @@ export function Files() {
         >
           Download all preserved browser data
         </button>
-        <button className={styles.secondary} onClick={() => setNew(true)}>
-          Start a new diagnostic
-        </button>
-      </div>
-      <p>
-        Older v1/v2 pilot keys and journals are preserved as raw recovery data.
-        They are not imported as evidence for this diagnostic. A browser-data
-        download retains original key/value strings.
-      </p>
-      <FileInput
-        label="Import a captured diagnostic session"
-        onFile={async (raw) => {
-          setPending(raw);
-          return false;
-        }}
-      />
-      <p>
-        Importing a session replaces the active workspace after confirmation.
-        The previous saved session is archived first.
-      </p>
+        <p>
+          Older v1/v2 pilot keys and journals remain raw recovery data. They are
+          not imported as evidence for this diagnostic. Clearing browser data
+          removes local progress.
+        </p>
+      </details>
       {newSession && (
         <Modal
           title="Start a new diagnostic?"

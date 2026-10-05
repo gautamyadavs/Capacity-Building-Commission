@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../context";
-import {
-  caseAvailable,
-  caseComplete,
-  currentPhase,
-  resumePath,
-} from "../model";
+import { caseAvailable, caseComplete, resumePath, casePath } from "../model";
 import { AppLink, Paragraphs } from "./Shared";
 import { Modal } from "./Forms";
 import styles from "../app.module.css";
@@ -18,6 +13,17 @@ export function Home() {
     [reason, setReason] = useState(""),
     [notes, setNotes] = useState(run.supportNotes),
     [support, setSupport] = useState(false);
+  const openCase = async (id: string) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await store.begin(id);
+      navigate(casePath(store.getSnapshot().run, id));
+    } catch {
+    } finally {
+      setBusy(false);
+    }
+  };
   const finish = async () => {
     if (busy) return;
     setBusy(true);
@@ -35,29 +41,34 @@ export function Home() {
   return (
     <div className={styles.workspace}>
       <section className={styles.workspaceIntro}>
-        <p className={styles.eyebrow}>
-          DEVELOPMENTAL DIAGNOSTIC · {config.packageVersion}
-        </p>
+        <p className={styles.eyebrow}>DEVELOPMENTAL DIAGNOSTIC</p>
         <h1>Reasoning through governance decisions</h1>
         <p>
-          Four fictional cases explore strategic choices, duties and citizen
-          impacts, feasible implementation, adaptation, causal explanation,
-          prediction, evidence interpretation and justified updating.
-        </p>
-        <p>
-          This is one diagnostic occasion under assisted conditions. Criterion
-          feedback follows human review. It has no overall score or pass/fail
-          result.
+          Explore four fictional cases. Explain your choices and causes, then
+          review them when new information arrives.
         </p>
         <div className={styles.workspaceActions}>
-          <AppLink className={styles.primary} to={resumePath(run)}>
-            {run.end
-              ? "View submissions and review"
-              : run.actualSequence.length
-                ? "Resume diagnostic"
-                : "Start diagnostic"}{" "}
-            →
-          </AppLink>
+          {run.end ||
+          (run.actualSequence.length && resumePath(run) !== "/learner") ? (
+            <AppLink className={styles.primary} to={resumePath(run)}>
+              {run.end ? "View submissions and feedback" : "Resume diagnostic"}{" "}
+              →
+            </AppLink>
+          ) : (
+            <button
+              className={styles.primary}
+              disabled={busy}
+              onClick={() =>
+                void openCase(
+                  run.config.cases.find(
+                    (a) => !caseComplete(a, run.sessions[a.id]),
+                  )!.id,
+                )
+              }
+            >
+              Start suggested case →
+            </button>
+          )}
           <span>
             {run.submissionSequence.length} of 8 phases submitted
             {run.end?.kind === "early" ? " · Ended early" : ""}
@@ -66,27 +77,42 @@ export function Home() {
       </section>
       <section
         aria-label="Diagnostic instructions"
-        className={styles.writingGuidance}
+        className={`${styles.writingGuidance} ${styles.orientation}`}
       >
         <h2>Before you begin</h2>
-        <Paragraphs lines={config.instructions} />
         <p>
-          Pause and resume on this browser. There is no timer or word ceiling.
-          Initial responses are preserved before updates appear; update
-          responses are saved separately. Substantive feedback is withheld until
-          all four cases finish or you explicitly end early.
+          Use the supplied fictional facts; label assumptions. Notes, online
+          resources and generative AI are allowed without penalty. Research is
+          optional and must not replace case facts.
         </p>
+        <p>
+          Bullets or short paragraphs are welcome. Explain your reasoning;
+          polish, length, framework names and source counts are not scored.
+          There is no timer or word limit.
+        </p>
+        <p>
+          Pause and resume in this browser. Submitting makes that version
+          read-only and reveals the update. You can keep a sound answer.
+        </p>
+        <p>
+          Human feedback follows actual review after all four cases or an
+          explicit early end. No overall score or pass/fail result.
+        </p>
+        <details>
+          <summary>Full response instructions</summary>
+          <Paragraphs lines={config.instructions} />
+        </details>
       </section>
       <h2 className={styles.sectionHeader}>Your cases</h2>
       <p className={styles.sequenceNote}>
-        Proposed starting order: A1, A2, B1, B2. Your actual sequence is
-        recorded.
+        {config.caseOrderPolicy === "free"
+          ? "Choose any case. Suggested order: A1, A2, B1, B2. You can switch between unfinished cases; each draft is saved."
+          : "This saved session follows A1, A2, B1, B2. Complete each case before starting the next."}
       </p>
       <div className={styles.batteryCases}>
         {config.cases.map((a) => {
           const s = run.sessions[a.id],
             done = caseComplete(a, s),
-            p = currentPhase(a, s),
             available = caseAvailable(run, a.id);
           return (
             <article key={a.id} data-format={a.set} className={styles.caseCard}>
@@ -97,7 +123,7 @@ export function Home() {
                   {done
                     ? reviews?.records.some((r) => r.caseId === a.id)
                       ? "Submitted · Human review records available"
-                      : "Submitted · Awaiting review"
+                      : "Submitted"
                     : run.end
                       ? "Diagnostic ended · Incomplete opportunities recorded"
                       : s.startedAt
@@ -108,21 +134,22 @@ export function Home() {
                 </p>
                 <p>{Object.keys(s.submitted).length} of 2 phases submitted</p>
                 {available && !run.end ? (
-                  <AppLink
-                    className={styles.cardLink}
-                    to={
-                      done
-                        ? `/learner/assessment/${a.id}/complete`
-                        : `/learner/assessment/${a.id}${p ? `/stage/${p.id}` : ""}`
-                    }
-                  >
-                    {done
-                      ? "View saved responses"
-                      : s.startedAt
-                        ? "Resume case"
-                        : "Open case"}{" "}
-                    →
-                  </AppLink>
+                  done ? (
+                    <AppLink
+                      className={styles.cardLink}
+                      to={`/learner/assessment/${a.id}/complete`}
+                    >
+                      View saved responses →
+                    </AppLink>
+                  ) : (
+                    <button
+                      className={styles.cardLink}
+                      disabled={busy}
+                      onClick={() => void openCase(a.id)}
+                    >
+                      {s.startedAt ? "Resume case" : "Start case"} →
+                    </button>
+                  )
                 ) : run.end ? (
                   <AppLink to="/learner/review">View record</AppLink>
                 ) : (
@@ -179,13 +206,32 @@ export function Home() {
         )}
         {support && <p role="status">Support notes saved.</p>}
       </details>
+      <details className={styles.references}>
+        <summary>Design and source information</summary>
+        <p>
+          {config.packageVersion} · {config.frameworkVersion}. Practice is
+          optional and pending. Subject-matter review, representative-officer
+          responses and rater calibration remain pending.
+        </p>
+        <p>
+          This records reasoning with assistance allowed. It does not establish
+          unaided mastery or learning gains.
+        </p>
+        <ul>
+          {config.sources.map((source) => (
+            <li key={source.id}>
+              <a href={source.url}>{source.title}</a>
+            </li>
+          ))}
+        </ul>
+      </details>
+
       {!run.end && (
         <section className={styles.writingGuidance}>
-          <h2>End before completing all four cases</h2>
+          <h2>Finish later or end early</h2>
           <p>
-            You can end deliberately. Submitted answers remain preserved, drafts
-            remain available for recovery, and unfinished opportunities are
-            recorded without assigning performance levels.
+            You can leave and resume here. Ending early closes further
+            submissions and keeps your existing responses and drafts.
           </p>
           <button className={styles.secondary} onClick={() => setEnd(true)}>
             End diagnostic early

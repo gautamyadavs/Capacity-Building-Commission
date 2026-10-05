@@ -663,7 +663,7 @@ export function Reviewer() {
           )}
           {view.bundle.records.map((r) => (
             <section key={r.id}>
-              <ReviewFeedback record={r} />
+              <ReviewFeedback record={r} config={view.run!.config} />
               <button
                 className={styles.secondary}
                 onClick={() =>

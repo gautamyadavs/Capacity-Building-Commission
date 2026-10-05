@@ -16,9 +16,7 @@ export function ResponseField({
     id = `${uid}-${prompt.id}`;
   return (
     <div className={styles.field} data-field-id={prompt.id}>
-      <label htmlFor={id}>
-        {prompt.id} · {prompt.label}
-      </label>
+      <label htmlFor={id}>{prompt.label}</label>
       <p id={`${id}-help`} className={styles.help}>
         {prompt.text}
       </p>

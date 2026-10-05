@@ -41,7 +41,9 @@ describe("learner evidence flow", () => {
     );
     for (const a of config.cases)
       expect(screen.getByRole("heading", { name: a.title })).toBeVisible();
-    expect(screen.getByText(/generative AI without penalty/)).toBeVisible();
+    expect(
+      screen.getAllByText(/generative AI are allowed without penalty/)[0],
+    ).toBeVisible();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
     expect(
       screen.queryByText(/maximum words|countdown|confidence rating/),
@@ -65,13 +67,18 @@ describe("learner evidence flow", () => {
       "/learner/assessment/A1/stage/A.I",
     );
     for (const p of config.cases[0].phases[0].prompts) {
-      expect(screen.getByLabelText(`${p.id} · ${p.label}`)).toHaveAttribute(
+      expect(screen.getByLabelText(p.label)).toHaveAttribute(
         "aria-describedby",
       );
       expect(screen.getByText(p.text)).toBeVisible();
     }
-    for (const f of config.cases[0].phases[0].facts)
-      expect(screen.getByText(f)).toBeVisible();
+    expect(
+      screen.getByRole("table", { name: "People, resources and conditions" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("cell", { name: "600 for emergency redeployment" }),
+    ).toBeVisible();
+    expect(screen.getByText(config.cases[0].phases[0].facts[0])).toBeVisible();
     expect(screen.getAllByRole("textbox")).toHaveLength(4);
   });
   it("D19 cancelling confirmation leaves draft and reveal boundary intact", async () => {
@@ -84,7 +91,9 @@ describe("learner evidence flow", () => {
       expect(screen.getByRole("heading", { level: 1 })).toHaveFocus(),
     );
     await user.type(screen.getAllByRole("textbox")[0], "A concise choice");
-    await user.click(screen.getByRole("button", { name: "Submit phase →" }));
+    await user.click(
+      screen.getByRole("button", { name: "Submit initial response →" }),
+    );
     expect(screen.getByRole("dialog")).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Cancel" }));
     expect(screen.getAllByRole("textbox")[0]).toHaveValue("A concise choice");
@@ -103,7 +112,10 @@ describe("learner evidence flow", () => {
     const store = show(run, "/learner/assessment/A1/stage/A.U");
     const input = screen.getAllByRole("textbox")[0];
     fireEvent.change(input, { target: { value: "Update draft" } });
+    expect(screen.queryByText("Original exact answer")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Submitted response" }));
     expect(screen.getAllByText("Original exact answer")).toHaveLength(4);
+    fireEvent.click(screen.getByRole("button", { name: "Initial facts" }));
     expect(screen.getByText(config.cases[0].phases[0].facts[0])).toBeVisible();
     expect(store.getSnapshot().run.sessions.A1.draft?.answers["A.P5"]).toBe(
       "Update draft",
@@ -123,7 +135,15 @@ describe("learner evidence flow", () => {
   });
   it("D10/D12 completed blanks remain Awaiting review and never Developing", () => {
     show(completeRun(""), "/learner/review");
-    expect(screen.getAllByText("Awaiting review")).toHaveLength(20);
+    expect(screen.getAllByText(/Awaiting review/)).toHaveLength(1);
+    expect(
+      screen.getByText(/A1 · Flood response/).closest("details"),
+    ).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByText(/A1 · Flood response/));
+    expect(
+      screen.getAllByText(/Evidence availability: Insufficient evidence/)
+        .length,
+    ).toBeGreaterThan(0);
     expect(screen.queryByText("Developing")).not.toBeInTheDocument();
     expect(screen.getByText(/No criterion performance levels/)).toBeVisible();
   });

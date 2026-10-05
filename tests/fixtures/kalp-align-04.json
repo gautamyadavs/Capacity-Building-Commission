@@ -1,53 +1,52 @@
 {
   "schemaVersion": 3,
-  "packageVersion": "KALP-ALIGN-05",
+  "packageVersion": "KALP-ALIGN-04",
   "frameworkVersion": "Focused Framework V5",
-  "taskVersion": "KALP-ALIGN-05:03",
-  "rubricVersion": "KALP-ALIGN-05:04",
-  "sourceReadDate": "2026-10-05",
+  "taskVersion": "KALP-ALIGN-04:03",
+  "rubricVersion": "KALP-ALIGN-04:04",
+  "sourceReadDate": "2026-10-04",
   "sources": [
     {
       "id": "1uEQpCgCZnsaWN2A47WJOM85nqP-4q2cXTY6EYHGY9IU",
       "title": "01 Bharat KALP Framework - Focused Revision V5",
       "url": "https://docs.google.com/spreadsheets/d/1uEQpCgCZnsaWN2A47WJOM85nqP-4q2cXTY6EYHGY9IU/edit",
-      "revision": "Focused Framework V5 / KALP-ALIGN-05"
+      "revision": "Focused Framework V5 / KALP-ALIGN-04"
     },
     {
       "id": "1rlHVPj1ebs6HjJAWm2iQm_gGjp1GV7UOrQ_0drIIe8Y",
       "title": "02 Bharat KALP - Learning Objectives and Assessment Alignment",
       "url": "https://docs.google.com/document/d/1rlHVPj1ebs6HjJAWm2iQm_gGjp1GV7UOrQ_0drIIe8Y/edit",
-      "revision": "AHj4eMSNu2sgA-callEm7-tyqjdAzQxq3nXKmt5pu89GDNYOfmdH_71No-NZwy_Owk5TaLbE_7XPvTnvgTS5kWFfvrvbg2pnIQhL_GnKudk"
+      "revision": "ANLCKQll1wgObhog1xdMUmWU4AutKUl_1QJdWRVX1TLfOZg9I3Du7U0K2YIhqDhugaB_zr0pzUUUTA_0ExiKzPVE7w8g18b6xk-AhkiFYRg"
     },
     {
       "id": "15e-IvwpU2gaKgwOGFr743qcdXPQ7VDj9PjVjoGxCiTg",
       "title": "03 Bharat KALP - Assessment Activities and Evidence Alignment",
       "url": "https://docs.google.com/document/d/15e-IvwpU2gaKgwOGFr743qcdXPQ7VDj9PjVjoGxCiTg/edit",
-      "revision": "AHj4eMTrpZ1nZrJE2Na3SVi2yfax75IZD-KPVWOCms0hT87uwEJzW1lgedL9pX6BKIjM80yubx8BxLPJASYGjDpBqZG4B7cEz9oo8h5ovJk"
+      "revision": "AHj4eMQ2HDuSxCZTJHjD2dgsjmPJoWUuXIfay1qTHWq4SHTv0m2ThPevfLjrW3jqiVVg6ZCsAV8qJukLQkcV1_HaoO6YOn-hTPNmE--UpfE"
     },
     {
       "id": "1xTYx5R4LCdXsV4MT0KkSUkZ_TkwDfhIVEAdKjtT7sEs",
       "title": "04 Bharat KALP - Task-specific Rubrics",
       "url": "https://docs.google.com/document/d/1xTYx5R4LCdXsV4MT0KkSUkZ_TkwDfhIVEAdKjtT7sEs/edit",
-      "revision": "AHj4eMS8vZRf01RvHLD8z3f1a5QdKBOzlB266-XJR7fcVCtQDgCkljF3BZxeifRU7c7QvSQT340_iww7XH4MB6c3WMmKawbhKIwRD8pwChQ"
+      "revision": "ANLCKQn3ZWDInxz9DScaqprgE5_E2Wn9yA_tNqZSP-9CpgjMdWuvSTMCA1btUvcEVi9oPL5lNA-TprdOVmfq1L2m9otnZYgYLk0Fh8kyg3s"
     },
     {
       "id": "1kzGTXPMnMSTuWUmwGvuPM0KWlgnzdWFbhnyQXmR1IVg",
       "title": "05 Bharat KALP - Response Examples and Rater Calibration",
       "url": "https://docs.google.com/document/d/1kzGTXPMnMSTuWUmwGvuPM0KWlgnzdWFbhnyQXmR1IVg/edit",
-      "revision": "ANLCKQn3kup9LQ4cJlizlFC6Ze6yyD7GEIwYRoBwYzOl8MAHEdcmkacOBWmlr9f4Phcclqv0szC9L7T7END1F_sRB8OXCuCzdkLMH2sAKxY"
+      "revision": "AHj4eMQLwxRhOOSg1gKdtEbmb0Qv6I9YH7JTSiuJtJhegt3EW5iwDYCu7wp5AM-CvRTXVyDSfv-ttJPX2-lXc02-0RnK0FUQkpQHZgUgtpE"
     },
     {
       "id": "1TEPo-hVVs4wFPZCuKl6sUq-MsCn-ZOGILnfp7OjMdgA",
       "title": "06 Bharat KALP - Learning Principles and Implementation Checks",
       "url": "https://docs.google.com/document/d/1TEPo-hVVs4wFPZCuKl6sUq-MsCn-ZOGILnfp7OjMdgA/edit",
-      "revision": "ANLCKQksyx7dz7XOvvumuH9LJ-qN59OzvB3hj-3_JAN61bemJAj3OtK4loO2-MbMYaQg29IBeY82BSpT3Cg9atYJ5e_OyW5ApEdUgMzrwp4"
+      "revision": "ANLCKQlIWsAh0l7CwTFDpwUHkiRwC2QRM_zCxat_JF8JJg-ub64Jra8YX8O2IjTNeAIrjHNtPnEYJfX_kp2Szx8bz0tWX6B30L-_2FurctI"
     }
   ],
   "instructions": [
-    "Use the supplied facts for these fictional cases. Notes, online resources and generative AI are allowed without penalty. Research is optional and must not replace the case facts. Reviewers interpret your response with this assistance allowed.",
-    "Use bullets or short paragraphs to explain your reasoning. There is no timer or word limit. Writing polish, length, framework names and number of sources are not scored. Different choices can be defensible. Label any assumptions you make.",
-    "You can pause and resume in this browser. Submit your initial response to reveal the update. Each submitted version becomes read-only and remains available. An update may keep a sound decision or explanation; changing your answer is not required.",
-    "Human feedback becomes available after all four cases are submitted or you explicitly end early, and only after a reviewer reviews your evidence. There is no overall score or pass/fail result."
+    "Use the supplied facts as the controlling facts of the fictional case. Necessary institutional and sector information is provided. You may use notes, online resources and generative AI without penalty. External research is optional and must not replace the case facts. The work will be interpreted as performance under these assisted conditions.",
+    "Bullets or short paragraphs are welcome. Explain enough to make your reasoning assessable; writing polish, response length, framework names and number of sources are not scored. Different actions can be defensible. If you make an assumption, identify it rather than presenting it as a case fact.",
+    "You will submit an initial response before receiving further case information. That response remains available for reference. Later information calls for an update, which can retain a sound decision or explanation. You do not need to change your answer merely because a new phase has begun."
   ],
   "objectives": [
     {
@@ -339,165 +338,62 @@
       "id": "A1",
       "set": "A",
       "title": "Flood response and essential movement",
-      "taskVersion": "KALP-ALIGN-05:03",
+      "taskVersion": "KALP-ALIGN-04:03",
       "phases": [
         {
           "id": "A.I",
           "kind": "initial",
-          "title": "Initial response",
-          "version": "KALP-ALIGN-05:A1.I",
+          "title": "Initial decision",
+          "version": "KALP-ALIGN-04:A1.I",
           "facts": [
             "Role and goal: you coordinate the metropolitan emergency transport response. Protect life and essential access over the next six hours and recommend a credible continuity direction for the next 72 hours. You can coordinate bus redeployment; districts run evacuation and shelters, the transport authority controls services, police secure routes, and health authorities organise hospital fuel. Transport asset reopening requires the relevant agency's safety clearance. Your role does not authorise overriding that clearance.",
             "Initial facts: flooding has disrupted normal routes for about 140,000 commuters. About 11,000 residents are under evacuation advisory. There are 600 buses available for emergency redeployment. Districts request 420 for evacuation and shelter movement; the rail authority requests 260 for stranded passengers. These requests exceed available capacity.",
             "Two major public hospitals have about eight hours of backup-generator fuel. Police can secure only two priority corridors at a time. Mobile connectivity is degraded in 40% of the affected area. Flooded metro assets await inspection. The weather service estimates a 60% chance of additional heavy rain over the next 12 hours.",
             "Some residents are reluctant to evacuate because they distrust conflicting official messages and fear losing possessions. Districts can arrange property-security patrols and shelter assistance, but must coordinate with police and local representatives. The case does not assume that issuing another evacuation instruction will resolve the reluctance."
           ],
-          "task": "Answer all four questions. You may prioritise requests, sequence deployment or propose another feasible response. There is no requirement to split capacity equally or satisfy every request immediately.",
+          "task": "complete A.P1 through A.P4. You may prioritise requests, sequence deployment or propose another feasible response. There is no requirement to split capacity equally or satisfy every request immediately.",
           "prompts": [
             {
               "id": "A.P1",
-              "label": "Choose and compare",
-              "text": "What response do you recommend? Explain why it serves the public goal better than a credible alternative. Consider the constraints and consequences over both the immediate and longer time horizons."
+              "label": "choose and compare",
+              "text": "What response do you recommend? Explain why it serves the stated public goal better than a credible alternative, considering constraints and consequences over the case's immediate and longer time horizons."
             },
             {
               "id": "A.P2",
-              "label": "Citizen impacts and duties",
-              "text": "Where does your choice create a tension between public duties and citizen interests? Explain who benefits, who may bear harm, and the safeguards you would use."
+              "label": "citizen impacts and duties",
+              "text": "What material tension between public duties and citizen interests does your choice involve? Explain who benefits, who may bear harm and the safeguards you would use."
             },
             {
               "id": "A.P3",
-              "label": "Put the response into practice",
-              "text": "How would you carry out the response? Identify the actors and their responsibilities, the coordination dependencies that matter, and a feasible way to address a likely barrier."
+              "label": "implementation",
+              "text": "How would the response be carried out? Identify relevant actors and responsibilities, important coordination dependencies and a feasible response to a likely barrier."
             },
             {
               "id": "A.P4",
-              "label": "Understand the challenge",
-              "text": "Which parts can established procedures or available expertise address? Which parts, if any, require people to learn or change how they act? Explain why and how your approach addresses each kind of challenge."
-            }
-          ],
-          "briefingBlocks": [
-            {
-              "type": "paragraph",
-              "text": "Role and goal: you coordinate the metropolitan emergency transport response. Protect life and essential access over the next six hours and recommend a credible continuity direction for the next 72 hours. You can coordinate bus redeployment; districts run evacuation and shelters, the transport authority controls services, police secure routes, and health authorities organise hospital fuel. Transport asset reopening requires the relevant agency's safety clearance. Your role does not authorise overriding that clearance.",
-              "heading": "Your role and goal"
-            },
-            {
-              "type": "table",
-              "caption": "People, resources and conditions",
-              "columns": [
-                "Item",
-                "Reported information"
-              ],
-              "rows": [
-                [
-                  "Disrupted normal travel",
-                  "About 140,000 commuters"
-                ],
-                [
-                  "Evacuation advisory",
-                  "About 11,000 residents"
-                ],
-                [
-                  "Available buses",
-                  "600 for emergency redeployment"
-                ],
-                [
-                  "District bus request",
-                  "420 for evacuation and shelter movement"
-                ],
-                [
-                  "Rail authority bus request",
-                  "260 for stranded passengers"
-                ],
-                [
-                  "Hospital fuel",
-                  "Two major public hospitals: about eight hours of backup-generator fuel"
-                ],
-                [
-                  "Priority corridors",
-                  "Police can secure only two at a time"
-                ],
-                [
-                  "Mobile connectivity",
-                  "Degraded in 40% of the affected area"
-                ],
-                [
-                  "Metro assets",
-                  "Flooded assets await inspection"
-                ],
-                [
-                  "Further heavy rain",
-                  "60% chance over the next 12 hours"
-                ]
-              ],
-              "notes": [
-                "Bus requests exceed available capacity."
-              ]
-            },
-            {
-              "type": "paragraph",
-              "text": "Some residents are reluctant to evacuate because they distrust conflicting official messages and fear losing possessions. Districts can arrange property-security patrols and shelter assistance, but must coordinate with police and local representatives. The case does not assume that issuing another evacuation instruction will resolve the reluctance.",
-              "heading": "Residents and evacuation"
+              "label": "challenge diagnosis",
+              "text": "Which part can be addressed using established procedures or available expertise? Which part, if any, requires people to learn or change how they act? Explain the diagnosis and how your approach addresses it."
             }
           ]
         },
         {
           "id": "A.U",
           "kind": "update",
-          "title": "Update response",
-          "version": "KALP-ALIGN-05:A1.U",
+          "title": "Updated decision",
+          "version": "KALP-ALIGN-04:A1.U",
           "facts": [
             "Update, revealed after initial submission: three hours later, the rail request falls from 260 to 180 buses because an unaffected terminal has added trains. One flooded metro tunnel will remain closed today. The largest shelter district will reach capacity within two hours unless additional space is opened. The chance of further heavy rain falls to 35%; it has not fallen to zero. Local representatives report that carers are avoiding shelters because arrangements for dependants are unclear."
           ],
-          "task": "Answer both questions using this update and your submitted initial response.",
+          "task": "complete A.P5 and A.P6 using this update and your preserved initial response.",
           "prompts": [
             {
               "id": "A.P5",
-              "label": "Review your decision",
-              "text": "What should you keep, revise or investigate? Connect your decisions to specific new facts and your earlier reasoning. Explain whether the kind of challenge you identified has changed."
+              "label": "justified update",
+              "text": "What should you retain, revise or investigate now? Link those decisions to specific new facts and your earlier reasoning. Explain whether the kind of challenge you diagnosed has changed."
             },
             {
               "id": "A.P6",
-              "label": "Explain the consequences",
-              "text": "Explain any material change to citizen impacts, safeguards, responsibilities or coordination. If they remain sound, explain why. What further evidence would make you reconsider your approach?"
-            }
-          ],
-          "briefingBlocks": [
-            {
-              "type": "paragraph",
-              "text": "Three hours later:",
-              "heading": "New information"
-            },
-            {
-              "type": "table",
-              "caption": "Updated conditions",
-              "columns": [
-                "Item",
-                "Reported information"
-              ],
-              "rows": [
-                [
-                  "Rail request",
-                  "Falls from 260 to 180 buses: an unaffected terminal has added trains"
-                ],
-                [
-                  "Metro tunnel",
-                  "One flooded tunnel will remain closed today"
-                ],
-                [
-                  "Largest shelter district",
-                  "Will reach capacity within two hours unless additional space opens"
-                ],
-                [
-                  "Further heavy rain",
-                  "Chance falls to 35%; it has not fallen to zero"
-                ]
-              ],
-              "notes": []
-            },
-            {
-              "type": "paragraph",
-              "text": "Local representatives report that carers are avoiding shelters because arrangements for dependants are unclear."
+              "label": "consequences of the update",
+              "text": "Explain any material change to citizen impacts, safeguards, responsibilities or coordination. State what further evidence would make you reconsider your current approach. If these elements remain sound, explain why."
             }
           ]
         }
@@ -507,137 +403,62 @@
       "id": "A2",
       "set": "A",
       "title": "LPG continuity under uneven scarcity",
-      "taskVersion": "KALP-ALIGN-05:03",
+      "taskVersion": "KALP-ALIGN-04:03",
       "phases": [
         {
           "id": "A.I",
           "kind": "initial",
-          "title": "Initial response",
-          "version": "KALP-ALIGN-05:A2.I",
+          "title": "Initial decision",
+          "version": "KALP-ALIGN-04:A2.I",
           "facts": [
             "Role and goal: you coordinate a fictional national LPG continuity response. Maintain essential access over the next seven days and recommend a feasible 30-day strategy. Supply companies allocate available stock and manage dispatch; states coordinate local distribution and complaints. Emergency price or subsidy changes require finance and legal approval. The case provides the authority needed for reasoning; recall of actual LPG rules is not expected.",
             "Initial facts: an import disruption may last two to five weeks. Usable national inventory equals about 18 days of normal consumption. Eight highly affected states have about seven days of stock, while less affected states have about 25 days. Redistribution is possible, but freight capacity limits how quickly stock can move.",
             "Hospitals and community kitchens depend on LPG for essential services. Many low-income households have no safe alternative fuel and cannot readily pay more. A uniform refill restriction is administratively simple but would apply to both essential and discretionary use. Allocating stock mainly through higher prices could reduce demand but may exclude households unable to pay.",
             "Reports of shortages have led some households to seek early refills. Supply companies can publish verified availability; local distributors and states would need to coordinate explanations and complaints handling. Current dispatch procedures alone do not address expectations or trust. Unsafe substitution must not be treated as an acceptable solution."
           ],
-          "task": "Answer all four questions. You may prioritise essential uses, redistribute stock, manage demand or combine approaches. Explain a credible alternative to your choice rather than assuming one allocation policy is mandatory.",
+          "task": "complete A.P1 through A.P4. You may prioritise essential uses, redistribute stock, manage demand or combine approaches. Explain a credible alternative to your choice rather than assuming one allocation policy is mandatory.",
           "prompts": [
             {
               "id": "A.P1",
-              "label": "Choose and compare",
-              "text": "What response do you recommend? Explain why it serves the public goal better than a credible alternative. Consider the constraints and consequences over both the immediate and longer time horizons."
+              "label": "choose and compare",
+              "text": "What response do you recommend? Explain why it serves the stated public goal better than a credible alternative, considering constraints and consequences over the case's immediate and longer time horizons."
             },
             {
               "id": "A.P2",
-              "label": "Citizen impacts and duties",
-              "text": "Where does your choice create a tension between public duties and citizen interests? Explain who benefits, who may bear harm, and the safeguards you would use."
+              "label": "citizen impacts and duties",
+              "text": "What material tension between public duties and citizen interests does your choice involve? Explain who benefits, who may bear harm and the safeguards you would use."
             },
             {
               "id": "A.P3",
-              "label": "Put the response into practice",
-              "text": "How would you carry out the response? Identify the actors and their responsibilities, the coordination dependencies that matter, and a feasible way to address a likely barrier."
+              "label": "implementation",
+              "text": "How would the response be carried out? Identify relevant actors and responsibilities, important coordination dependencies and a feasible response to a likely barrier."
             },
             {
               "id": "A.P4",
-              "label": "Understand the challenge",
-              "text": "Which parts can established procedures or available expertise address? Which parts, if any, require people to learn or change how they act? Explain why and how your approach addresses each kind of challenge."
-            }
-          ],
-          "briefingBlocks": [
-            {
-              "type": "paragraph",
-              "text": "Role and goal: you coordinate a fictional national LPG continuity response. Maintain essential access over the next seven days and recommend a feasible 30-day strategy. Supply companies allocate available stock and manage dispatch; states coordinate local distribution and complaints. Emergency price or subsidy changes require finance and legal approval. The case provides the authority needed for reasoning; recall of actual LPG rules is not expected.",
-              "heading": "Your role and goal"
-            },
-            {
-              "type": "table",
-              "caption": "Inventory and distribution",
-              "columns": [
-                "Item",
-                "Reported information"
-              ],
-              "rows": [
-                [
-                  "Import disruption",
-                  "May last two to five weeks"
-                ],
-                [
-                  "Usable national inventory",
-                  "About 18 days of normal consumption"
-                ],
-                [
-                  "Eight highly affected states",
-                  "About seven days of stock"
-                ],
-                [
-                  "Less affected states",
-                  "About 25 days of stock"
-                ]
-              ],
-              "notes": [
-                "Redistribution is possible, but freight capacity limits how quickly stock can move."
-              ]
-            },
-            {
-              "type": "paragraph",
-              "text": "Hospitals and community kitchens depend on LPG for essential services. Many low-income households have no safe alternative fuel and cannot readily pay more. A uniform refill restriction is administratively simple but would apply to both essential and discretionary use. Allocating stock mainly through higher prices could reduce demand but may exclude households unable to pay.",
-              "heading": "Essential use and access"
-            },
-            {
-              "type": "paragraph",
-              "text": "Reports of shortages have led some households to seek early refills. Supply companies can publish verified availability; local distributors and states would need to coordinate explanations and complaints handling. Current dispatch procedures alone do not address expectations or trust. Unsafe substitution must not be treated as an acceptable solution.",
-              "heading": "Refill requests and information"
+              "label": "challenge diagnosis",
+              "text": "Which part can be addressed using established procedures or available expertise? Which part, if any, requires people to learn or change how they act? Explain the diagnosis and how your approach addresses it."
             }
           ]
         },
         {
           "id": "A.U",
           "kind": "update",
-          "title": "Update response",
-          "version": "KALP-ALIGN-05:A2.U",
+          "title": "Updated decision",
+          "version": "KALP-ALIGN-04:A2.U",
           "facts": [
             "Update, revealed after initial submission: the import disruption is now expected to last four more weeks. A freight disruption cuts inter-state redistribution capacity for the coming week. Community kitchens report that blanket restrictions are reducing meal provision. Distributors report repeated early-refill requests despite stable delivery schedules in some districts; other districts report genuine missed deliveries. These reports require different responses."
           ],
-          "task": "Answer both questions using this update and your submitted initial response.",
+          "task": "complete A.P5 and A.P6 using this update and your preserved initial response.",
           "prompts": [
             {
               "id": "A.P5",
-              "label": "Review your decision",
-              "text": "What should you keep, revise or investigate? Connect your decisions to specific new facts and your earlier reasoning. Explain whether the kind of challenge you identified has changed."
+              "label": "justified update",
+              "text": "What should you retain, revise or investigate now? Link those decisions to specific new facts and your earlier reasoning. Explain whether the kind of challenge you diagnosed has changed."
             },
             {
               "id": "A.P6",
-              "label": "Explain the consequences",
-              "text": "Explain any material change to citizen impacts, safeguards, responsibilities or coordination. If they remain sound, explain why. What further evidence would make you reconsider your approach?"
-            }
-          ],
-          "briefingBlocks": [
-            {
-              "type": "table",
-              "caption": "Updated supply and use",
-              "columns": [
-                "Item",
-                "Reported information"
-              ],
-              "rows": [
-                [
-                  "Import disruption",
-                  "Now expected to last four more weeks"
-                ],
-                [
-                  "Inter-state redistribution",
-                  "Freight disruption cuts capacity for the coming week"
-                ],
-                [
-                  "Community kitchens",
-                  "Blanket restrictions are reducing meal provision"
-                ]
-              ],
-              "notes": []
-            },
-            {
-              "type": "paragraph",
-              "text": "Distributors report repeated early-refill requests despite stable delivery schedules in some districts; other districts report genuine missed deliveries. These reports require different responses."
+              "label": "consequences of the update",
+              "text": "Explain any material change to citizen impacts, safeguards, responsibilities or coordination. State what further evidence would make you reconsider your current approach. If these elements remain sound, explain why."
             }
           ]
         }
@@ -647,132 +468,51 @@
       "id": "B1",
       "set": "B",
       "title": "Air quality and freight restrictions",
-      "taskVersion": "KALP-ALIGN-05:03",
+      "taskVersion": "KALP-ALIGN-04:03",
       "phases": [
         {
           "id": "B.I",
           "kind": "initial",
-          "title": "Initial response",
-          "version": "KALP-ALIGN-05:B1.I",
+          "title": "Explanation and prediction",
+          "version": "KALP-ALIGN-04:B1.I",
           "facts": [
             "Role and problem: you advise a city on reducing residents' exposure to fine-particle air pollution. PM2.5 is a measure of fine-particle concentration; lower values indicate less pollution at the monitor. Traffic contributes to pollution, but weather and other sources also affect measured concentrations. Exposure depends on where people live and spend time.",
             "Initial facts: two central zones have high monitor readings and heavy diesel freight traffic. Nearby residential roads could receive diverted trucks. The proposed intervention restricts daytime diesel freight access in the two zones, with essential-service exemptions and enforcement by the transport authority. It does not reduce the total amount of freight that must move.",
             "The city will observe central-zone monitor readings, comparison-zone readings and truck counts on nearby residential roads. The comparison zones will not receive the restriction, but differ in traffic and land use. Initial seven-day average PM2.5 values are 120 units in the intervention zones and 100 in the comparison zones. No claim is made that these zones are equivalent."
           ],
-          "task": "Answer both questions. Predict consequences for the stated goal of reducing resident exposure, rather than treating an improvement at one monitor as the whole goal.",
+          "task": "complete B.P1 and B.P2. Predict consequences for the stated goal of reducing resident exposure, rather than treating an improvement at one monitor as the whole goal.",
           "prompts": [
             {
               "id": "B.P1",
-              "label": "Explain the causes",
-              "text": "Explain how the problem is produced. Distinguish observed symptoms from plausible drivers, and show relevant links between actors, incentives or feedback. A short narrative is enough; a diagram is optional and receives no extra credit."
+              "label": "causal account",
+              "text": "Explain how the problem is produced. Distinguish observed symptoms from plausible drivers and show relevant links between actors, incentives or feedback. A short causal narrative is sufficient; a diagram is optional and receives no extra credit."
             },
             {
               "id": "B.P2",
-              "label": "Predict and test",
-              "text": "What effects do you expect if the proposed intervention is implemented as described, and through what mechanism? State a material assumption and an observation that would support or challenge your prediction. Explain a relevant indirect effect where your account warrants one. Precise numerical forecasts are not required."
-            }
-          ],
-          "briefingBlocks": [
-            {
-              "type": "paragraph",
-              "text": "Role and problem: you advise a city on reducing residents' exposure to fine-particle air pollution. PM2.5 is a measure of fine-particle concentration; lower values indicate less pollution at the monitor. Traffic contributes to pollution, but weather and other sources also affect measured concentrations. Exposure depends on where people live and spend time.",
-              "heading": "Your role and goal"
-            },
-            {
-              "type": "paragraph",
-              "text": "Initial facts: two central zones have high monitor readings and heavy diesel freight traffic. Nearby residential roads could receive diverted trucks. The proposed intervention restricts daytime diesel freight access in the two zones, with essential-service exemptions and enforcement by the transport authority. It does not reduce the total amount of freight that must move.",
-              "heading": "Proposed intervention"
-            },
-            {
-              "type": "table",
-              "caption": "Initial monitor readings",
-              "columns": [
-                "Location",
-                "Seven-day average PM2.5"
-              ],
-              "rows": [
-                [
-                  "Intervention zones",
-                  "120 units"
-                ],
-                [
-                  "Comparison zones",
-                  "100 units"
-                ]
-              ],
-              "notes": [
-                "The city will observe central-zone monitor readings, comparison-zone readings and truck counts on nearby residential roads.",
-                "Comparison zones will not receive the restriction, but differ in traffic and land use. No claim is made that these zones are equivalent."
-              ]
+              "label": "prediction and test",
+              "text": "What effects do you expect from the proposed intervention, and through what mechanism? State a material assumption and an observation that would support or challenge the prediction. Explain a relevant indirect effect where your causal account warrants one. Precise numerical forecasting is not required."
             }
           ]
         },
         {
           "id": "B.U",
           "kind": "update",
-          "title": "Update response",
-          "version": "KALP-ALIGN-05:B1.U",
+          "title": "Results and revision",
+          "version": "KALP-ALIGN-04:B1.U",
           "facts": [
             "Results, revealed after initial submission: during the next seven days, central-zone PM2.5 averages 84 units and comparison-zone PM2.5 averages 80. Stronger winds occur across the city during this period. Daytime diesel truck counts in central zones fall, while truck counts on nearby residential roads rise by 20%. The city has no pollution monitor on those residential roads and has not measured residents' personal exposure. The intervention was not randomly assigned."
           ],
-          "task": "Answer both questions. You need not calculate a causal effect. Use the reported patterns and measurement limits to assess the claim and identify the next useful test.",
+          "task": "complete B.P3 and B.P4. You need not calculate a causal effect. Use the reported patterns and measurement limits to assess the claim and identify the next useful test.",
           "prompts": [
             {
               "id": "B.P3",
-              "label": "Interpret the results",
-              "text": "How do the results compare with your prediction? Explain what they support and what they do not establish. Consider a credible alternative explanation or a material limitation in the data."
+              "label": "interpret the evidence",
+              "text": "How do these results compare with your prediction? Explain what they support and what they do not establish. Consider a credible alternative explanation or a material limitation in the data."
             },
             {
               "id": "B.P4",
-              "label": "Review your explanation and action",
-              "text": "Which parts of your original causal explanation should you keep or revise, and why? What should you keep, revise or test in the proposed intervention? Connect both decisions to the results, state the remaining uncertainty, and identify the next useful evidence or test."
-            }
-          ],
-          "briefingBlocks": [
-            {
-              "type": "table",
-              "caption": "Monitor readings over two seven-day periods",
-              "columns": [
-                "Location",
-                "Initial period",
-                "Next seven days"
-              ],
-              "rows": [
-                [
-                  "Central intervention zones",
-                  "120 units",
-                  "84 units"
-                ],
-                [
-                  "Comparison zones",
-                  "100 units",
-                  "80 units"
-                ]
-              ],
-              "notes": [
-                "Values are average PM2.5 concentrations. Stronger winds occur across the city during the next seven days. The intervention was not randomly assigned."
-              ]
-            },
-            {
-              "type": "table",
-              "caption": "Truck counts and exposure",
-              "columns": [
-                "Item",
-                "Reported information"
-              ],
-              "rows": [
-                [
-                  "Central zones",
-                  "Daytime diesel truck counts fall"
-                ],
-                [
-                  "Nearby residential roads",
-                  "Truck counts rise by 20%"
-                ]
-              ],
-              "notes": [
-                "The city has no pollution monitor on those residential roads and has not measured residents’ personal exposure."
-              ]
+              "label": "update the model and action",
+              "text": "Which part of your original causal account should be revised or retained, and why? What should now be retained, revised or tested in the proposed intervention? Connect both decisions to the results, state remaining uncertainty and identify the next useful evidence or test."
             }
           ]
         }
@@ -782,130 +522,55 @@
       "id": "B2",
       "set": "B",
       "title": "Grievance closure and service resolution",
-      "taskVersion": "KALP-ALIGN-05:03",
+      "taskVersion": "KALP-ALIGN-04:03",
       "phases": [
         {
           "id": "B.I",
           "kind": "initial",
-          "title": "Initial response",
-          "version": "KALP-ALIGN-05:B2.I",
+          "title": "Explanation and prediction",
+          "version": "KALP-ALIGN-04:B2.I",
           "facts": [
             "Role and problem: you advise a department seeking to resolve citizens' service grievances. Closing a ticket is an administrative status; resolving the underlying problem is the public goal. Citizens may submit again if a grievance is closed without resolution.",
             "Initial facts: the department has a backlog. A proposed reform introduces a dashboard ranking offices by the proportion of tickets closed within seven days. Supervisors will review that ranking each week. Staff can close a ticket after recording an action, even when the citizen has not confirmed that the issue is resolved. Citizen follow-up is feasible but currently separate from the dashboard.",
             "Before reform, 2,000 tickets are registered in a month and 60% are closed within seven days. An independent random follow-up sample of 200 citizens finds that 56% report their underlying problem resolved. The dashboard measures speed and status, not verified resolution."
           ],
-          "task": "Answer both questions. Explain how the proposed incentive might affect staff behaviour, citizens and recorded performance. Consider that faster handling could help as well as create unintended incentives.",
+          "task": "complete B.P1 and B.P2. Explain how the proposed incentive might affect staff behaviour, citizens and recorded performance. Consider that faster handling could help as well as create unintended incentives.",
           "prompts": [
             {
               "id": "B.P1",
-              "label": "Explain the causes",
-              "text": "Explain how the problem is produced. Distinguish observed symptoms from plausible drivers, and show relevant links between actors, incentives or feedback. A short narrative is enough; a diagram is optional and receives no extra credit."
+              "label": "causal account",
+              "text": "Explain how the problem is produced. Distinguish observed symptoms from plausible drivers and show relevant links between actors, incentives or feedback. A short causal narrative is sufficient; a diagram is optional and receives no extra credit."
             },
             {
               "id": "B.P2",
-              "label": "Predict and test",
-              "text": "What effects do you expect if the proposed intervention is implemented as described, and through what mechanism? State a material assumption and an observation that would support or challenge your prediction. Explain a relevant indirect effect where your account warrants one. Precise numerical forecasts are not required."
-            }
-          ],
-          "briefingBlocks": [
-            {
-              "type": "paragraph",
-              "text": "Role and problem: you advise a department seeking to resolve citizens' service grievances. Closing a ticket is an administrative status; resolving the underlying problem is the public goal. Citizens may submit again if a grievance is closed without resolution.",
-              "heading": "Your role and goal"
-            },
-            {
-              "type": "paragraph",
-              "text": "Initial facts: the department has a backlog. A proposed reform introduces a dashboard ranking offices by the proportion of tickets closed within seven days. Supervisors will review that ranking each week. Staff can close a ticket after recording an action, even when the citizen has not confirmed that the issue is resolved. Citizen follow-up is feasible but currently separate from the dashboard.",
-              "heading": "Proposed reform"
-            },
-            {
-              "type": "table",
-              "caption": "Before reform",
-              "columns": [
-                "Measure",
-                "Reported value"
-              ],
-              "rows": [
-                [
-                  "Tickets registered in a month",
-                  "2,000"
-                ],
-                [
-                  "Tickets closed within seven days",
-                  "60%"
-                ],
-                [
-                  "Citizens reporting the problem resolved",
-                  "56%"
-                ]
-              ],
-              "notes": [
-                "Resolution is reported by an independent random follow-up sample of 200 citizens. The dashboard measures speed and status, not verified resolution."
-              ]
+              "label": "prediction and test",
+              "text": "What effects do you expect from the proposed intervention, and through what mechanism? State a material assumption and an observation that would support or challenge the prediction. Explain a relevant indirect effect where your causal account warrants one. Precise numerical forecasting is not required."
             }
           ]
         },
         {
           "id": "B.U",
           "kind": "update",
-          "title": "Update response",
-          "version": "KALP-ALIGN-05:B2.U",
+          "title": "Results and revision",
+          "version": "KALP-ALIGN-04:B2.U",
           "facts": [
             "Results, revealed after initial submission: in the next month, 2,600 tickets are registered and 85% are closed within seven days. An independent random follow-up sample of 200 citizens finds 58% reporting resolution. Registration channels were expanded during that month, so more registered tickets do not necessarily mean more underlying problems. Some citizens report being asked to submit a new ticket if the issue persists after closure. The department has no comparison group or multi-month trend for this reform."
           ],
-          "task": "Answer both questions. Evaluate which claims the dashboard and follow-up evidence support, then propose a warranted revision or retention of the reform.",
+          "task": "complete B.P3 and B.P4. Evaluate which claims the dashboard and follow-up evidence support, then propose a warranted revision or retention of the reform.",
           "prompts": [
             {
               "id": "B.P3",
-              "label": "Interpret the results",
-              "text": "How do the results compare with your prediction? Explain what they support and what they do not establish. Consider a credible alternative explanation or a material limitation in the data."
+              "label": "interpret the evidence",
+              "text": "How do these results compare with your prediction? Explain what they support and what they do not establish. Consider a credible alternative explanation or a material limitation in the data."
             },
             {
               "id": "B.P4",
-              "label": "Review your explanation and action",
-              "text": "Which parts of your original causal explanation should you keep or revise, and why? What should you keep, revise or test in the proposed intervention? Connect both decisions to the results, state the remaining uncertainty, and identify the next useful evidence or test."
-            }
-          ],
-          "briefingBlocks": [
-            {
-              "type": "table",
-              "caption": "Reported results",
-              "columns": [
-                "Measure",
-                "Before reform",
-                "Next month"
-              ],
-              "rows": [
-                [
-                  "Tickets registered",
-                  "2,000",
-                  "2,600"
-                ],
-                [
-                  "Closed within seven days",
-                  "60%",
-                  "85%"
-                ],
-                [
-                  "Citizens reporting resolution",
-                  "56%",
-                  "58%"
-                ]
-              ],
-              "notes": [
-                "Each resolution figure comes from an independent random follow-up sample of 200 citizens.",
-                "Registration channels expanded during the next month: more registered tickets do not necessarily mean more underlying problems.",
-                "The department has no comparison group or multi-month trend for this reform."
-              ]
-            },
-            {
-              "type": "paragraph",
-              "text": "Some citizens report being asked to submit a new ticket if the issue persists after closure."
+              "label": "update the model and action",
+              "text": "Which part of your original causal account should be revised or retained, and why? What should now be retained, revised or tested in the proposed intervention? Connect both decisions to the results, state remaining uncertainty and identify the next useful evidence or test."
             }
           ]
         }
       ]
     }
-  ],
-  "caseOrderPolicy": "free"
+  ]
 }

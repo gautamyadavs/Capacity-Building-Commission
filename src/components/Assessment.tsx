@@ -6,10 +6,12 @@ import {
   caseComplete,
   currentPhase,
   resumePath,
+  casePath,
 } from "../model";
 import {
   AppLink,
-  CaseFacts,
+  CaseReference,
+  ReferenceDialog,
   ErrorBox,
   StageProgress,
   SubmittedResponsePanel,
@@ -47,7 +49,7 @@ export function AssessmentIntro() {
           setBusy(true);
           try {
             await store.begin(a.id);
-            navigate(resumePath(store.getSnapshot().run));
+            navigate(casePath(store.getSnapshot().run, a.id));
           } catch {
           } finally {
             setBusy(false);
@@ -64,7 +66,8 @@ export function AssessmentStage() {
     { run, store, error } = useSession(),
     navigate = useNavigate();
   const [confirm, setConfirm] = useState(false),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [referenceOpen, setReferenceOpen] = useState(false);
   const a = run.config.cases.find((a) => a.id === aid),
     p = a?.phases.find((p) => p.id === sid);
   if (!a || !p) return <ErrorBox message="Case phase not found." />;
@@ -94,7 +97,9 @@ export function AssessmentStage() {
           ? "/learner/review"
           : following
             ? `/learner/assessment/${a.id}/stage/${following.id}`
-            : `/learner/assessment/${a.id}/complete`,
+            : next.config.caseOrderPolicy === "free"
+              ? "/learner"
+              : `/learner/assessment/${a.id}/complete`,
       );
     } catch {
     } finally {
@@ -120,87 +125,109 @@ export function AssessmentStage() {
         </div>
       </section>
       <div className={styles.stageWork}>
-        <CaseFacts phase={p} />
-        {p.kind === "update" && (
-          <details className={styles.references} open>
-            <summary>Initial facts and exact submitted response</summary>
-            <CaseFacts phase={a.phases[0]} />
-            <SubmittedResponsePanel
-              phase={a.phases[0]}
-              snapshot={s.submitted[a.phases[0].id]}
-              expanded
-            />
-          </details>
-        )}
-        {snap ? (
-          <>
-            <SubmittedResponsePanel phase={p} snapshot={snap} expanded />
-            <AppLink className={styles.primary} to={resumePath(run)}>
-              Continue to diagnostic record →
-            </AppLink>
-          </>
-        ) : run.end ? (
-          <section>
-            <h2>Phase left unsubmitted</h2>
-            <p>
-              The diagnostic ended. This draft is retained for recovery; it is
-              not submitted evidence.
-            </p>
-            {p.prompts.map((f) => (
-              <section className={styles.answer} key={f.id}>
-                <h3>
-                  {f.id} · {f.label}
-                </h3>
-                <p>{draft?.answers[f.id] || "No draft response"}</p>
-              </section>
-            ))}
-          </section>
-        ) : draft ? (
-          <form
-            aria-label="Phase response"
-            className={styles.responseForm}
-            onSubmit={(e) => {
-              e.preventDefault();
-              setConfirm(true);
-            }}
-          >
-            <h2>Your response</h2>
-            {p.prompts.map((f) => (
-              <ResponseField
-                key={f.id}
-                prompt={f}
-                value={draft.answers[f.id]}
-                onChange={(value) =>
-                  store.edit(a.id, {
-                    ...draft,
-                    answers: { ...draft.answers, [f.id]: value },
-                  })
-                }
-                disabled={busy}
-              />
-            ))}
-            <div className={styles.submitBar}>
-              <p>Your exact response will be preserved.</p>
-              <button type="submit" className={styles.primary} disabled={busy}>
-                Submit phase →
-              </button>
-            </div>
-          </form>
-        ) : null}
+        <aside
+          className={styles.referencePane}
+          aria-label="Case reference"
+          tabIndex={0}
+        >
+          <CaseReference a={a} phase={p} />
+        </aside>
+        <div className={styles.responseColumn}>
+          <div className={styles.mobileReferenceControl}>
+            <button
+              type="button"
+              className={styles.secondary}
+              onClick={() => setReferenceOpen(true)}
+            >
+              View case information
+            </button>
+          </div>
+          {snap ? (
+            <>
+              <SubmittedResponsePanel phase={p} snapshot={snap} expanded />
+              <AppLink className={styles.primary} to={resumePath(run)}>
+                Continue to diagnostic record →
+              </AppLink>
+            </>
+          ) : run.end ? (
+            <section>
+              <h2>Phase left unsubmitted</h2>
+              <p>
+                The diagnostic ended. This draft is retained for recovery; it is
+                not submitted evidence.
+              </p>
+              {p.prompts.map((f) => (
+                <section className={styles.answer} key={f.id}>
+                  <h3>{f.label}</h3>
+                  <p>{draft?.answers[f.id] || "No draft response"}</p>
+                </section>
+              ))}
+            </section>
+          ) : draft ? (
+            <form
+              aria-label="Phase response"
+              className={styles.responseForm}
+              onSubmit={(e) => {
+                e.preventDefault();
+                setConfirm(true);
+              }}
+            >
+              <h2>Your response</h2>
+              {p.prompts.map((f) => (
+                <ResponseField
+                  key={f.id}
+                  prompt={f}
+                  value={draft.answers[f.id]}
+                  onChange={(value) =>
+                    store.edit(a.id, {
+                      ...draft,
+                      answers: { ...draft.answers, [f.id]: value },
+                    })
+                  }
+                  disabled={busy}
+                />
+              ))}
+              <div className={styles.submitBar}>
+                <p>Submitted responses become read-only.</p>
+                <button
+                  type="submit"
+                  className={styles.primary}
+                  disabled={busy}
+                >
+                  {p.kind === "initial"
+                    ? "Submit initial response"
+                    : "Submit update"}{" "}
+                  →
+                </button>
+              </div>
+            </form>
+          ) : null}
+        </div>
       </div>
+      {referenceOpen && (
+        <ReferenceDialog
+          a={a}
+          phase={p}
+          close={() => setReferenceOpen(false)}
+        />
+      )}
       {confirm && (
         <Modal
-          title="Submit and preserve this response?"
+          title={
+            p.kind === "initial" ? "Submit initial response?" : "Submit update?"
+          }
           cancel={() => setConfirm(false)}
           confirm={commit}
-          confirmLabel="Submit and preserve"
+          confirmLabel={
+            p.kind === "initial" ? "Submit initial response" : "Submit update"
+          }
           busy={busy}
           error={error}
         >
           <p>
             {p.kind === "initial"
-              ? "The initial response will be saved before the update is revealed. Later responses become a separate record; this original stays readable."
-              : "This update is saved separately from your initial response."}
+              ? "This submitted version cannot be edited. It stays available for reference and unlocks the update. Your update will be a separate record."
+              : "This submitted update cannot be edited. It stays available alongside your initial response and completes this case."}
           </p>
           {draft && Object.values(draft.answers).some((x) => !x.trim()) && (
             <p>
@@ -225,7 +252,7 @@ export function AssessmentCompletion() {
   return (
     <section className={styles.completion}>
       <p className={styles.eyebrow}>{a.id} · SUBMITTED</p>
-      <h1>Both phase responses are preserved</h1>
+      <h1>Case submitted</h1>
       <p>
         Criterion judgements await human review. Substantive feedback becomes
         available after all four cases finish or an explicit early end.
@@ -238,8 +265,11 @@ export function AssessmentCompletion() {
         />
       ))}
       <div className={styles.actions}>
-        <AppLink className={styles.primary} to={resumePath(run)}>
-          {run.end ? "View diagnostic record" : "Continue to next case"} →
+        <AppLink
+          className={styles.primary}
+          to={run.end ? "/learner/review" : "/learner"}
+        >
+          {run.end ? "View submissions and feedback" : "Choose another case"} →
         </AppLink>
         <AppLink className={styles.secondary} to="/learner">
           Diagnostic home
