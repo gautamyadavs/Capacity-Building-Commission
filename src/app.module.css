@@ -172,20 +172,13 @@
   border-radius: 4px;
   margin: 20px 0;
 }
-.sectionHeader,
 .writingGuidance {
   border-top: 1px solid var(--line);
   padding-top: 24px;
   margin: 24px 0;
 }
-.sectionHeader {
-  font-size: 23px;
-}
 .writingGuidance h2 {
   font-size: 21px;
-}
-.sequenceNote {
-  color: #435b4d;
 }
 .batteryCases {
   display: grid;
@@ -233,7 +226,7 @@
 .writingHelp summary {
   font-weight: 600;
 }
-.caseMain h3 {
+.caseMain h2 {
   font-size: 21px;
   line-height: 1.4;
 }

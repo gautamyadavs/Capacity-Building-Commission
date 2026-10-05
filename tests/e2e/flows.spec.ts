@@ -224,7 +224,7 @@ test("all four cases and eight phase submissions under the actual Pages subpath"
     }
     if (a.id !== "B2") {
       await expect(
-        page.getByRole("heading", { name: "Your cases", exact: true }),
+        page.getByRole("heading", { name: "Reasoning through governance decisions", level: 1, exact: true }),
       ).toBeVisible();
       await expect(page.locator("[data-review-id]")).toHaveCount(0);
     }
@@ -789,7 +789,7 @@ test("B2-first case choice, interleaved drafts, latest resume and different comp
   await submit(page);
   await submit(page);
   await expect(
-    page.getByRole("heading", { name: "Your cases", exact: true }),
+    page.getByRole("heading", { name: "Reasoning through governance decisions", level: 1, exact: true }),
   ).toBeVisible();
   for (const id of ["B1", "A1", "B2"]) {
     await card(id)
@@ -801,7 +801,7 @@ test("B2-first case choice, interleaved drafts, latest resume and different comp
     await submit(page);
     if (id !== "B2")
       await expect(
-        page.getByRole("heading", { name: "Your cases", exact: true }),
+        page.getByRole("heading", { name: "Reasoning through governance decisions", level: 1, exact: true }),
       ).toBeVisible();
   }
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(

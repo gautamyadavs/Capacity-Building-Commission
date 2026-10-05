@@ -37,7 +37,6 @@ export function Home() {
   return (
     <div className={styles.workspace}>
       <section className={styles.workspaceIntro}>
-        <p className={styles.eyebrow}>TRIAL · RETRIES AVAILABLE</p>
         <h1>Reasoning through governance decisions</h1>
         <p>
           Choose a fictional case and start with the first question. Then revisit
@@ -58,14 +57,6 @@ export function Home() {
           </AppLink>
         )}
       </section>
-      <h2 className={styles.sectionHeader}>Your cases</h2>
-      {!run.end && (
-        <p className={styles.sequenceNote}>
-          {config.caseOrderPolicy === "free"
-            ? "Choose any case. You can switch between unfinished cases; each draft is saved."
-            : "Complete each case before starting the next."}
-        </p>
-      )}
       <div className={styles.batteryCases}>
         {config.cases.map((a) => {
           const s = run.sessions[a.id],
@@ -74,7 +65,7 @@ export function Home() {
           return (
             <article key={a.id} data-format={a.set} className={styles.caseCard}>
               <div className={styles.caseMain}>
-                <h3>{a.title}</h3>
+                <h2>{a.title}</h2>
                 <p>
                   Set {a.set} ·{" "}
                   {done
