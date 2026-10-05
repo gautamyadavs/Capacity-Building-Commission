@@ -22,7 +22,7 @@ import { Files } from "./components/Files";
 import { Reviewer } from "./components/Reviewer";
 import styles from "./app.module.css";
 function Layout() {
-  const { store, saveStatus, error, notice, fatal } = useSession(),
+  const { run, store, saveStatus, error, notice, fatal } = useSession(),
     location = useLocation(),
     isReviewer = location.pathname === "/reviewer";
   useEffect(() => {
@@ -62,12 +62,14 @@ function Layout() {
         <nav aria-label="Main navigation">
           <AppLink to="/learner">Diagnostic home</AppLink>
           <AppLink to="/learner/files">Recovery and files</AppLink>
-          <AppLink to="/reviewer">Human review</AppLink>
+          {run.end && (
+            <AppLink to="/learner/review">Submissions and feedback</AppLink>
+          )}
         </nav>
       </header>
       {!isReviewer && (
         <section aria-label="Local saving status" className={styles.saveStrip}>
-          <span>Local browser workspace</span>
+          <span>Progress in this browser</span>
           <span
             role="status"
             className={
@@ -123,7 +125,7 @@ function Layout() {
       </main>
       <footer className={styles.footer}>
         <span>BHARAT KALP · Diagnostic design review</span>
-        <span>Fictional cases · Practice optional and pending</span>
+        <AppLink to="/reviewer">Reviewer workspace</AppLink>
       </footer>
     </div>
   );

@@ -4,6 +4,7 @@ import {
   beginCase,
   caseAvailable,
   createRun,
+  resumePath,
   emptyReviewBundle,
   endRun,
   evidenceAvailability,
@@ -69,8 +70,8 @@ describe("two-phase diagnostic evidence", () => {
   });
   it("records actual starts and all eight submissions without premature completion", () => {
     let run = createRun(config);
-    expect(caseAvailable(run, "A2")).toBe(false);
-    expect(() => beginCase(run, "B1")).toThrow();
+    expect(caseAvailable(run, "A2")).toBe(true);
+    expect(caseAvailable(run, "B1")).toBe(true);
     for (const a of config.cases) {
       run = beginCase(run, a.id);
       for (const p of a.phases) {
@@ -134,7 +135,7 @@ describe("two-phase diagnostic evidence", () => {
         r.sessions.A1.submitted["A.U"].phaseVersion = "wrong";
       },
       (r: typeof valid) => {
-        r.actualSequence.reverse();
+        r.actualSequence.push("A1");
       },
       (r: typeof valid) => {
         r.end!.incomplete.push({
@@ -309,4 +310,93 @@ describe("real human review contract", () => {
       parseReviewBundle(JSON.stringify(bundle), run),
     ).rejects.toThrow("earlier");
   });
+});
+
+describe("free case order and captured-session compatibility", () => {
+  it("starts B2 first, interleaves case phases and keeps exact submissions", () => {
+    let run = beginCase(createRun(config), "B2");
+    run = submitPhase(run, "B2", "B.I", response(run, "B2", "B.I", "B2 first"));
+    run = beginCase(run, "A2");
+    run = submitPhase(run, "A2", "A.I", response(run, "A2", "A.I", "A2 next"));
+    run = submitPhase(
+      run,
+      "B2",
+      "B.U",
+      response(run, "B2", "B.U", "B2 update"),
+    );
+    run = beginCase(run, "B1");
+    run = beginCase(run, "A1");
+    for (const id of ["B1", "A1", "A2"]) {
+      const a = config.cases.find((a) => a.id === id)!;
+      for (const p of a.phases)
+        if (!run.sessions[id].submitted[p.id])
+          run = submitPhase(run, id, p.id, response(run, id, p.id));
+    }
+    expect(run.actualSequence).toEqual(["B2", "A2", "B1", "A1"]);
+    expect(
+      run.submissionSequence.slice(0, 3).map((r) => `${r.caseId}/${r.phaseId}`),
+    ).toEqual(["B2/B.I", "A2/A.I", "B2/B.U"]);
+    expect(run.sessions.B2.submitted["B.I"].answers["B.P1"]).toBe("B2 first");
+    expect(run.end?.kind).toBe("complete");
+    expect(parseRun(JSON.stringify(run))).toEqual(run);
+    for (const corrupt of [
+      (r: typeof run) => {
+        r.actualSequence.push("B2");
+      },
+      (r: typeof run) => {
+        r.submissionSequence[0] = r.submissionSequence[2];
+      },
+      (r: typeof run) => {
+        r.submissionSequence.splice(0, 1);
+      },
+      (r: typeof run) => {
+        delete r.sessions.B2.revealedAt["B.U"];
+      },
+    ]) {
+      const invalid = structuredClone(run);
+      corrupt(invalid);
+      expect(() => parseRun(JSON.stringify(invalid))).toThrow();
+    }
+  });
+  it("resumes the latest unfinished activity and uses suggested order for ties", () => {
+    const created = createRun(config);
+    const firstAt = new Date(
+      Date.parse(created.createdAt) + 1000,
+    ).toISOString();
+    const laterAt = new Date(Date.parse(firstAt) + 1000).toISOString();
+    let run = beginCase(beginCase(created, "B2", firstAt), "A1", firstAt);
+    // Draft creation time must not obscure the intentional equal activity timestamps.
+    run.sessions.B2.draft!.updatedAt = firstAt;
+    run.sessions.A1.draft!.updatedAt = firstAt;
+    expect(resumePath(run)).toContain("A1/stage/A.I");
+    run = beginCase(run, "B2", laterAt);
+    expect(resumePath(run)).toContain("B2/stage/B.I");
+    expect(parseRun(JSON.stringify(run))).toEqual(run);
+  });
+});
+
+it("keeps KALP-ALIGN-04 captured content and fixed progression when policy and blocks are absent", async () => {
+  const { default: captured } = await import("./fixtures/kalp-align-04.json");
+  const old = ConfigSchema.parse(captured);
+  let run = createRun(old);
+  expect(caseAvailable(run, "B2")).toBe(false);
+  expect(() => beginCase(run, "B2")).toThrow();
+  run = beginCase(run, "A1");
+  expect(parseRun(JSON.stringify(run)).config).toEqual(old);
+  expect(run.config.packageVersion).toBe("KALP-ALIGN-04");
+  expect(resumePath(run)).toContain("A1/stage/A.I");
+  for (const a of old.cases) {
+    run = beginCase(run, a.id);
+    for (const phase of a.phases)
+      run = submitPhase(run, a.id, phase.id, response(run, a.id, phase.id));
+  }
+  const oldDigest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(JSON.stringify(run)),
+  );
+  const oldBinding = Array.from(new Uint8Array(oldDigest), (x) =>
+    x.toString(16).padStart(2, "0"),
+  ).join("");
+  expect(await runBinding(run)).toBe(oldBinding);
+  expect(await runBinding(parseRun(JSON.stringify(run)))).toBe(oldBinding);
 });

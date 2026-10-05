@@ -26,13 +26,12 @@ export function Debrief() {
         ← Diagnostic home
       </AppLink>
       <p className={styles.eyebrow}>
-        {run.config.packageVersion} ·{" "}
         {run.end.kind === "early" ? "ENDED EARLY" : "FOUR CASES SUBMITTED"}
       </p>
-      <h1 className={styles.debriefTitle}>Submissions and human review</h1>
+      <h1 className={styles.debriefTitle}>Submissions and feedback</h1>
       <p>
-        Submitted responses are preserved. Criterion feedback appears only from
-        actual imported human-review records. Practice is optional and pending.
+        Your submitted responses are read-only. Feedback appears after a human
+        reviewer reviews your evidence.
       </p>
       <p>
         Actual case sequence:{" "}
@@ -69,16 +68,35 @@ export function Debrief() {
         label="Import human-review feedback"
         onFile={(raw) => store.importReviews(raw)}
       />
-      {!reviews?.records.length && (
-        <p role="status" className={styles.pauseNote}>
-          Awaiting review. No criterion performance levels have been assigned.
-        </p>
-      )}
+      <p role="status" className={styles.pauseNote}>
+        {!reviews?.records.length
+          ? "Awaiting review. No criterion performance levels have been assigned."
+          : `${new Set(reviews.records.map((r) => `${r.caseId}/${r.criterionId}`)).size} of 20 case criteria have human-review records. Uncertain judgements and evidence limitations are identified in the records.`}
+      </p>
       {run.config.cases.map((a) => (
-        <section key={a.id} data-format={a.set}>
-          <h2>
-            {a.id} · {a.title}
-          </h2>
+        <details
+          key={a.id}
+          data-format={a.set}
+          className={styles.caseRecord}
+          open={reviews?.records.some((r) => r.caseId === a.id) || undefined}
+        >
+          <summary>
+            <h2>
+              {a.id} · {a.title}
+              <span>
+                {Object.keys(run.sessions[a.id].submitted).length} of 2
+                responses submitted ·{" "}
+                {
+                  new Set(
+                    reviews?.records
+                      .filter((r) => r.caseId === a.id)
+                      .map((r) => r.criterionId),
+                  ).size
+                }{" "}
+                of {criteriaFor(run, a.id).length} criteria with review records
+              </span>
+            </h2>
+          </summary>
           <div className={styles.profileList}>
             {criteriaFor(run, a.id).map((c) => {
               const records =
@@ -87,9 +105,11 @@ export function Debrief() {
                 ) || [];
               return (
                 <section key={c.id} className={styles.profile}>
-                  <h3>
-                    {c.id} · {c.title}
-                  </h3>
+                  {!records.length && (
+                    <h3>
+                      {c.id} · {c.title}
+                    </h3>
+                  )}
                   {records.length ? (
                     <>
                       {records
@@ -98,7 +118,11 @@ export function Debrief() {
                             !records.some((later) => later.supersedes === r.id),
                         )
                         .map((r) => (
-                          <ReviewFeedback key={r.id} record={r} />
+                          <ReviewFeedback
+                            key={r.id}
+                            record={r}
+                            config={run.config}
+                          />
                         ))}
                       {records.some((r) =>
                         records.some((later) => later.supersedes === r.id),
@@ -112,14 +136,18 @@ export function Debrief() {
                               ),
                             )
                             .map((r) => (
-                              <ReviewFeedback key={r.id} record={r} />
+                              <ReviewFeedback
+                                key={r.id}
+                                record={r}
+                                config={run.config}
+                              />
                             ))}
                         </details>
                       )}
                     </>
                   ) : (
                     <>
-                      <p>Awaiting review</p>
+                      <p>No human-review record yet.</p>
                       {evidenceAvailability(run, a.id, c) !==
                         "Awaiting review" && (
                         <p>
@@ -173,14 +201,21 @@ export function Debrief() {
                 ))}
             </div>
           </details>
-        </section>
+        </details>
       ))}
-      <p className={styles.note}>
-        This prototype supports design review. Subject-matter review,
-        representative-officer responses, example review and rater calibration
-        remain pending before operational interpretation. Programme-learning
-        claims require actual teaching exposure and further evidence.
-      </p>
+      <details className={styles.references}>
+        <summary>Design status and captured version</summary>
+        <p>
+          {run.config.packageVersion} · Task {run.config.taskVersion} · Rubric{" "}
+          {run.config.rubricVersion}. Practice is optional and pending.
+        </p>
+        <p>
+          This prototype supports design review. Subject-matter review,
+          representative-officer responses, example review and rater calibration
+          remain pending before operational interpretation. Programme-learning
+          claims require actual teaching exposure and further evidence.
+        </p>
+      </details>
     </div>
   );
 }

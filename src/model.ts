@@ -14,12 +14,35 @@ const PromptSchema = z.strictObject({
   label: Nonempty,
   text: Nonempty,
 });
+const BriefingBlockSchema = z.discriminatedUnion("type", [
+  z.strictObject({
+    type: z.literal("paragraph"),
+    text: Nonempty,
+    heading: Nonempty.optional(),
+  }),
+  z
+    .strictObject({
+      type: z.literal("table"),
+      caption: Nonempty,
+      columns: z.array(Nonempty).min(2),
+      rows: z.array(z.array(Nonempty)).min(1),
+      notes: z.array(Nonempty),
+    })
+    .superRefine((table, ctx) => {
+      if (table.rows.some((row) => row.length !== table.columns.length))
+        ctx.addIssue({
+          code: "custom",
+          message: "Table rows must match the columns",
+        });
+    }),
+]);
 const PhaseSchema = z.strictObject({
   id: Nonempty,
   kind: z.enum(["initial", "update"]),
   title: Nonempty,
   version: Nonempty,
   facts: z.array(Nonempty).min(1),
+  briefingBlocks: z.array(BriefingBlockSchema).min(1).optional(),
   task: Nonempty,
   prompts: z.array(PromptSchema).min(1),
 });
@@ -49,6 +72,7 @@ const CriterionSchema = z.strictObject({
 export const ConfigSchema = z
   .strictObject({
     schemaVersion: z.literal(3),
+    caseOrderPolicy: z.enum(["fixed", "free"]).optional(),
     packageVersion: Nonempty,
     frameworkVersion: Nonempty,
     taskVersion: Nonempty,
@@ -180,6 +204,7 @@ const RunSchema = z.strictObject({
     z.string(),
     z.strictObject({
       startedAt: Time.nullable(),
+      lastActivityAt: Time.optional(),
       revealedAt: z.record(z.string(), Time),
       draft: DraftSchema.nullable(),
       submitted: z.record(z.string(), SnapshotSchema),
@@ -237,16 +262,46 @@ export function caseAvailable(run: Run, id: string) {
   const i = run.config.cases.findIndex((a) => a.id === id);
   return (
     i >= 0 &&
-    run.config.cases
-      .slice(0, i)
-      .every((a) => caseComplete(a, run.sessions[a.id]))
+    (run.config.caseOrderPolicy === "free" ||
+      run.config.cases
+        .slice(0, i)
+        .every((a) => caseComplete(a, run.sessions[a.id])))
   );
+}
+export function casePath(run: Run, id: string) {
+  const a = run.config.cases.find((a) => a.id === id)!;
+  const p = currentPhase(a, run.sessions[id]);
+  if (caseComplete(a, run.sessions[id]))
+    return `/learner/assessment/${id}/complete`;
+  return `/learner/assessment/${id}${p ? `/stage/${p.id}` : ""}`;
 }
 export function resumePath(run: Run) {
   if (run.end) return "/learner/review";
-  const a = run.config.cases.find((a) => !caseComplete(a, run.sessions[a.id]))!;
-  const p = currentPhase(a, run.sessions[a.id]);
-  return `/learner/assessment/${a.id}${p ? `/stage/${p.id}` : ""}`;
+  const unfinished = run.config.cases.filter(
+    (a) => !caseComplete(a, run.sessions[a.id]),
+  );
+  if (run.config.caseOrderPolicy === "free") {
+    const active = unfinished.filter((a) => run.sessions[a.id].startedAt);
+    // Stable sort keeps the suggested case order for equal activity times.
+    active.sort((a, b) => {
+      const activity = (id: string) => {
+        const s = run.sessions[id];
+        return Math.max(
+          ...[
+            s.lastActivityAt,
+            s.startedAt,
+            s.draft?.updatedAt,
+            ...Object.values(s.revealedAt),
+          ]
+            .filter((x): x is string => !!x)
+            .map((x) => Date.parse(x)),
+        );
+      };
+      return activity(b.id) - activity(a.id);
+    });
+    return active.length ? casePath(run, active[0].id) : "/learner";
+  }
+  return unfinished.length ? casePath(run, unfinished[0].id) : "/learner";
 }
 export function validAnswers(phase: Phase, answers: Record<string, string>) {
   return (
@@ -267,6 +322,7 @@ export function beginCase(run: Run, id: string, at = now()): Run {
     s.draft = emptyDraft(a.phases[0]);
     n.actualSequence.push(id);
   }
+  if (n.config.caseOrderPolicy === "free") s.lastActivityAt = at;
   return n;
 }
 export function incompleteOpportunities(run: Run) {
@@ -323,6 +379,7 @@ export function submitPhase(
   if (!validAnswers(p, draft.answers))
     throw new Error("Response fields do not match the captured task.");
   const n = structuredClone(run);
+  if (n.config.caseOrderPolicy === "free") n.sessions[id].lastActivityAt = at;
   n.sessions[id].submitted[phaseId] = {
     phaseId,
     phaseVersion: p.version,
@@ -347,7 +404,8 @@ export function parseRun(raw: string): Run {
   for (const a of run.config.cases) {
     const s = run.sessions[a.id];
     if (s.startedAt) {
-      if (blocked) throw new Error("Invalid case sequence.");
+      if (blocked && run.config.caseOrderPolicy !== "free")
+        throw new Error("Invalid case sequence.");
       starts.push(a.id);
     }
     if (s.startedAt !== (s.revealedAt[a.phases[0].id] || null))
@@ -398,11 +456,49 @@ export function parseRun(raw: string): Run {
       throw new Error("Missing current draft.");
     blocked ||= !caseComplete(a, s);
   }
-  if (
+  if (run.config.caseOrderPolicy === "free") {
+    if (
+      new Set(run.actualSequence).size !== starts.length ||
+      run.actualSequence.length !== starts.length ||
+      run.actualSequence.some((id) => !starts.includes(id))
+    )
+      throw new Error("Invalid recorded start sequence.");
+    let lastStart = run.createdAt;
+    for (const id of run.actualSequence) {
+      const at = run.sessions[id].startedAt!;
+      if (at < lastStart) throw new Error("Invalid start chronology.");
+      lastStart = at;
+    }
+    const remaining = new Map(
+      sequence.map((r) => [`${r.caseId}/${r.phaseId}`, r]),
+    );
+    let lastSubmission = run.createdAt;
+    const seen = new Set<string>();
+    for (const r of run.submissionSequence) {
+      const key = `${r.caseId}/${r.phaseId}`;
+      const recorded = remaining.get(key);
+      const a = run.config.cases.find((a) => a.id === r.caseId);
+      if (
+        !recorded ||
+        !a ||
+        JSON.stringify(recorded) !== JSON.stringify(r) ||
+        r.submittedAt < lastSubmission ||
+        r.submittedAt < run.sessions[r.caseId].revealedAt[r.phaseId] ||
+        (r.phaseId === a.phases[1].id &&
+          !seen.has(`${r.caseId}/${a.phases[0].id}`))
+      )
+        throw new Error("Invalid recorded submission sequence.");
+      remaining.delete(key);
+      seen.add(key);
+      lastSubmission = r.submittedAt;
+    }
+    if (remaining.size) throw new Error("Missing recorded submission.");
+  } else if (
     JSON.stringify(starts) !== JSON.stringify(run.actualSequence) ||
     JSON.stringify(sequence) !== JSON.stringify(run.submissionSequence)
-  )
+  ) {
     throw new Error("Invalid recorded sequence.");
+  }
   if (
     (diagnosticComplete(run) && !run.end) ||
     (run.end && (run.end.kind === "complete") !== diagnosticComplete(run))
@@ -480,7 +576,7 @@ export type ReviewRecord = z.infer<typeof ReviewRecordSchema>;
 export type ReviewBundle = z.infer<typeof ReviewBundleSchema>;
 // A consistency binding, not a signature, identity check, authentication or concealment mechanism.
 export async function runBinding(run: Run) {
-  const bytes = new TextEncoder().encode(JSON.stringify(run));
+  const bytes = new TextEncoder().encode(JSON.stringify(RunSchema.parse(run)));
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return Array.from(new Uint8Array(digest), (x) =>
     x.toString(16).padStart(2, "0"),

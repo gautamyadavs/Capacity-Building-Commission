@@ -19,9 +19,13 @@ async function seed(
   await page.reload();
 }
 async function submit(page: Page) {
-  await page.getByRole("button", { name: "Submit phase →" }).click();
   await page
-    .getByRole("button", { name: "Submit and preserve", exact: true })
+    .getByRole("form", { name: "Phase response" })
+    .getByRole("button", { name: /Submit initial response|Submit update/ })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: /Submit initial response|Submit update/ })
     .click();
 }
 async function checkAxe(page: Page) {
@@ -50,8 +54,16 @@ test("all four cases and eight phase submissions under the actual Pages subpath"
       await expect(
         page.getByRole("heading", { name: p.title, exact: true }),
       ).toBeVisible();
-      for (const f of p.facts)
-        await expect(page.getByText(f, { exact: true })).toBeVisible();
+      for (const block of p.briefingBlocks || []) {
+        if (block.type === "paragraph")
+          await expect(
+            page.getByText(block.text, { exact: true }),
+          ).toBeVisible();
+        else
+          await expect(
+            page.getByRole("table", { name: block.caption }),
+          ).toBeVisible();
+      }
       expect(await page.getByRole("textbox").count()).toBe(p.prompts.length);
       if (p.kind === "initial") {
         await expect(
@@ -60,14 +72,20 @@ test("all four cases and eight phase submissions under the actual Pages subpath"
       }
       for (const f of p.prompts)
         await page
-          .getByLabel(`${f.id} · ${f.label}`, { exact: true })
+          .getByLabel(f.label, { exact: true })
           .fill(
             `${a.id} ${f.id}: • A defensible narrative\nReasons and remaining uncertainty.`,
           );
       if (p.kind === "update") {
+        await page
+          .getByRole("button", { name: "Initial facts", exact: true })
+          .click();
         await expect(
           page.getByText(a.phases[0].facts[0], { exact: true }),
         ).toBeVisible();
+        await page
+          .getByRole("button", { name: "Submitted response", exact: true })
+          .click();
         await expect(
           page.getByText(
             `${a.id} ${a.phases[0].prompts[0].id}: • A defensible narrative\nReasons and remaining uncertainty.`,
@@ -80,17 +98,16 @@ test("all four cases and eight phase submissions under the actual Pages subpath"
     }
     if (a.id !== "B2") {
       await expect(
-        page.getByText(/Criterion judgements await human review/),
+        page.getByRole("heading", { name: "Your cases", exact: true }),
       ).toBeVisible();
       await expect(page.locator("[data-review-id]")).toHaveCount(0);
     }
   }
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Submissions and human review",
+    "Submissions and feedback",
   );
-  await expect(page.getByText("Awaiting review", { exact: true })).toHaveCount(
-    20,
-  );
+  await expect(page.getByText(/Awaiting review/)).toHaveCount(1);
+  await expect(page.locator("details[data-format][open]")).toHaveCount(0);
   await expect(page.locator("[data-review-id]")).toHaveCount(0);
   await checkAxe(page);
   const run = await page.evaluate(
@@ -100,7 +117,7 @@ test("all four cases and eight phase submissions under the actual Pages subpath"
   expect(run.actualSequence).toEqual(["A1", "A2", "B1", "B2"]);
   expect(run.submissionSequence).toHaveLength(8);
   expect(run.end.kind).toBe("complete");
-  expect(run.config.taskVersion).toBe("KALP-ALIGN-04:03");
+  expect(run.config.taskVersion).toBe("KALP-ALIGN-05:03");
 });
 test("keyboard cancel/confirm, exact draft recovery and direct-route reveal guard", async ({
   page,
@@ -117,7 +134,7 @@ test("keyboard cancel/confirm, exact draft recovery and direct-route reveal guar
     page.getByText(config.cases[0].phases[1].facts[0], { exact: true }),
   ).toHaveCount(0);
   await page.goto(`${base}#/learner/assessment/A1/stage/A.I`);
-  const first = page.getByLabel("A.P1 · choose and compare", { exact: true });
+  const first = page.getByLabel("Choose and compare", { exact: true });
   await first.focus();
   await page.keyboard.type("Keyboard draft");
   await page.reload();
@@ -125,7 +142,7 @@ test("keyboard cancel/confirm, exact draft recovery and direct-route reveal guar
   await first.focus();
   for (let i = 0; i < 4; i++) await page.keyboard.press("Tab");
   await expect(
-    page.getByRole("button", { name: "Submit phase →" }),
+    page.getByRole("button", { name: "Submit initial response →" }),
   ).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(
@@ -133,14 +150,17 @@ test("keyboard cancel/confirm, exact draft recovery and direct-route reveal guar
   ).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(
-    page.getByRole("button", { name: "Submit phase →" }),
+    page.getByRole("button", { name: "Submit initial response →" }),
   ).toBeFocused();
   await expect(first).toHaveValue("Keyboard draft");
   await submit(page);
   await expect(
-    page.getByRole("heading", { name: "Updated decision", exact: true }),
+    page.getByRole("heading", { name: "Update response", exact: true }),
   ).toBeVisible();
   await page.reload();
+  await page
+    .getByRole("button", { name: "Submitted response", exact: true })
+    .click();
   await expect(page.getByText("Keyboard draft", { exact: true })).toBeVisible();
   await expect(page.getByRole("textbox")).toHaveCount(2);
 });
@@ -160,16 +180,28 @@ test("wide and narrow reference access, reflow and accessible names", async ({
   for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     await reflow(page);
+    const reference =
+      width < 1100
+        ? page.getByRole("dialog")
+        : page.getByRole("complementary", { name: "Case reference" });
+    if (width < 1100)
+      await page.getByRole("button", { name: "View case information" }).click();
+    await reference
+      .getByRole("button", { name: "Initial facts", exact: true })
+      .click();
     await expect(
-      page.getByText(config.cases[3].phases[0].facts[0], { exact: true }),
+      reference.getByText(config.cases[3].phases[0].facts[0], { exact: true }),
     ).toBeVisible();
+    if (width < 1100)
+      await page
+        .getByRole("button", { name: "Close case information" })
+        .click();
     await expect(
-      page.getByLabel("B.P3 · interpret the evidence", { exact: true }),
+      page.getByLabel("Interpret the results", { exact: true }),
     ).toHaveValue("Narrow draft");
     await checkAxe(page);
     const snapshot = await page.locator("main").ariaSnapshot();
-    expect(snapshot).toContain('textbox "B.P3 · interpret the evidence"');
-    expect(snapshot).toContain('heading "Case information"');
+    expect(snapshot).toContain('textbox "Interpret the results"');
   }
   await page.screenshot({
     path: "test-results/narrow-update.png",
@@ -190,7 +222,7 @@ test("early end retains drafts and missing opportunities without invented rating
     "/learner/assessment/A1/stage/A.I",
   );
   await page
-    .getByLabel("A.P1 · choose and compare", { exact: true })
+    .getByLabel("Choose and compare", { exact: true })
     .fill("Draft retained for recovery");
   await page
     .getByRole("link", { name: "Diagnostic home", exact: true })
@@ -219,7 +251,9 @@ test("human-review form export/import, supplementary attribution and immutable r
 }) => {
   const run = completeRun("Submitted reasons for software verification");
   await seed(page, run);
-  await page.getByRole("link", { name: "Human review", exact: true }).click();
+  await page
+    .getByRole("link", { name: "Reviewer workspace", exact: true })
+    .click();
   await page.getByLabel("Import ended diagnostic session").setInputFiles({
     name: "session.json",
     mimeType: "application/json",
@@ -228,6 +262,16 @@ test("human-review form export/import, supplementary attribution and immutable r
   await page
     .getByRole("button", { name: "Preserve workspace and import" })
     .click();
+  const reference = page.locator("details").filter({
+    has: page.getByText("Authored illustrations and calibration reference", {
+      exact: true,
+    }),
+  });
+  await reference.locator("summary").click();
+  await expect(
+    reference.getByText(/Developing illustration:/).first(),
+  ).toBeVisible();
+  await reference.locator("summary").click();
   await page
     .getByText(
       "A1 · Flood response and essential movement: responses and criteria",
@@ -344,12 +388,18 @@ test("save failure stays truthful and retry preserves work without reveal", asyn
     "/learner/assessment/A1/stage/A.I",
   );
   await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Object.defineProperty(window, "restoreTestStorage", {
+      value: () => {
+        Storage.prototype.setItem = original;
+      },
+    });
     Storage.prototype.setItem = function () {
       throw new Error("Simulated failure");
     };
   });
   await page
-    .getByLabel("A.P1 · choose and compare", { exact: true })
+    .getByLabel("Choose and compare", { exact: true })
     .fill("Unsaved recovery draft");
   await expect(
     page.getByRole("status").filter({ hasText: "Not saved" }),
@@ -364,8 +414,28 @@ test("save failure stays truthful and retry preserves work without reveal", asyn
     page.getByText(config.cases[0].phases[1].facts[0], { exact: true }),
   ).toHaveCount(0);
   await expect(
-    page.getByLabel("A.P1 · choose and compare", { exact: true }),
+    page.getByLabel("Choose and compare", { exact: true }),
   ).toHaveValue("Unsaved recovery draft");
+  await page.screenshot({
+    path: "test-results/save-failure.png",
+    fullPage: true,
+  });
+  await page.evaluate(() => {
+    (
+      window as unknown as { restoreTestStorage: () => void }
+    ).restoreTestStorage();
+  });
+  await page.getByRole("button", { name: "Retry save", exact: true }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Saved" }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByLabel("Choose and compare", { exact: true }),
+  ).toHaveValue("Unsaved recovery draft");
+  await expect(
+    page.getByText(config.cases[0].phases[1].facts[0], { exact: true }),
+  ).toHaveCount(0);
 });
 test("cross-tab submission and new-session safeguards", async ({
   page,
@@ -379,13 +449,11 @@ test("cross-tab submission and new-session safeguards", async ({
   const other = await context.newPage();
   await other.goto(`${base}#/learner/assessment/A1/stage/A.I`);
   await page
-    .getByLabel("A.P1 · choose and compare", { exact: true })
+    .getByLabel("Choose and compare", { exact: true })
     .fill("Original from first tab");
-  await page
-    .getByLabel("A.P2 · citizen impacts and duties", { exact: true })
-    .focus();
+  await page.getByLabel("Citizen impacts and duties", { exact: true }).focus();
   await expect(
-    other.getByLabel("A.P1 · choose and compare", { exact: true }),
+    other.getByLabel("Choose and compare", { exact: true }),
   ).toHaveValue("Original from first tab");
   await submit(page);
   await expect(
@@ -413,32 +481,33 @@ test("long response acceptance and keyboard reference disclosure", async ({
     "/learner/assessment/A1/stage/A.I",
   );
   const long = "Reasons and uncertainty. ".repeat(2000);
-  await page
-    .getByLabel("A.P1 · choose and compare", { exact: true })
-    .fill(long);
+  await page.getByLabel("Choose and compare", { exact: true }).fill(long);
   await submit(page);
   const stored = await page.evaluate(
     (key) => JSON.parse(localStorage.getItem(key)!),
     key,
   );
   expect(stored.sessions.A1.submitted["A.I"].answers["A.P1"]).toBe(long);
-  const reference = page
-    .locator("summary")
-    .filter({ hasText: "Initial facts and exact submitted response" });
+  const reference = page.getByRole("button", {
+    name: "Initial facts",
+    exact: true,
+  });
   await reference.focus();
   await page.keyboard.press("Enter");
   await expect(
     page.getByText(config.cases[0].phases[0].facts[0], { exact: true }),
-  ).not.toBeVisible();
-  await page.keyboard.press("Enter");
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "New information", exact: true })
+    .click();
   await expect(
     page.getByText(config.cases[0].phases[0].facts[0], { exact: true }),
-  ).toBeVisible();
-  await page.getByLabel("A.P5 · justified update", { exact: true }).focus();
+  ).toHaveCount(0);
+  await page.getByLabel("Review your decision", { exact: true }).focus();
   await page.keyboard.press("Tab");
   expect(
     await page
-      .getByLabel("A.P6 · consequences of the update", { exact: true })
+      .getByLabel("Explain the consequences", { exact: true })
       .evaluate((el) => getComputedStyle(el).outlineStyle),
   ).toBe("solid");
 });
@@ -448,14 +517,14 @@ test("missing-evidence and uncertain human-review statuses with retained revisio
 }) => {
   const run = completeRun("");
   await seed(page, run);
-  await page.getByRole("link", { name: "Human review", exact: true }).click();
   await page
-    .getByLabel("Import ended diagnostic session")
-    .setInputFiles({
-      name: "blank-session.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify(run)),
-    });
+    .getByRole("link", { name: "Reviewer workspace", exact: true })
+    .click();
+  await page.getByLabel("Import ended diagnostic session").setInputFiles({
+    name: "blank-session.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(run)),
+  });
   await page
     .getByRole("button", { name: "Preserve workspace and import" })
     .click();
@@ -543,4 +612,295 @@ test("missing-evidence and uncertain human-review statuses with retained revisio
   await page.setViewportSize({ width: 320, height: 1000 });
   await reflow(page);
   await checkAxe(page);
+});
+
+test("B2-first case choice, interleaved drafts, latest resume and different completion order", async ({
+  page,
+}) => {
+  await page.goto(`${base}#/learner`);
+  const card = (id: string) =>
+    page.getByRole("article").filter({
+      has: page.getByRole("heading", {
+        name: config.cases.find((a) => a.id === id)!.title,
+        exact: true,
+      }),
+    });
+  await card("B2").getByRole("button", { name: "Start case →" }).click();
+  await page
+    .getByLabel("Explain the causes", { exact: true })
+    .fill("B2 draft preserved across cases");
+  await page
+    .getByRole("link", { name: "Diagnostic home", exact: true })
+    .click();
+  await card("A2").getByRole("button", { name: "Start case →" }).click();
+  await page
+    .getByLabel("Choose and compare", { exact: true })
+    .fill("A2 independent draft");
+  await page.reload();
+  await page
+    .getByRole("link", { name: "Diagnostic home", exact: true })
+    .click();
+  await page.getByRole("link", { name: "Resume diagnostic →" }).click();
+  await expect(page).toHaveURL(/A2\/stage\/A.I$/);
+  await expect(
+    page.getByLabel("Choose and compare", { exact: true }),
+  ).toHaveValue("A2 independent draft");
+  await page
+    .getByRole("link", { name: "Diagnostic home", exact: true })
+    .click();
+  await card("B2").getByRole("button", { name: "Resume case →" }).click();
+  await expect(
+    page.getByLabel("Explain the causes", { exact: true }),
+  ).toHaveValue("B2 draft preserved across cases");
+  await expect(
+    page.getByRole("table", { name: "Reported results" }),
+  ).toHaveCount(0);
+  await submit(page);
+  await expect(
+    page.getByRole("table", { name: "Reported results" }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Diagnostic home", exact: true })
+    .click();
+  await card("A2").getByRole("button", { name: "Resume case →" }).click();
+  await submit(page);
+  await submit(page);
+  await expect(
+    page.getByRole("heading", { name: "Your cases", exact: true }),
+  ).toBeVisible();
+  for (const id of ["B1", "A1", "B2"]) {
+    await card(id)
+      .getByRole("button", {
+        name: id === "B2" ? "Resume case →" : "Start case →",
+      })
+      .click();
+    if (id !== "B2") await submit(page);
+    await submit(page);
+    if (id !== "B2")
+      await expect(
+        page.getByRole("heading", { name: "Your cases", exact: true }),
+      ).toBeVisible();
+  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Submissions and feedback",
+  );
+  const saved = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key)!),
+    key,
+  );
+  expect(saved.actualSequence).toEqual(["B2", "A2", "B1", "A1"]);
+  expect(
+    saved.submissionSequence
+      .slice(0, 3)
+      .map(
+        (r: { caseId: string; phaseId: string }) => `${r.caseId}/${r.phaseId}`,
+      ),
+  ).toEqual(["B2/B.I", "A2/A.I", "A2/A.U"]);
+  expect(saved.sessions.B2.submitted["B.I"].answers["B.P1"]).toBe(
+    "B2 draft preserved across cases",
+  );
+  expect(saved.end.kind).toBe("complete");
+});
+
+test("mobile reference dialog returns focus and writing position with drafts intact", async ({
+  page,
+}) => {
+  const run = completeRun();
+  run.end = null;
+  delete run.sessions.B2.submitted["B.U"];
+  run.submissionSequence.pop();
+  run.sessions.B2.draft = {
+    phaseId: "B.U",
+    answers: { "B.P3": "", "B.P4": "" },
+    updatedAt: new Date().toISOString(),
+  };
+  await seed(page, run, "/learner/assessment/B2/stage/B.U");
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    const input = page.getByLabel("Interpret the results", { exact: true });
+    await input.fill(`Draft at ${width}px`);
+    const control = page.getByRole("button", { name: "View case information" });
+    await control.focus();
+    const position = await page.evaluate(() => window.scrollY);
+    await page.keyboard.press("Enter");
+    const dialog = page.getByRole("dialog");
+    await expect(
+      dialog.getByRole("button", { name: "Close case information" }),
+    ).toBeFocused();
+    await dialog
+      .getByRole("button", { name: "Submitted response", exact: true })
+      .click();
+    await expect(
+      dialog.getByText("A defensible response with reasons", { exact: true }),
+    ).toHaveCount(2);
+    await checkAxe(page);
+    await reflow(page);
+    await page.keyboard.press("Escape");
+    await expect(control).toBeFocused();
+    expect(await page.evaluate(() => window.scrollY)).toBe(position);
+    await expect(input).toHaveValue(`Draft at ${width}px`);
+  }
+});
+
+test("older captured sessions retain fixed progression and paragraph briefing", async ({
+  page,
+}) => {
+  const captured = JSON.parse(
+    await readFile("tests/fixtures/kalp-align-04.json", "utf8"),
+  );
+  const old = beginCase(createRun(captured), "A1");
+  await seed(page, old, "/learner/assessment/A1/stage/A.I");
+  await expect(
+    page.getByText(captured.cases[0].phases[0].facts[1], { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("table")).toHaveCount(0);
+  await page
+    .getByRole("link", { name: "Diagnostic home", exact: true })
+    .click();
+  await expect(
+    page.getByText("Complete the preceding case to continue."),
+  ).toHaveCount(3);
+  const restored = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key)!),
+    key,
+  );
+  expect(restored.config).toEqual(captured);
+  await checkAxe(page);
+});
+
+test("learner backup, cancelled restore and corrupt-storage recovery preserve archives", async ({
+  page,
+}) => {
+  await seed(
+    page,
+    beginCase(createRun(config), "B2"),
+    "/learner/assessment/B2/stage/B.I",
+  );
+  await page
+    .getByLabel("Explain the causes", { exact: true })
+    .fill("Backup draft — exact line\nSecond line.");
+  await page
+    .getByRole("link", { name: "Recovery and files", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Back up", exact: true }),
+  ).toBeVisible();
+  const downloadPromise = page.waitForEvent("download");
+  await page
+    .getByRole("button", {
+      name: "Download current session and drafts",
+      exact: true,
+    })
+    .click();
+  const backupPath = await (await downloadPromise).path();
+  const backup = JSON.parse(await readFile(backupPath!, "utf8"));
+  expect(backup.sessions.B2.draft.answers["B.P1"]).toBe(
+    "Backup draft — exact line\nSecond line.",
+  );
+  await page.screenshot({ path: "test-results/recovery.png", fullPage: true });
+  await page
+    .getByRole("button", { name: "Start a new diagnostic", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  expect(
+    await page.evaluate(
+      (key) => JSON.parse(localStorage.getItem(key)!).runId,
+      key,
+    ),
+  ).toBe(backup.runId);
+  await page
+    .getByRole("button", { name: "Start a new diagnostic", exact: true })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "Preserve previous and start new",
+      exact: true,
+    })
+    .click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Reasoning through governance decisions",
+  );
+  const newId = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key)!).runId,
+    key,
+  );
+  expect(newId).not.toBe(backup.runId);
+  await page
+    .getByRole("link", { name: "Recovery and files", exact: true })
+    .click();
+  await page
+    .getByLabel("Import a captured diagnostic session", { exact: true })
+    .setInputFiles(backupPath!);
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
+  expect(
+    await page.evaluate(
+      (key) => JSON.parse(localStorage.getItem(key)!).runId,
+      key,
+    ),
+  ).toBe(newId);
+  await page
+    .getByLabel("Import a captured diagnostic session", { exact: true })
+    .setInputFiles(backupPath!);
+  await page
+    .getByRole("button", { name: "Archive current and import", exact: true })
+    .click();
+  await page
+    .getByRole("link", { name: "Resume diagnostic →", exact: true })
+    .click();
+  await expect(
+    page.getByLabel("Explain the causes", { exact: true }),
+  ).toHaveValue("Backup draft — exact line\nSecond line.");
+  await page.evaluate(
+    (key) => localStorage.setItem(key, "malformed original data"),
+    key,
+  );
+  await page.reload();
+  await expect(
+    page.getByRole("heading", {
+      name: "Saved progress needs recovery",
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(await page.evaluate((key) => localStorage.getItem(key), key)).toBe(
+    "malformed original data",
+  );
+  await page
+    .getByRole("link", { name: "Open recovery and files", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", {
+      name: "Download all preserved browser data",
+      exact: true,
+    }),
+  ).toBeVisible();
+  const recoveryPromise = page.waitForEvent("download");
+  await page
+    .getByRole("button", {
+      name: "Download all preserved browser data",
+      exact: true,
+    })
+    .click();
+  const recoveryPath = await (await recoveryPromise).path();
+  const recovery = JSON.parse(await readFile(recoveryPath!, "utf8"));
+  expect(Object.values(recovery)).toContain("malformed original data");
+  expect(
+    Object.values(recovery).some(
+      (raw) => typeof raw === "string" && raw.includes(backup.runId),
+    ),
+  ).toBe(true);
+  await checkAxe(page);
+  await page
+    .getByRole("button", { name: "Start a new diagnostic", exact: true })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "Preserve previous and start new",
+      exact: true,
+    })
+    .click();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Reasoning through governance decisions",
+  );
+  const preserved = await page.evaluate(() => Object.values(localStorage));
+  expect(preserved).toContain("malformed original data");
 });

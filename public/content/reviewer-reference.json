@@ -1,41 +1,41 @@
 {
-  "packageVersion": "KALP-ALIGN-04",
+  "packageVersion": "KALP-ALIGN-05",
   "sources": [
     {
       "id": "1uEQpCgCZnsaWN2A47WJOM85nqP-4q2cXTY6EYHGY9IU",
       "title": "01 Bharat KALP Framework - Focused Revision V5",
       "url": "https://docs.google.com/spreadsheets/d/1uEQpCgCZnsaWN2A47WJOM85nqP-4q2cXTY6EYHGY9IU/edit",
-      "revision": "Focused Framework V5 / KALP-ALIGN-04"
+      "revision": "Focused Framework V5 / KALP-ALIGN-05"
     },
     {
       "id": "1rlHVPj1ebs6HjJAWm2iQm_gGjp1GV7UOrQ_0drIIe8Y",
       "title": "02 Bharat KALP - Learning Objectives and Assessment Alignment",
       "url": "https://docs.google.com/document/d/1rlHVPj1ebs6HjJAWm2iQm_gGjp1GV7UOrQ_0drIIe8Y/edit",
-      "revision": "ANLCKQll1wgObhog1xdMUmWU4AutKUl_1QJdWRVX1TLfOZg9I3Du7U0K2YIhqDhugaB_zr0pzUUUTA_0ExiKzPVE7w8g18b6xk-AhkiFYRg"
+      "revision": "AHj4eMSNu2sgA-callEm7-tyqjdAzQxq3nXKmt5pu89GDNYOfmdH_71No-NZwy_Owk5TaLbE_7XPvTnvgTS5kWFfvrvbg2pnIQhL_GnKudk"
     },
     {
       "id": "15e-IvwpU2gaKgwOGFr743qcdXPQ7VDj9PjVjoGxCiTg",
       "title": "03 Bharat KALP - Assessment Activities and Evidence Alignment",
       "url": "https://docs.google.com/document/d/15e-IvwpU2gaKgwOGFr743qcdXPQ7VDj9PjVjoGxCiTg/edit",
-      "revision": "AHj4eMQ2HDuSxCZTJHjD2dgsjmPJoWUuXIfay1qTHWq4SHTv0m2ThPevfLjrW3jqiVVg6ZCsAV8qJukLQkcV1_HaoO6YOn-hTPNmE--UpfE"
+      "revision": "AHj4eMTrpZ1nZrJE2Na3SVi2yfax75IZD-KPVWOCms0hT87uwEJzW1lgedL9pX6BKIjM80yubx8BxLPJASYGjDpBqZG4B7cEz9oo8h5ovJk"
     },
     {
       "id": "1xTYx5R4LCdXsV4MT0KkSUkZ_TkwDfhIVEAdKjtT7sEs",
       "title": "04 Bharat KALP - Task-specific Rubrics",
       "url": "https://docs.google.com/document/d/1xTYx5R4LCdXsV4MT0KkSUkZ_TkwDfhIVEAdKjtT7sEs/edit",
-      "revision": "ANLCKQn3ZWDInxz9DScaqprgE5_E2Wn9yA_tNqZSP-9CpgjMdWuvSTMCA1btUvcEVi9oPL5lNA-TprdOVmfq1L2m9otnZYgYLk0Fh8kyg3s"
+      "revision": "AHj4eMS8vZRf01RvHLD8z3f1a5QdKBOzlB266-XJR7fcVCtQDgCkljF3BZxeifRU7c7QvSQT340_iww7XH4MB6c3WMmKawbhKIwRD8pwChQ"
     },
     {
       "id": "1kzGTXPMnMSTuWUmwGvuPM0KWlgnzdWFbhnyQXmR1IVg",
       "title": "05 Bharat KALP - Response Examples and Rater Calibration",
       "url": "https://docs.google.com/document/d/1kzGTXPMnMSTuWUmwGvuPM0KWlgnzdWFbhnyQXmR1IVg/edit",
-      "revision": "AHj4eMQLwxRhOOSg1gKdtEbmb0Qv6I9YH7JTSiuJtJhegt3EW5iwDYCu7wp5AM-CvRTXVyDSfv-ttJPX2-lXc02-0RnK0FUQkpQHZgUgtpE"
+      "revision": "ANLCKQn3kup9LQ4cJlizlFC6Ze6yyD7GEIwYRoBwYzOl8MAHEdcmkacOBWmlr9f4Phcclqv0szC9L7T7END1F_sRB8OXCuCzdkLMH2sAKxY"
     },
     {
       "id": "1TEPo-hVVs4wFPZCuKl6sUq-MsCn-ZOGILnfp7OjMdgA",
       "title": "06 Bharat KALP - Learning Principles and Implementation Checks",
       "url": "https://docs.google.com/document/d/1TEPo-hVVs4wFPZCuKl6sUq-MsCn-ZOGILnfp7OjMdgA/edit",
-      "revision": "ANLCKQlIWsAh0l7CwTFDpwUHkiRwC2QRM_zCxat_JF8JJg-ub64Jra8YX8O2IjTNeAIrjHNtPnEYJfX_kp2Szx8bz0tWX6B30L-_2FurctI"
+      "revision": "ANLCKQksyx7dz7XOvvumuH9LJ-qN59OzvB3hj-3_JAN61bemJAj3OtK4loO2-MbMYaQg29IBeY82BSpT3Cg9atYJ5e_OyW5ApEdUgMzrwp4"
     }
   ],
   "notice": "The examples below are fictional, criterion-specific response fragments authored for design review. The level labels are intended interpretations, not ratings established through independent scoring. They are not complete case answers, model policies or empirical anchors. Real responses may combine strengths and weaknesses across criteria, and these fragments must not be given a whole-case score. Current delivery scope is the diagnostic design package for CBC review by Uma and Radha, including these illustrations, calibration guidance and reviewed-feedback requirements. The follow-up practice section is an optional, pending extension outside this delivery scope.",

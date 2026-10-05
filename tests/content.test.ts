@@ -5,8 +5,8 @@ import reference from "../public/content/reviewer-reference.json";
 const hash = (value: unknown) =>
   createHash("sha256").update(JSON.stringify(value)).digest("hex");
 // Digests of the exact implementation projection transcribed from the six live
-// Drive originals on 2026-10-04. Update only after a fresh authoritative read.
-describe("KALP-ALIGN-04 live-source transcription", () => {
+// Drive originals on 2026-10-05. Update only after a fresh authoritative read.
+describe("KALP-ALIGN-05 live-source transcription", () => {
   it("D02/D03 retains all exact case titles, controlling facts, task text and prompts", () => {
     const projection = config.cases.map((a) => ({
       id: a.id,
@@ -14,12 +14,13 @@ describe("KALP-ALIGN-04 live-source transcription", () => {
       phases: a.phases.map((p) => ({
         id: p.id,
         facts: p.facts,
+        briefingBlocks: p.briefingBlocks,
         task: p.task,
         prompts: p.prompts,
       })),
     }));
     expect(hash(projection)).toBe(
-      "d35b2a98b65541a6de150f00c539e6d5374902984736cdfb5f941811dcc296c9",
+      "73a69d517e77a395b5f03fdaf6fb384395ae94c161fdb751b5fc5151fb943d10",
     );
   });
   it("D01 retains exact objectives and the live framework crosswalk", () => {
@@ -33,6 +34,8 @@ describe("KALP-ALIGN-04 live-source transcription", () => {
     );
   });
   it("preserves source identities and discloses authored reference status without practice tasks", () => {
+    expect(reference.packageVersion).toBe(config.packageVersion);
+    expect(reference.sources).toEqual(config.sources);
     expect(config.sources.map((s) => s.id)).toEqual([
       "1uEQpCgCZnsaWN2A47WJOM85nqP-4q2cXTY6EYHGY9IU",
       "1rlHVPj1ebs6HjJAWm2iQm_gGjp1GV7UOrQ_0drIIe8Y",

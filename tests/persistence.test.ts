@@ -96,7 +96,7 @@ describe("local run durability", () => {
       s = new RunStore(config, storage, "/");
     await s.begin("A1");
     const later = structuredClone(config);
-    later.packageVersion = "KALP-ALIGN-05";
+    later.packageVersion = "KALP-ALIGN-06";
     later.cases[0].phases[0].facts[0] = "Later facts";
     later.criteria[0].descriptors.Proficient = "Later descriptor";
     const restored = new RunStore(later, storage, "/");

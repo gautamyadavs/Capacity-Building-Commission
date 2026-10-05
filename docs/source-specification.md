@@ -1,4 +1,4 @@
-> Historical reference: superseded for the active diagnostic by KALP-ALIGN-04 and the six live Drive originals. These earlier tasks, limits and learning/transfer proposals do not govern current delivery. See [current verification](diagnostic-verification.md). Do not run the historical extractor to replace diagnostic content.
+> Historical reference: superseded for the active diagnostic by KALP-ALIGN-05 and the six live Drive originals. These earlier tasks, limits and learning/transfer proposals do not govern current delivery. See [current verification](diagnostic-verification.md). Do not run the historical extractor to replace diagnostic content.
 
 # Bharat KALP Assessment Prototype \- Detailed Interaction Specification
 
