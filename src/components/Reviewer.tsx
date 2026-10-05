@@ -529,6 +529,7 @@ export function Reviewer() {
         </div>
       )}
       <div className={styles.actions}>
+        <Link className={styles.secondary} to="/coverage">Teaching and assessment coverage</Link>
         <Link className={styles.secondary} to="/learner">
           Return to learner workspace
         </Link>

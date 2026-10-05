@@ -20,13 +20,14 @@ import { Debrief } from "./components/Debrief";
 import { ErrorBox } from "./components/Shared";
 import { Files } from "./components/Files";
 import { Reviewer } from "./components/Reviewer";
+import { Coverage } from "./components/Coverage";
 import { learnerReviewText } from "./presentation";
 import styles from "./app.module.css";
 function Layout() {
   const { run, store, saveStatus, error, notice, fatal } = useSession(),
     location = useLocation(),
     isReviewer = location.pathname === "/reviewer",
-    isFacilitator = isReviewer || location.pathname === "/learner/files";
+    isFacilitator = isReviewer || location.pathname === "/learner/files" || location.pathname === "/coverage";
   useEffect(() => {
     document.title = "Bharat KALP · Developmental diagnostic";
     const frame = requestAnimationFrame(() => {
@@ -181,6 +182,7 @@ export default function App({
               element={<Navigate to="/learner/review" replace />}
             />
             <Route path="/reviewer" element={<Reviewer />} />
+            <Route path="/coverage" element={<Coverage />} />
             <Route
               path="*"
               element={<ErrorBox message="This page does not exist." />}

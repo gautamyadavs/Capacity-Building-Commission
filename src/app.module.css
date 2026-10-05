@@ -4,6 +4,22 @@
   --line: #ccd6ca;
   min-height: 100vh;
 }
+.coverageCard {
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  overflow-wrap: anywhere;
+}
+.coverageCard dd {
+  margin: 6px 0 14px;
+}
+.coverageFilter {
+  display: grid;
+  gap: 8px;
+  max-width: 32rem;
+}
 [data-format="B"] {
   --accent: #365a79;
   --pale: #eaf0f5;

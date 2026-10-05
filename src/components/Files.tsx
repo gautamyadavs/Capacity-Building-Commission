@@ -71,6 +71,7 @@ export function Files() {
         exported copy for transfer or recovery.
       </p>
       <div className={styles.actions}>
+        <AppLink className={styles.secondary} to="/coverage">Teaching and assessment coverage</AppLink>
         {!fatal && (
           <AppLink className={styles.primary} to={resumePath(run)}>
             {run.end

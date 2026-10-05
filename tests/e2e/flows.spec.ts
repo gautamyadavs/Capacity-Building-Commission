@@ -54,6 +54,39 @@ async function reflow(page: Page) {
     ),
   ).toBe(true);
 }
+test("reviewers trace coverage and export the current design without participant responses", async ({ page }) => {
+  await seed(page, completeRun("PRIVATE_SYNTHETIC_RESPONSE_DO_NOT_EXPORT"), "/coverage");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Teaching and assessment coverage");
+  await expect(page.locator("article")).toHaveCount(8);
+  await expect(page.getByRole("button", { name: "Download coverage crosswalk" })).toBeEnabled();
+  await expect(page.getByText(/The coverage reference and assessment content differ/)).toHaveCount(0);
+  await checkAxe(page);
+  await page.getByLabel("Framework domain").selectOption("Systems Leadership");
+  await expect(page.locator("article")).toHaveCount(4);
+  const prediction = page.locator("article").filter({ has: page.getByRole("heading", { name: /B-LO2/ }) });
+  await expect(prediction).toContainText("Partial match");
+  await prediction.getByText("Declared teaching evidence and source locators", { exact: true }).click();
+  await expect(prediction.getByRole("link", { name: /Learning Outcomes/ }).first()).toHaveAttribute("href", "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit");
+  await prediction.getByText("Exact questions and criterion descriptors", { exact: true }).click();
+  await expect(prediction.getByText(config.cases[2].phases[0].prompts[1].text, { exact: false }).first()).toBeVisible();
+  await expect(prediction.getByText(config.criteria.find(c => c.id === "B-R2")!.descriptors.Proficient, { exact: true })).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await reflow(page);
+  await page.screenshot({ path: "test-results/coverage-mobile.png", fullPage: true });
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Download coverage crosswalk" }).click();
+  const file = await download;
+  const exported = JSON.parse(await readFile((await file.path())!, "utf8"));
+  expect(exported.rows).toHaveLength(8);
+  expect(exported.criteria).toEqual(config.criteria);
+  expect(exported.objectives).toEqual(config.objectives);
+  expect(JSON.stringify(exported)).not.toContain("PRIVATE_SYNTHETIC_RESPONSE_DO_NOT_EXPORT");
+  await page.getByLabel("Framework domain").selectOption("Programme learning");
+  await expect(page.locator("article")).toHaveCount(0);
+  await expect(page.getByRole("status")).toContainText("3 framework metrics outside");
+  await page.goto(`${base}#/learner`);
+  await expect(page.getByRole("link", { name: /coverage/i })).toHaveCount(0);
+});
 test("all four cases and eight phase submissions under the actual Pages subpath", async ({
   page,
 }) => {

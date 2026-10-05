@@ -1,0 +1,345 @@
+{
+  "packageVersion": "KALP-ALIGN-06",
+  "frameworkVersion": "Focused Framework V5",
+  "taskVersion": "KALP-ALIGN-05:03",
+  "rubricVersion": "KALP-ALIGN-05:04",
+  "masterUrl": "https://docs.google.com/document/d/1u8TM_kfP42SZXbzc2SRCZb-6ZSb45gtyiRUpERB227Q/edit",
+  "curriculumUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+  "notice": "This is a design crosswalk for assisted diagnostic performance. Course descriptions show declared curriculum relevance; they do not verify delivered instruction, practice or participant exposure. Declared match names an explicit related outcome; Partial match means a material assessed relationship is not explicit. Neither status proves programme learning, full framework coverage or mastery.",
+  "teachingStatus": "Delivery and participant exposure unverified",
+  "demonstration": "Select a framework domain or objective, inspect its lesson locator and teaching limit, then compare the exact question with the criterion descriptor. After a real diagnostic ends, use the reviewer workspace to attach a response location or quotation and a criterion judgement. A design link is an elicitation opportunity; reviewed participant evidence is a separate record.",
+  "teachingEvidenceNeeded": "For each assessed relationship, attach the actual lesson/module and segment, a taught or practised example, delivery/cohort information, and relevant participant exposure. Confirm or narrow the assessment demand where the relationship was not taught; use untaught demands only as disclosed readiness probes. No compulsory learner AI/source log is introduced.",
+  "rows": [
+    {
+      "objectiveId": "A-LO1",
+      "domains": [
+        "Strategic Leadership"
+      ],
+      "fit": "Declared match",
+      "lessons": [
+        {
+          "course": "07: Governing with Artificial Intelligence",
+          "locator": "Learning Outcomes 5",
+          "excerpt": "Analyze real-world challenges, such as urban water management and agricultural transformation, using advanced reasoning techniques like trade-off analysis and scenario planning.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "15: Strategic Leadership: The Indic Way",
+          "locator": "Learning Outcomes 3",
+          "excerpt": "Apply systems thinking inspired by Lokasamgraha to analyze stakeholders and align decisions with long-term collective benefit.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        }
+      ],
+      "teachingLimit": "Course outcomes explicitly name trade-off analysis, scenario planning and long-term collective benefit. Delivered lessons, practice and participant exposure are unverified."
+    },
+    {
+      "objectiveId": "A-LO2",
+      "domains": [
+        "Ethical & Civilisational Leadership"
+      ],
+      "fit": "Declared match",
+      "lessons": [
+        {
+          "course": "05: Rajadharma: The Inner Compass for Modern Governance",
+          "locator": "Learning Outcomes 3",
+          "excerpt": "Apply the principle of Lokasamgraha (collective welfare) to evaluate and guide decision-making processes.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "05: Rajadharma: The Inner Compass for Modern Governance",
+          "locator": "Learning Outcomes 5",
+          "excerpt": "Differentiate between procedural compliance and ethical, value-based governance.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "19: Rama's Leadership Code",
+          "locator": "Learning Outcomes 4",
+          "excerpt": "Cultivate a leadership style rooted in universal compassion and freedom from envy (Sarvabhūteṣu hitaḥ and Anasūyakaḥ) for inclusive decision-making.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "13: Fundamentals of the Digital Public Infrastructure Approach",
+          "locator": "Learning Outcomes 5",
+          "excerpt": "Apply best practices and safeguards to ensure a DPI rollout is secure, private, and inclusive.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        }
+      ],
+      "teachingLimit": "Public welfare, ethical judgement, inclusion and safeguards are declared. Applying them to competing duties and differential harms in these cases is a transfer hypothesis; its teaching and practice need confirmation."
+    },
+    {
+      "objectiveId": "A-LO3",
+      "domains": [
+        "Systems Leadership"
+      ],
+      "fit": "Partial match",
+      "lessons": [
+        {
+          "course": "02: Purpose-Driven Leadership",
+          "locator": "Learning Outcomes 4",
+          "excerpt": "Evaluate common cognitive, resource, and political obstacles to leadership and formulate strategies to overcome them.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "16: The Art and Science of Managing Negotiation in Public Governance",
+          "locator": "Learning Outcomes 7",
+          "excerpt": "Assess the influence of psychological, cultural, political, and institutional factors on negotiation processes and outcomes.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        }
+      ],
+      "teachingLimit": "Obstacles and institutional factors are declared; a worked approach linking authority, actor responsibilities and inter-agency dependencies is not established in these descriptions."
+    },
+    {
+      "objectiveId": "A-LO4",
+      "domains": [
+        "Strategic Leadership"
+      ],
+      "fit": "Partial match",
+      "lessons": [
+        {
+          "course": "09: Evidence-based Policy Making",
+          "locator": "Learning Outcomes 5",
+          "excerpt": "Recognize the characteristics of ’wicked problems’ and complex adaptive systems within governance.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "09: Evidence-based Policy Making",
+          "locator": "Learning Outcomes 3",
+          "excerpt": "Apply the ’Science of Muddling Through’ and the ABCD-X framework to structure decision-making under uncertainty.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "10: Leading in a VUCA World: Identify and Reduce the Impacts of VUCA on Your Organization",
+          "locator": "Learning Outcomes 1",
+          "excerpt": "Identify and analyze how volatility, uncertainty, complexity, and ambiguity are impacting you and your organization",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "10: Leading in a VUCA World: Identify and Reduce the Impacts of VUCA on Your Organization",
+          "locator": "Learning Outcomes 3",
+          "excerpt": "Formulate a plan for counteracting the effects of VUCA on your organization or team",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        }
+      ],
+      "teachingLimit": "Complexity and responding to uncertainty are declared. Explicit teaching of technical versus adaptive diagnosis and evidence-linked revision or retention is not established."
+    },
+    {
+      "objectiveId": "B-LO1",
+      "domains": [
+        "Systems Leadership"
+      ],
+      "fit": "Declared match",
+      "lessons": [
+        {
+          "course": "09: Evidence-based Policy Making",
+          "locator": "Learning Outcomes 2",
+          "excerpt": "Analyze complex, multi-causal problems by identifying their multiple drivers and feedback loops.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "15: Strategic Leadership: The Indic Way",
+          "locator": "Learning Outcomes 3",
+          "excerpt": "Apply systems thinking inspired by Lokasamgraha to analyze stakeholders and align decisions with long-term collective benefit.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        }
+      ],
+      "teachingLimit": "Multiple drivers, feedback loops and systems thinking are declared. Mechanism-based explanations in unfamiliar governance cases still need taught-example and participant-exposure evidence."
+    },
+    {
+      "objectiveId": "B-LO2",
+      "domains": [
+        "Systems Leadership"
+      ],
+      "fit": "Partial match",
+      "lessons": [
+        {
+          "course": "09: Evidence-based Policy Making",
+          "locator": "Learning Outcomes 6",
+          "excerpt": "Critique policy interventions by anticipating potential unintended consequences and systemic impacts.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "07: Governing with Artificial Intelligence",
+          "locator": "Learning Outcomes 5",
+          "excerpt": "Analyze real-world challenges, such as urban water management and agricultural transformation, using advanced reasoning techniques like trade-off analysis and scenario planning.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        }
+      ],
+      "teachingLimit": "Anticipating unintended effects and scenario planning are declared. The full mechanism → assumption → observable test relationship is not explicitly established; retain this as a readiness probe pending teaching confirmation."
+    },
+    {
+      "objectiveId": "B-LO3",
+      "domains": [
+        "Systems Leadership"
+      ],
+      "fit": "Declared match",
+      "lessons": [
+        {
+          "course": "12: Insights from Data for Policy",
+          "locator": "Learning Outcomes 3",
+          "excerpt": "Identify common statistical fallacies such as the ecological fallacy, regression to the mean, and problems of scale in data interpretation.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "12: Insights from Data for Policy",
+          "locator": "Learning Outcomes 4",
+          "excerpt": "Critically assess data-based arguments in public policy to avoid cognitive biases and stereotypes.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "09: Evidence-based Policy Making",
+          "locator": "Learning Outcomes 4",
+          "excerpt": "Evaluate the critical challenges in policy measurement, including time, scale, dynamics, and the Jevons Paradox.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        }
+      ],
+      "teachingLimit": "Statistical fallacies, critique of data arguments and measurement limits are declared. Comparing a result with a prior causal prediction in these cases is an applied inference; delivery and exposure remain unverified."
+    },
+    {
+      "objectiveId": "B-LO4",
+      "domains": [
+        "Self Leadership"
+      ],
+      "fit": "Partial match",
+      "lessons": [
+        {
+          "course": "02: Purpose-Driven Leadership",
+          "locator": "Learning Outcomes 3",
+          "excerpt": "Develop strategies to cultivate a growth mindset and enhance learning agility to navigate a VUCA environment.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        },
+        {
+          "course": "09: Evidence-based Policy Making",
+          "locator": "Learning Outcomes 3",
+          "excerpt": "Apply the ’Science of Muddling Through’ and the ABCD-X framework to structure decision-making under uncertainty.",
+          "sourceUrl": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+          "sourceRevision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+        }
+      ],
+      "teachingLimit": "Learning agility and incremental decisions are declared. Explicit practice revising or retaining a causal model and supplied intervention from results, with a next test, is not established; retain as a readiness probe."
+    }
+  ],
+  "excludedMetrics": [
+    {
+      "metric": "Knowledge Recall",
+      "domain": "Programme learning"
+    },
+    {
+      "metric": "Conceptual Understanding",
+      "domain": "Programme learning"
+    },
+    {
+      "metric": "Application of Concepts",
+      "domain": "Programme learning"
+    },
+    {
+      "metric": "Reflection Depth",
+      "domain": "Self Leadership"
+    },
+    {
+      "metric": "Self-Awareness & Inner Clarity",
+      "domain": "Self Leadership"
+    },
+    {
+      "metric": "Leadership Growth",
+      "domain": "Self Leadership"
+    },
+    {
+      "metric": "Future Orientation",
+      "domain": "Strategic Leadership"
+    },
+    {
+      "metric": "Integrity of Judgement",
+      "domain": "Ethical & Civilisational Leadership"
+    },
+    {
+      "metric": "IKS Integration",
+      "domain": "Ethical & Civilisational Leadership"
+    },
+    {
+      "metric": "Perspective Taking",
+      "domain": "Collaborative Leadership"
+    },
+    {
+      "metric": "Collaborative Learning",
+      "domain": "Collaborative Leadership"
+    },
+    {
+      "metric": "Contribution Quality",
+      "domain": "Collaborative Leadership"
+    },
+    {
+      "metric": "Influence Without Authority",
+      "domain": "Collaborative Leadership"
+    },
+    {
+      "metric": "Translation to Practice",
+      "domain": "Transformational Leadership"
+    },
+    {
+      "metric": "Innovation",
+      "domain": "Transformational Leadership"
+    },
+    {
+      "metric": "Stakeholder Engagement",
+      "domain": "Transformational Leadership"
+    },
+    {
+      "metric": "Outcomes Achieved",
+      "domain": "Transformational Leadership"
+    },
+    {
+      "metric": "Sustainability & Scalability",
+      "domain": "Transformational Leadership"
+    }
+  ],
+  "courseScope": "These cases do not assess all twenty courses. Cybersecurity, specialist AI/DPI use, nation branding, IKS concept accuracy, live negotiation, communication and team performance require separate targeted evidence.",
+  "science": "Evidence-Centered Design links intended inference, task and observed evidence. KLI guides candidate follow-up instruction after an evidenced gap; it does not certify taught coverage or knowledge-component mastery. Mayer's coherence and signaling guide compact, neutral presentation while retaining case constraints. Practice and D15 remain deferred.",
+  "reviewedTeachingSources": [
+    {
+      "title": "Course Descriptions",
+      "url": "https://docs.google.com/document/d/1abMDwCB9DyFd69elATxKX1yqhAtfKGtmnFFzxQISMJk/edit",
+      "revision": "AHj4eMR0n4yo0YQsjbHWcCE6Et8o-vbKRV7S16U2dvTk8Ys0OP5gGv_f8c-MzIYBGG0Ok2D7DZ5sia9t5Fwdb24wd7sCOxINKRnpEu8cG2Y"
+    },
+    {
+      "title": "KALP_Samvaad_Ep_1_The_Essence_of_Leadership_and_Duty_Dr._Hasmukh_Adhia_[ekEO05xsu3Y].en-orig",
+      "url": "https://docs.google.com/document/d/1yViWxMdlHyNsB5PstU852Wkq07iAsMlKw2C4e8GtGco/edit",
+      "revision": "ANLCKQl1r-237WmjiJbHLEopVFhKxNv3Mn4zSaigaLyaLWyf0wZFGkUjxMWN0bHhC7vBCBfP6-PgbRo2TCAfwyRjempn_ezxoRlvH0pdJnc"
+    },
+    {
+      "title": "KALP_Samvaad_Ep_2_Leading_Change_in_Government_Dr._Hasmukh_Adhia_[s7cMT6ZZ-cA].en-orig",
+      "url": "https://docs.google.com/document/d/11jUR29dwHUX_EKcEUuMU0YBGyGPy0vedtwp9yHfmChQ/edit",
+      "revision": "AHj4eMTJHD0pfh6PcjQvfiJkGh5fNNyYXbADzE59FsF09h2wanBAF5UgRew8tArNhBj7M06JxRqDXrBYVUcMlAhef0QObMGVNL1v6eWWxEk"
+    },
+    {
+      "title": "KALP_Samvaad_Ep_3_What_Does_Good_Bureaucratic_Leadership_Look_Like_Ms._S._Radha_Chauhan_[odA8HvPgX1E].en-orig",
+      "url": "https://docs.google.com/document/d/1PPHd9fafCUKrEYrjOj3XFprsbBLGKZIUuZfy63iVeOM/edit",
+      "revision": "ANLCKQmi8OISAhNG5QOY1qzPP3Ozi9bTr83lq5mPbHgQOyWUp56tBEGP9cxd5OiF5MA59x_9k6CHXgXIGxOmQjs2kZdChBK8K712O34P5jE"
+    },
+    {
+      "title": "KALP_Indian_Knowledge_Systems_Wrap_Up_Series_-_Episode_1_[DLPlHL1i4Vk].en-orig",
+      "url": "https://docs.google.com/document/d/1qlpb882blMAKeX69O1_WDhejmlQ4bNwon8Noknjgc88/edit",
+      "revision": "AHj4eMRurF-x6F2BA0vTRfS2ReYXXYhtEX_8j2_vbOe1KwYSUUnylZ5iow3G8tpLyYnWxB9uARJxrvl3-hqk88q841fIEp_dkWRSGYCicnk"
+    }
+  ],
+  "transcriptLimit": "The supplied Samvaad and IKS transcripts contain related discussions of duty, citizen empathy, institutional processes, learning from experience, delegation and public value. They add context, not verification of the full assessed reasoning sequences or participant exposure. Transcript examples do not override the fictional case's explicit authority and constraints."
+}

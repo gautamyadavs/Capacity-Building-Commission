@@ -2,11 +2,33 @@ import { createHash } from "node:crypto";
 import { describe, it, expect } from "vitest";
 import { config } from "./helpers";
 import reference from "../public/content/reviewer-reference.json";
+import coverage from "../public/content/coverage.json";
 const hash = (value: unknown) =>
   createHash("sha256").update(JSON.stringify(value)).digest("hex");
 // Digests of the exact implementation projection transcribed from the six live
 // Drive originals on 2026-10-05. Update only after a fresh authoritative read.
-describe("KALP-ALIGN-05 live-source transcription", () => {
+describe("KALP-ALIGN-06 coverage with retained task/rubric transcription", () => {
+  it("partitions the full framework and discloses the incomplete teaching links", () => {
+    expect(coverage.packageVersion).toBe(config.packageVersion);
+    expect(coverage.taskVersion).toBe(config.taskVersion);
+    expect(coverage.rubricVersion).toBe(config.rubricVersion);
+    expect(coverage.rows.map(r => r.objectiveId)).toEqual(config.objectives.map(o => o.id));
+    const sampled = new Set(config.objectives.flatMap(o => o.metrics.split("; ")));
+    const excluded = coverage.excludedMetrics.map(m => m.metric);
+    expect(sampled.size).toBe(10);
+    expect(excluded).toHaveLength(18);
+    expect(new Set([...sampled, ...excluded]).size).toBe(28);
+    expect(coverage.rows.filter(r => r.fit === "Partial match").map(r => r.objectiveId)).toEqual(["A-LO3", "A-LO4", "B-LO2", "B-LO4"]);
+    for (const row of coverage.rows) {
+      expect(row.lessons.length).toBeGreaterThan(0);
+      expect(row.teachingLimit).toMatch(row.fit === "Partial match" ? /not (?:explicitly )?established|readiness probe/i : /unverified|confirmation|evidence/i);
+      for (const lesson of row.lessons) {
+        expect(lesson.sourceUrl).toBe(coverage.curriculumUrl);
+        expect(lesson.excerpt.length).toBeGreaterThan(20);
+        expect(lesson.locator).toContain("Learning Outcomes");
+      }
+    }
+  });
   it("D02/D03 retains all exact case titles, controlling facts, task text and prompts", () => {
     const projection = config.cases.map((a) => ({
       id: a.id,
