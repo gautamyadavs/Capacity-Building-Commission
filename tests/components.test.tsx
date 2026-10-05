@@ -1,154 +1,189 @@
-import { afterEach, beforeEach, it, expect, vi } from 'vitest';
-import { render, screen, cleanup, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import App from '../src/App';
-import { ResponseField } from '../src/components/Forms';
-import { SubmittedResponsePanel } from '../src/components/Assessment';
-import { SelectedResponseFeedback } from '../src/components/Feedback';
-import { AppContext } from '../src/context';
-import { RunStore } from '../src/persistence';
-import { submitStage, type Run } from '../src/model';
-import { beforeCase, complete, completedBattery, config, started, throughStage, validDraft } from './helpers';
-beforeEach(() => { localStorage.clear(); window.location.hash = '#/learner'; vi.spyOn(window, 'scrollTo').mockImplementation(() => {}); });
-afterEach(() => { cleanup(); vi.restoreAllMocks(); });
-function show(path: string, run: Run) {
-  window.location.hash = `#${path}`; const initial = new RunStore(config, 'learner'); localStorage.setItem(initial.key, JSON.stringify(run));
-  return render(<App config={config} store={new RunStore(config, 'learner')}/>);
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import App from "../src/App";
+import { RunStore } from "../src/persistence";
+import {
+  beginCase,
+  createRun,
+  emptyReviewBundle,
+  endRun,
+  submitPhase,
+} from "../src/model";
+import { config, completeRun, response, reviewRecord } from "./helpers";
+beforeEach(() => {
+  localStorage.clear();
+  window.location.hash = "/learner";
+  vi.spyOn(window, "scrollTo").mockImplementation(() => {});
+});
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
+function show(run = createRun(config), path = "/learner") {
+  localStorage.setItem("bharat-kalp:/:v3:learner", JSON.stringify(run));
+  window.location.hash = path;
+  const store = new RunStore(config, localStorage, "/");
+  render(<App config={config} store={store} />);
+  return store;
 }
-it('associates validation and live counters with a labelled textarea using default spellcheck', async () => {
-  const onChange = vi.fn(); render(<ResponseField field={{ id: 'response', type: 'text', required: true, label: 'Reasoning', prompt: 'Explain the situation.', maxWords: 2 }} value="one two three" onChange={onChange}/>);
-  const input = screen.getByRole('textbox', { name: 'Reasoning' }); expect(input).toHaveAttribute('aria-invalid', 'true'); expect(input).toHaveAccessibleDescription(/Use 2 words or fewer/);
-  expect(input).not.toHaveAttribute('spellcheck'); expect(screen.getByRole('status')).toHaveTextContent('3 / 2 words · maximum');
-  await userEvent.type(input, 'x'); expect(onChange).toHaveBeenCalled();
-});
-it('preserves exact submitted text without editable controls', () => {
-  const a = config.assessments[0]; const stage = a.stages[0]; const draft = validDraft(a, stage);
-  const { container } = render(<SubmittedResponsePanel assessment={a} stage={stage} snapshot={{ stageId: stage.id, answers: draft.answers, cardOrder: draft.cardOrder, submittedAt: new Date().toISOString() }}/>);
-  expect(container.querySelector('textarea,input')).toBeNull(); expect(container.querySelectorAll('p')[1].textContent).toBe(draft.answers.response); expect(screen.getByText('▣ Submitted and locked')).toBeInTheDocument();
-});
-it('shows a compact learning workspace, two episodes, one writing guide and pause-at-any-stage copy', () => {
-  const { container } = show('/learner', beforeCase(0));
-  expect(screen.getByRole('heading', { name: 'Practise governance decisions' })).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: 'Start assessment →' })).toBeInTheDocument(); expect(screen.getAllByRole('article')).toHaveLength(2);
-  expect(screen.getByText('0 / 2 episodes complete')).toBeInTheDocument(); expect(screen.getByText('You may answer in bullet points. Writing style is not assessed.')).toBeInTheDocument();
-  expect(container.textContent).toContain('pause at any stage'); expect(container.textContent).toContain('bring one lesson into the next');
-  expect(container.textContent).not.toMatch(/Reviewer|KCM|KQF|rubric|competency|sample answer|Format A|Format B|SJT|PEOE|four cases/i);
-  expect(container.querySelector('a[href*="reviewer"]')).toBeNull();
-});
-it.each([0, 1])('explains the stage purposes without repeating writing guidance in episode %i', index => {
-  const a = config.assessments[index]; const { container } = show(`/learner/assessment/${a.id}`, beforeCase(index));
-  expect(screen.getByText(/What you will practise/)).toBeInTheDocument();
-  for (const s of a.stages) expect(screen.getByText(s.rationale!)).toBeInTheDocument();
-  expect(container.textContent).not.toContain('You may answer in bullet points.'); expect(container.textContent).toContain(`EPISODE ${index + 1} OF 2`);
-});
-it('renders an accessible timeline and neutral resource tables with the original facts', () => {
-  show('/learner/assessment/A1_FLOOD/stage/A1_initial', started());
-  expect(screen.getByLabelText('Case timeline')).toHaveTextContent('07:00, after seven hours of intense rainfall.');
-  const table = screen.getByRole('table', { name: 'Transport capacity' });
-  for (const fact of config.assessments[0].stages[0].groups.find(g => g.title === 'Transport capacity')!.paragraphs) expect(within(table).getByText(fact)).toBeInTheDocument();
-  expect(within(table).getByRole('columnheader', { name: 'Case facts' })).toBeInTheDocument();
-});
-it('renders exactly two prediction cards and keeps outcomes, checks and coaching absent', () => {
-  const a = config.assessments[1]; const { container } = show(`/learner/assessment/${a.id}/stage/B1_predict`, started(1));
-  expect(screen.getByRole('region', { name: 'Prediction 1' })).toBeInTheDocument(); expect(screen.getByRole('region', { name: 'Prediction 2' })).toBeInTheDocument();
-  expect(screen.queryByText('Prediction 3')).toBeNull(); expect(container.textContent).not.toMatch(/Primary outcome|System response|Secondary consequence/);
-  for (const s of [a.stages[1], a.stages[5]]) for (const p of s.groups.flatMap(g => g.paragraphs)) expect(screen.queryByText(p)).toBeNull();
-  for (const q of a.stages[4].selectedResponses) expect(screen.queryByText(q.prompt)).toBeNull();
-});
-it('keeps earlier submissions read-only in expandable references while the next response is editable', async () => {
-  const a = config.assessments[0]; const run = throughStage(0, 1);
-  show(`/learner/assessment/${a.id}/stage/A1_execution`, run);
-  expect(screen.getAllByRole('textbox')).toHaveLength(1);
-  await userEvent.click(screen.getByText('Earlier briefings and locked responses'));
-  expect(screen.getByRole('region', { name: 'Previously submitted responses' }).querySelector('textarea,input')).toBeNull();
-  expect(screen.getByText('▣ Submitted and locked')).toBeInTheDocument();
-});
-it.each([1, 2, 3, 4])('displays the supplied package adjacent to the current task at B1 stage index %i', count => {
-  const a = config.assessments[1]; const stage = a.stages[count]; show(`/learner/assessment/${a.id}/stage/${stage.id}`, throughStage(1, count));
-  const packageHeading = screen.getAllByRole('heading', { name: '48-hour response package' }).find(el => !el.closest('details'))!;
-  const packageRegion = packageHeading.closest('[aria-label="Case information"]') as HTMLElement;
-  for (const p of a.stages[0].groups.find(g => g.title === '48-hour response package')!.paragraphs) expect(within(packageRegion).getByText(p)).toBeVisible();
-  if (count === 3) expect(screen.getByText(stage.fields[0].prompt)).toHaveTextContent('supplied 48-hour response package');
-  expect(screen.queryByText('Observed evidence')).toBeNull();
-});
-it('gates checks until the open revision is submitted and never reveals their answers in the check form', () => {
-  const a = config.assessments[1]; let run = throughStage(1, 3);
-  const { unmount } = show(`/learner/assessment/${a.id}/stage/B1_checks`, run);
-  expect(screen.getByRole('heading', { name: 'This stage is not available yet' })).toBeInTheDocument();
-  for (const q of a.stages[4].selectedResponses) expect(screen.queryByText(q.prompt)).toBeNull(); unmount();
-  run = submitStage(config, run, a.id, 'B1_revise', validDraft(a, a.stages[3]));
-  const { container } = show(`/learner/assessment/${a.id}/stage/B1_checks`, run);
-  expect(screen.getAllByRole('radio')).toHaveLength(9); expect(screen.queryByRole('textbox')).toBeNull();
-  expect(container.querySelector('[data-feedback-id]')).toBeNull();
-  for (const q of a.stages[4].selectedResponses) for (const feedback of Object.values(q.feedbackByOption)) expect(screen.queryByText(feedback)).toBeNull();
-});
-it.each([0, 1])('blocks direct review URLs before all substantive stages in episode %i', index => {
-  const a = config.assessments[index]; const review = a.stages.at(-1)!;
-  const { container } = show(`/learner/assessment/${a.id}/stage/${review.id}`, throughStage(index, a.stages.length - 2));
-  expect(screen.getByRole('heading', { name: 'This stage is not available yet' })).toBeInTheDocument();
-  expect(screen.queryByRole('textbox')).toBeNull(); expect(container.querySelector('[data-feedback-id]')).toBeNull();
-  for (const p of review.groups.flatMap(g => g.paragraphs)) expect(screen.queryByText(p)).toBeNull();
-});
-it.each([0, 1])('shows guided commentary, two approaches, originals and a separate unscored amendment in episode %i', index => {
-  const a = config.assessments[index]; const review = a.stages.at(-1)!;
-  const { container } = show(`/learner/assessment/${a.id}/stage/${review.id}`, throughStage(index, a.stages.length - 1));
-  expect(screen.getByRole('region', { name: 'Previously submitted responses' }).querySelector('textarea,input')).toBeNull();
-  expect(screen.getByRole('region', { name: 'Case commentary' })).toHaveTextContent('has not automatically evaluated your response');
-  for (const group of review.groups.filter(g => /defensible approach/.test(g.title))) expect(screen.getByRole('heading', { name: group.title })).toBeInTheDocument();
-  const input = screen.getByRole('textbox', { name: /Your review amendment/ }); expect(input).toHaveAttribute('aria-required', 'true'); expect(input).not.toHaveAttribute('spellcheck');
-  expect(screen.getByText(review.fields[0].prompt)).toBeInTheDocument(); expect(screen.getByText('0 / 100 words · maximum')).toBeInTheDocument();
-  expect(container.querySelectorAll('[data-feedback-id]')).toHaveLength(index === 1 ? 3 : 0);
-});
-it('guards the feedback component independently of route rendering', () => {
-  const store = new RunStore(config, 'learner'); localStorage.setItem(store.key, JSON.stringify(throughStage(1, 4)));
-  const { container } = render(<AppContext.Provider value={{ config, store: new RunStore(config, 'learner') }}><SelectedResponseFeedback assessment={config.assessments[1]}/></AppContext.Provider>);
-  expect(container.textContent).toBe('');
-});
-it('submits the flood amendment, preserves originals and proceeds to the pause screen', async () => {
-  const a = config.assessments[0]; const run = throughStage(0, 4); const originals = structuredClone(run.sessions[a.id].submitted);
-  show(`/learner/assessment/${a.id}/stage/A1_review`, run);
-  await userEvent.type(screen.getByRole('textbox'), 'I will connect my allocation to access and coordination conditions.');
-  await userEvent.click(screen.getByRole('button', { name: 'Submit and continue →' }));
-  await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /^Submit and lock$/ }));
-  expect(await screen.findByRole('heading', { name: config.intermission.heading })).toBeInTheDocument();
-  const saved = new RunStore(config, 'learner').getSnapshot().run;
-  for (const [id, snap] of Object.entries(originals)) expect(saved.sessions[a.id].submitted[id]).toEqual(snap);
-  expect(saved.sessions[a.id].submitted.A1_review.answers.amendment).toBe('I will connect my allocation to access and coordination conditions.');
-  expect(window.location.hash).toBe('#/learner/intermission');
-});
-it('shows the pause choice after the first review and blocks episode two until continuation', () => {
-  const run = complete(config.assessments[0], beforeCase(0)); const { unmount } = show('/learner/intermission', run);
-  expect(screen.getByRole('heading', { name: config.intermission.heading })).toBeInTheDocument(); expect(screen.getByText(config.intermission.body)).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Continue to Episode 2 →' })).toBeInTheDocument(); unmount();
-  show('/learner/assessment/B1_AIR_POE', run); expect(screen.getByRole('heading', { name: 'This case is not available yet' })).toBeInTheDocument();
-});
-it('keeps submitted evidence answers read-only and reveals feedback only in the guided review', () => {
-  const a = config.assessments[1]; const { container } = show(`/learner/assessment/${a.id}/stage/B1_checks`, throughStage(1, 5));
-  expect(container.querySelector('textarea,input')).toBeNull(); expect(container.querySelector('[data-feedback-id]')).toBeNull();
-  for (const q of a.stages[4].selectedResponses) for (const feedback of Object.values(q.feedbackByOption)) expect(screen.queryByText(feedback)).toBeNull();
-});
-it.each([0, 1])('keeps the final review locked before episode %i is complete', index => {
-  const { container } = show('/learner/review', beforeCase(index));
-  expect(screen.getByRole('heading', { name: 'Your final review is still locked' })).toBeInTheDocument();
-  expect(container.querySelector('[data-feedback-id], [data-trail-id], textarea')).toBeNull();
-});
-it('keeps the final review locked when B1 reasoning is complete but its amendment is missing', () => {
-  const { container } = show('/learner/review', throughStage(1, 5));
-  expect(screen.getByRole('heading', { name: 'Your final review is still locked' })).toBeInTheDocument(); expect(container.querySelector('[data-feedback-id]')).toBeNull();
-});
-it.each(['A', 'B', 'C'])('shows exactly three final feedback results for choice %s, two trails, both amendments and one optional reflection', async answer => {
-  const run = completedBattery(); const a = config.assessments[1];
-  for (const q of a.stages[4].selectedResponses) run.sessions[a.id].submitted.B1_checks.answers[q.id] = answer;
-  const { container } = show('/learner/review', run);
-  expect(screen.getByRole('heading', { name: config.finalReview.heading })).toBeInTheDocument(); expect(container.querySelectorAll('[data-feedback-id]')).toHaveLength(3);
-  for (const q of a.stages[4].selectedResponses) {
-    expect(container.querySelectorAll(`[data-feedback-id="${q.id}"]`)).toHaveLength(1);
-    expect(screen.getAllByText(q.feedbackByOption[answer], { exact: true })).toHaveLength(1);
-  }
-  expect(Array.from(container.querySelectorAll('[data-trail-id]')).map(el => el.getAttribute('data-trail-id'))).toEqual(['A1', 'B1']);
-  expect(screen.getAllByRole('textbox')).toHaveLength(1); expect(screen.getByRole('textbox')).toHaveAttribute('aria-required', 'false'); expect(screen.getByRole('textbox')).not.toHaveAttribute('spellcheck');
-  expect(container.textContent).not.toMatch(/total score|overall score|competency profile|KCM|KQF|rubric|sample answer|reviewer note/);
-  for (const trail of container.querySelectorAll<HTMLDetailsElement>('[data-trail-id]')) await userEvent.click(trail.querySelector('summary')!);
-  expect(screen.getAllByText('Your review amendment (unscored)')).toHaveLength(2);
-  expect(screen.getAllByText('Critical assumption or dependency')).toHaveLength(1);
+describe("learner evidence flow", () => {
+  it("D01/D05 gives neutral purpose, four cases and assistance without extra controls", () => {
+    show();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Reasoning through governance decisions",
+    );
+    for (const a of config.cases)
+      expect(screen.getByRole("heading", { name: a.title })).toBeVisible();
+    expect(screen.getByText(/generative AI without penalty/)).toBeVisible();
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/maximum words|countdown|confidence rating/),
+    ).not.toBeInTheDocument();
+  });
+  it("D09 gates direct update routes and case review routes before initial submission", () => {
+    show(
+      beginCase(createRun(config), "A1"),
+      "/learner/assessment/A1/stage/A.U",
+    );
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "not available",
+    );
+    expect(
+      screen.queryByText(config.cases[0].phases[1].facts[0]),
+    ).not.toBeInTheDocument();
+  });
+  it("D02/D03 displays exact phase prompts and controlling facts", () => {
+    show(
+      beginCase(createRun(config), "A1"),
+      "/learner/assessment/A1/stage/A.I",
+    );
+    for (const p of config.cases[0].phases[0].prompts) {
+      expect(screen.getByLabelText(`${p.id} · ${p.label}`)).toHaveAttribute(
+        "aria-describedby",
+      );
+      expect(screen.getByText(p.text)).toBeVisible();
+    }
+    for (const f of config.cases[0].phases[0].facts)
+      expect(screen.getByText(f)).toBeVisible();
+    expect(screen.getAllByRole("textbox")).toHaveLength(4);
+  });
+  it("D19 cancelling confirmation leaves draft and reveal boundary intact", async () => {
+    const user = userEvent.setup(),
+      store = show(
+        beginCase(createRun(config), "A1"),
+        "/learner/assessment/A1/stage/A.I",
+      );
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { level: 1 })).toHaveFocus(),
+    );
+    await user.type(screen.getAllByRole("textbox")[0], "A concise choice");
+    await user.click(screen.getByRole("button", { name: "Submit phase →" }));
+    expect(screen.getByRole("dialog")).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(screen.getAllByRole("textbox")[0]).toHaveValue("A concise choice");
+    expect(
+      store.getSnapshot().run.sessions.A1.revealedAt["A.U"],
+    ).toBeUndefined();
+  });
+  it("D04 update references preserve current draft and exact initial response", async () => {
+    let run = beginCase(createRun(config), "A1");
+    run = submitPhase(
+      run,
+      "A1",
+      "A.I",
+      response(run, "A1", "A.I", "Original exact answer"),
+    );
+    const store = show(run, "/learner/assessment/A1/stage/A.U");
+    const input = screen.getAllByRole("textbox")[0];
+    fireEvent.change(input, { target: { value: "Update draft" } });
+    expect(screen.getAllByText("Original exact answer")).toHaveLength(4);
+    expect(screen.getByText(config.cases[0].phases[0].facts[0])).toBeVisible();
+    expect(store.getSnapshot().run.sessions.A1.draft?.answers["A.P5"]).toBe(
+      "Update draft",
+    );
+  });
+  it("D11/D12 after A1, A2 or B1 there is no substantive coaching or personalised feedback", () => {
+    const run = completeRun();
+    delete run.sessions.B2.submitted["B.U"];
+    run.sessions.B2.draft = response(run, "B2", "B.U");
+    run.end = null;
+    run.submissionSequence.pop();
+    show(run, "/learner/review");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "still in progress",
+    );
+    expect(screen.queryByText(/Supported strength/)).not.toBeInTheDocument();
+  });
+  it("D10/D12 completed blanks remain Awaiting review and never Developing", () => {
+    show(completeRun(""), "/learner/review");
+    expect(screen.getAllByText("Awaiting review")).toHaveLength(20);
+    expect(screen.queryByText("Developing")).not.toBeInTheDocument();
+    expect(screen.getByText(/No criterion performance levels/)).toBeVisible();
+  });
+  it("D10 explicit early end records phase opportunities", () => {
+    show(
+      endRun(beginCase(createRun(config), "A1"), "Test interruption"),
+      "/learner/review",
+    );
+    expect(screen.getByText(/ENDED EARLY/)).toBeVisible();
+    expect(
+      screen.getAllByText(/Evidence availability: Not elicited/).length,
+    ).toBeGreaterThan(0);
+    expect(screen.queryByText("Developing")).not.toBeInTheDocument();
+  });
+  it("D13/D14 renders actual differing primary/supplementary human feedback", async () => {
+    const run = completeRun(),
+      bundle = await emptyReviewBundle(run),
+      r = reviewRecord(run);
+    r.supplementary = [
+      {
+        ...structuredClone(r.primary),
+        judgement: "Proficient",
+        rationale: "Later evidence supports a stronger relationship.",
+        evidence: [
+          {
+            phaseId: "A.U",
+            promptId: "A.P5",
+            location: "First paragraph",
+            excerpt: "",
+          },
+        ],
+      },
+    ];
+    bundle.records = [r];
+    localStorage.setItem(
+      `bharat-kalp:/:v3:learner:reviews:${run.runId}`,
+      JSON.stringify(bundle),
+    );
+    show(run, "/learner/review");
+    await waitFor(() => expect(screen.getByText("Emerging")).toBeVisible());
+    expect(screen.getByText("Proficient")).toBeVisible();
+    expect(
+      screen.getByText(
+        "Later supplementary evidence — initial judgement retained",
+      ),
+    ).toBeVisible();
+    expect(screen.getAllByText(r.primary.strengthOrGap)).toHaveLength(2);
+    expect(screen.getAllByText(r.primary.nextOpportunity)).toHaveLength(2);
+  });
+  it("D18 unreadable state exposes recovery without overwriting raw data", () => {
+    localStorage.setItem("bharat-kalp:/:v3:learner", "broken");
+    render(
+      <App config={config} store={new RunStore(config, localStorage, "/")} />,
+    );
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "needs recovery",
+    );
+    expect(
+      screen.getByRole("link", { name: "Open recovery and files" }),
+    ).toBeVisible();
+    expect(localStorage.getItem("bharat-kalp:/:v3:learner")).toBe("broken");
+  });
 });

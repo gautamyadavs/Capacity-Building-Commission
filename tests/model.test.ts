@@ -1,197 +1,312 @@
-import { describe, it, expect } from 'vitest';
-import { ConfigSchema, assessmentAvailable, batteryComplete, createRun, currentStage, feedbackAvailable, fieldsFor, intermissionDue, parseRun, reasoningComplete, restoreRun, resumePath, submitStage, validate, wordCount } from '../src/model';
-import { beforeCase, complete, completedBattery, config, preAuditConfig, previousConfig, started, throughStage, validDraft } from './helpers';
-
-describe('two-case learning content', () => {
-  it('retains the substantive skeleton and appends one gated review per episode', () => {
-    expect(config.assessments.map(a => a.shortId)).toEqual(['A1', 'B1']);
-    expect(config.assessments.map(a => a.stages.map(s => s.id))).toEqual([
-      ['A1_initial', 'A1_execution', 'A1_update', 'A1_challenge', 'A1_review'],
-      ['B1_predict', 'B1_compare', 'B1_explain', 'B1_revise', 'B1_checks', 'B1_review'],
+import { describe, it, expect } from "vitest";
+import {
+  ConfigSchema,
+  beginCase,
+  caseAvailable,
+  createRun,
+  emptyReviewBundle,
+  endRun,
+  evidenceAvailability,
+  mergeReviews,
+  parseReviewBundle,
+  parseRun,
+  runBinding,
+  submitPhase,
+  validateReviewRecord,
+} from "../src/model";
+import { config, completeRun, response, reviewRecord } from "./helpers";
+describe("two-phase diagnostic evidence", () => {
+  it("D01/D02 captures four cases, eight objectives and ten criterion mappings", () => {
+    expect(config.cases.map((a) => a.id)).toEqual(["A1", "A2", "B1", "B2"]);
+    expect(config.objectives).toHaveLength(8);
+    expect(config.criteria).toHaveLength(10);
+    expect(
+      config.cases.map((a) => a.phases.map((p) => p.prompts.length)),
+    ).toEqual([
+      [4, 2],
+      [4, 2],
+      [2, 2],
+      [2, 2],
     ]);
-    for (const a of config.assessments) {
-      const review = a.stages.at(-1)!;
-      expect(review).toMatchObject({ kind: 'review', title: 'Review your reasoning', selectedResponses: [], requires: a.stages.slice(0, -1).map(s => s.id) });
-      expect(review.fields).toEqual([{ id: 'amendment', label: 'Your review amendment', prompt: 'Choose one part of your submitted response that you would improve after this review. Rewrite that part, then state briefly what changed in your reasoning.', type: 'text', required: true, unscored: true, maxWords: 100 }]);
-      expect(review.groups.filter(g => /defensible approach/.test(g.title))).toHaveLength(2);
-      expect(a.stages.every(s => !!s.task && !!s.rationale)).toBe(true);
-      const old = previousConfig.assessments.find(old => old.id === a.id)!;
-      expect(a.stages.slice(0, -1).map(s => s.fields.map(f => f.maxWords))).toEqual(old.stages.map(s => s.fields.map(f => f.maxWords)));
-      expect(a.contentVersion).not.toBe(old.contentVersion);
-    }
-    expect(config.contentVersion).toBe('learning-pilot-2026-10-01-v3');
-    expect(config.guidance.join(' ')).toContain('You may answer in bullet points.');
+    const wrong = structuredClone(config);
+    wrong.criteria[9].comparisonPrompts = ["B.P4"];
+    expect(() => ConfigSchema.parse(wrong)).toThrow();
   });
-  it('keeps two prediction cards, confidence and comparison choices unscored, and every maximum', () => {
-    const a = config.assessments[1];
-    expect(a.predictions!.cards.map(c => c.label)).toEqual(['Prediction 1', 'Prediction 2']);
-    expect(a.predictions!.fields.map(f => [f.id, f.maxWords])).toEqual([['prediction', 35], ['why', 60], ['confidence', undefined]]);
-    expect(a.predictions!.fields.find(f => f.id === 'confidence')).toMatchObject({ required: true, unscored: true });
-    expect(a.predictions!.evidenceMaxWords).toBe(35);
-    expect(a.stages[0].fields[0].maxWords).toBe(60);
-    expect(a.stages[2].fields.map(f => f.maxWords)).toEqual([120, 150]);
-    expect(a.stages[3].fields[0].maxWords).toBe(180);
-    expect(fieldsFor(a, a.stages[1]).filter(f => f.type === 'choice').every(f => f.unscored)).toBe(true);
-    expect(config.assessments[0].stages[3].fields[0]).toMatchObject({ id: 'position', unscored: true, options: [{ id: 'Maintain' }, { id: 'Modify' }, { id: 'Reverse' }] });
-    expect(config.finalReview.reflection).toMatchObject({ required: false, maxWords: 150 });
+  it("D08/D09 prevents update submission before initial preservation and preserves exact records", () => {
+    let run = beginCase(createRun(config), "A1");
+    const original = structuredClone(run);
+    expect(() =>
+      submitPhase(run, "A1", "A.U", response(run, "A1", "A.U")),
+    ).toThrow();
+    const draft = response(
+      run,
+      "A1",
+      "A.I",
+      "• First choice\n  Prior reasons.",
+    );
+    run = submitPhase(run, "A1", "A.I", draft);
+    draft.answers["A.P1"] = "Tamper";
+    expect(original.sessions.A1.submitted).toEqual({});
+    expect(run.sessions.A1.submitted["A.I"].answers["A.P1"]).toBe(
+      "• First choice\n  Prior reasons.",
+    );
+    expect(run.sessions.A1.revealedAt["A.U"]).toBe(
+      run.sessions.A1.submitted["A.I"].submittedAt,
+    );
+    const next = submitPhase(
+      run,
+      "A1",
+      "A.U",
+      response(run, "A1", "A.U", "Retain with reasons"),
+    );
+    expect(next.sessions.A1.submitted["A.I"]).toEqual(
+      run.sessions.A1.submitted["A.I"],
+    );
+    expect(() =>
+      submitPhase(next, "A1", "A.U", response(next, "A1", "A.U")),
+    ).toThrow();
+    expect(parseRun(JSON.stringify(next))).toEqual(next);
   });
-  it('preserves all group facts, uncertainty, challenges, notes and the three original MCQs', () => {
-    for (const a of config.assessments) {
-      const old = previousConfig.assessments.find(old => old.id === a.id)!;
-      for (const [i, stage] of a.stages.slice(0, -1).entries()) {
-        const previous = old.stages[i];
-        for (const group of previous.groups) for (const fact of group.paragraphs) {
-          const displayed = [...stage.groups.flatMap(g => g.paragraphs), ...(stage.timeline?.map(t => t.text) || [])];
-          expect(displayed).toContain(fact);
-        }
-        expect(stage.note).toEqual(previous.note);
-        if (i > 0) expect(stage.information).toEqual(previous.information);
-        expect(stage.selectedResponses).toEqual(previous.selectedResponses.map(q => ({ ...q, deferFeedbackUntilBatteryComplete: false })));
+  it("records actual starts and all eight submissions without premature completion", () => {
+    let run = createRun(config);
+    expect(caseAvailable(run, "A2")).toBe(false);
+    expect(() => beginCase(run, "B1")).toThrow();
+    for (const a of config.cases) {
+      run = beginCase(run, a.id);
+      for (const p of a.phases) {
+        run = submitPhase(run, a.id, p.id, response(run, a.id, p.id));
+        if (a.id !== "B2" || p.kind !== "update") expect(run.end).toBeNull();
       }
     }
-    const flood = config.assessments[0].stages[0];
-    expect(flood.timeline).toEqual([{ label: 'Current time', text: '07:00, after seven hours of intense rainfall.' }, { label: 'Immediate window', text: 'Next 6 hours: lead emergency transport coordination.' }, { label: 'Planning horizon', text: 'Following 72 hours: set direction for continuity.' }]);
-    expect(flood.information).toEqual(previousConfig.assessments[0].stages[0].information.slice(1));
-    const air = config.assessments[1];
-    expect(air.stages[1].groups[0].title).toBe('Simulated outcomes');
-    expect(air.stages[3].fields[0].prompt).toContain('supplied 48-hour response package');
-    expect(air.stages[3].focusContext).toContainEqual({ stageId: 'B1_predict', groupTitles: ['48-hour response package'] });
-    const checks = air.stages.flatMap(s => s.selectedResponses);
-    expect(checks).toHaveLength(3); expect(checks.map(q => q.correctOptionId)).toEqual(['B', 'A', 'C']);
+    expect(run.actualSequence).toEqual(["A1", "A2", "B1", "B2"]);
+    expect(run.submissionSequence).toHaveLength(8);
+    expect(run.end?.kind).toBe("complete");
+    expect(parseRun(JSON.stringify(run))).toEqual(run);
   });
-  it('rejects broken prerequisites, early or incomplete reviews, bad context, tables and feedback', () => {
-    const badGraph = structuredClone(config); badGraph.assessments[0].stages[1].requires = [];
-    const earlyReview = structuredClone(config); earlyReview.assessments[0].stages.reverse();
-    const missingPrerequisite = structuredClone(config); missingPrerequisite.assessments[0].stages.at(-1)!.requires = ['A1_challenge'];
-    const scoredReview = structuredClone(config); scoredReview.assessments[0].stages.at(-1)!.fields[0].unscored = false;
-    const wrongMaximum = structuredClone(config); wrongMaximum.assessments[0].stages.at(-1)!.fields[0].maxWords = 150;
-    const noReview = structuredClone(config); noReview.assessments[1].stages.pop();
-    const badContext = structuredClone(config); badContext.assessments[1].stages[3].focusContext![0].groupTitles = ['Unknown package'];
-    const futureContext = structuredClone(config); futureContext.assessments[1].stages[0].focusContext = [{ stageId: 'B1_compare', groupTitles: ['Simulated outcomes'] }];
-    const badTable = structuredClone(config); badTable.assessments[0].stages[0].groups[0].rowLabels = [];
-    const missingFeedback = structuredClone(config); missingFeedback.assessments[1].stages[4].selectedResponses[0].feedbackByOption = {};
-    for (const invalid of [badGraph, earlyReview, missingPrerequisite, scoredReview, wrongMaximum, noReview, badContext, futureContext, badTable, missingFeedback]) expect(ConfigSchema.safeParse(invalid).success).toBe(false);
+  it("D06/D07 accepts a concise narrative, bullets and a very long response without word or vocabulary rules", () => {
+    for (const value of [
+      "Reason.",
+      "• Retain\n• Investigate",
+      "reason ".repeat(7000),
+    ]) {
+      const run = beginCase(createRun(config), "A1");
+      expect(
+        submitPhase(run, "A1", "A.I", response(run, "A1", "A.I", value))
+          .sessions.A1.submitted["A.I"].answers["A.P1"],
+      ).toBe(value);
+    }
+  });
+  it("D10 preserves blanks and early-end drafts and identifies unrevealed opportunities", () => {
+    let run = beginCase(createRun(config), "A1");
+    run.sessions.A1.draft!.answers["A.P1"] = "Unsubmitted draft";
+    run = endRun(run, "Technical interruption");
+    expect(run.sessions.A1.draft!.answers["A.P1"]).toBe("Unsubmitted draft");
+    expect(
+      run.end?.incomplete.find(
+        (m) => m.promptId === "A.P1" && m.caseId === "A1",
+      )?.opportunity,
+    ).toBe("Unsubmitted");
+    expect(
+      run.end?.incomplete.find(
+        (m) => m.promptId === "A.P5" && m.caseId === "A1",
+      )?.opportunity,
+    ).toBe("Not elicited");
+    expect(evidenceAvailability(run, "A1", config.criteria[0])).toBe(
+      "Insufficient evidence",
+    );
+    expect(() =>
+      submitPhase(run, "A1", "A.I", response(run, "A1", "A.I")),
+    ).toThrow();
+    expect(parseRun(JSON.stringify(run))).toEqual(run);
+    const blank = completeRun("");
+    expect(blank.end?.incomplete).toHaveLength(20);
+    expect(evidenceAvailability(blank, "A1", config.criteria[0])).toBe(
+      "Insufficient evidence",
+    );
+  });
+  it("D20 validates saved graph, phase versions, sequence and incomplete records", () => {
+    const valid = completeRun();
+    for (const mutate of [
+      (r: typeof valid) => {
+        delete r.sessions.A1.submitted["A.I"];
+      },
+      (r: typeof valid) => {
+        r.sessions.A1.submitted["A.U"].phaseVersion = "wrong";
+      },
+      (r: typeof valid) => {
+        r.actualSequence.reverse();
+      },
+      (r: typeof valid) => {
+        r.end!.incomplete.push({
+          caseId: "B1",
+          phaseId: "B.U",
+          promptId: "B.P3",
+          opportunity: "Not elicited",
+        });
+      },
+    ]) {
+      const r = structuredClone(valid);
+      mutate(r);
+      expect(() => parseRun(JSON.stringify(r))).toThrow();
+    }
+  });
+  it("D20 captures facts and rubric content by value", () => {
+    const c = structuredClone(config),
+      run = createRun(c);
+    c.cases[0].phases[0].facts[0] = "new facts";
+    c.criteria[0].descriptors.Proficient = "new rubric";
+    expect(run.config).toEqual(config);
+    expect(parseRun(JSON.stringify(run)).config).toEqual(config);
   });
 });
-
-describe('learning sequence and immutable submissions', () => {
-  it('requires the first amendment and explicit continuation before episode two', () => {
-    const a = config.assessments[0]; let run = throughStage(0, 4);
-    expect(reasoningComplete(a, run.sessions[a.id])).toBe(true);
-    expect(intermissionDue(config, run)).toBe(false); expect(assessmentAvailable(config, run, config.assessments[1].id)).toBe(false);
-    expect(run.intermission.seenAt).toBeNull(); expect(currentStage(a, run.sessions[a.id])!.id).toBe('A1_review');
-    run = submitStage(config, run, a.id, 'A1_review', validDraft(a, a.stages[4]));
-    expect(intermissionDue(config, run)).toBe(true); expect(resumePath(config, run)).toBe('/learner/intermission');
-    expect(assessmentAvailable(config, run, config.assessments[1].id)).toBe(false);
-    run.intermission.continuedAt = new Date().toISOString();
-    expect(assessmentAvailable(config, run, config.assessments[1].id)).toBe(true);
+describe("real human review contract", () => {
+  it("requires identifiable prior reasoning for update performance, with same-phase cross-field evidence allowed", () => {
+    const run = completeRun();
+    const r = reviewRecord(run, "B2", "B-R4");
+    r.comparisonEvidence = [];
+    expect(() => validateReviewRecord(r, run)).toThrow(
+      "preserved prior reasoning",
+    );
+    r.comparisonEvidence = [
+      {
+        phaseId: "B.I",
+        promptId: "B.P2",
+        location: "Second initial prompt",
+        excerpt: "",
+      },
+    ];
+    expect(() => validateReviewRecord(r, run)).not.toThrow();
+    run.sessions.B2.submitted["B.I"].answers = { "B.P1": "", "B.P2": "" };
+    expect(() => validateReviewRecord(r, run)).toThrow(
+      "prior evidence is unavailable",
+    );
+    r.primary.judgement = "Insufficient evidence";
+    expect(() => validateReviewRecord(r, run)).not.toThrow();
+    expect(evidenceAvailability(run, "B2", config.criteria[9])).toBe(
+      "Insufficient evidence",
+    );
   });
-  it.each([0, 1])('gates review until every substantive stage is locked in episode %i', index => {
-    const a = config.assessments[index]; const review = a.stages.at(-1)!; let run = started(index);
-    for (const s of a.stages.slice(0, -1)) {
-      expect(() => submitStage(config, run, a.id, review.id, validDraft(a, review))).toThrow('no longer editable');
-      run = submitStage(config, run, a.id, s.id, validDraft(a, s));
-    }
-    expect(currentStage(a, run.sessions[a.id])!.id).toBe(review.id);
-    const originals = structuredClone(run.sessions[a.id].submitted);
-    const amendment = validDraft(a, review);
-    run = submitStage(config, run, a.id, review.id, amendment);
-    for (const [id, snap] of Object.entries(originals)) expect(run.sessions[a.id].submitted[id]).toEqual(snap);
-    expect(run.sessions[a.id].submitted[review.id].answers).toEqual({ amendment: amendment.answers.amendment });
-    expect(() => submitStage(config, run, a.id, review.id, amendment)).toThrow('no longer editable');
+  it("D11/D12 refuses review before end and creates no automatic ratings", async () => {
+    await expect(emptyReviewBundle(createRun(config))).rejects.toThrow("End");
+    const b = await emptyReviewBundle(completeRun());
+    expect(b.records).toEqual([]);
   });
-  it('locks predictions, open explanations and revision before objective checks', () => {
-    const a = config.assessments[1]; let run = started(1);
-    expect(currentStage(a, run.sessions[a.id])!.kind).toBe('predict');
-    expect(() => submitStage(config, run, a.id, a.stages[1].id, validDraft(a, a.stages[1]))).toThrow('no longer editable');
-    for (const s of a.stages.slice(0, 4)) {
-      expect(() => submitStage(config, run, a.id, 'B1_checks', validDraft(a, a.stages[4]))).toThrow('no longer editable');
-      run = submitStage(config, run, a.id, s.id, validDraft(a, s));
-    }
-    expect(currentStage(a, run.sessions[a.id])!.kind).toBe('evidence');
+  it("D12/D13 binds feedback to the exact run, response record and versions", async () => {
+    const run = completeRun(),
+      bundle = await emptyReviewBundle(run);
+    bundle.records = [reviewRecord(run)];
+    expect(await parseReviewBundle(JSON.stringify(bundle), run)).toEqual(
+      bundle,
+    );
+    await expect(
+      parseReviewBundle(JSON.stringify(bundle), completeRun()),
+    ).rejects.toThrow("different");
+    const changed = structuredClone(run);
+    changed.sessions.A1.submitted["A.I"].answers["A.P1"] = "Changed";
+    await expect(
+      parseReviewBundle(JSON.stringify(bundle), changed),
+    ).rejects.toThrow("different");
+    expect(await runBinding(changed)).not.toBe(bundle.binding);
   });
-  it('releases feedback only after all reasoning and checks, before the review amendment', () => {
-    const a = config.assessments[1]; const questions = a.stages[4].selectedResponses;
-    for (let count = 0; count < 5; count++) {
-      const run = throughStage(1, count);
-      expect(questions.every(q => !feedbackAvailable(config, run, a, q))).toBe(true);
-    }
-    const run = throughStage(1, 5);
-    expect(batteryComplete(config, run)).toBe(false);
-    expect(questions.every(q => feedbackAvailable(config, run, a, q))).toBe(true);
-    const incomplete = structuredClone(run); delete incomplete.sessions[a.id].submitted.B1_checks.answers.B1_check3;
-    expect(reasoningComplete(a, incomplete.sessions[a.id])).toBe(false);
-    expect(questions.every(q => !feedbackAvailable(config, incomplete, a, q))).toBe(true);
-    expect(feedbackAvailable(config, run, a, { ...questions[0], deferFeedbackUntilBatteryComplete: true })).toBe(false);
-    expect(feedbackAvailable(config, completedBattery(), a, { ...questions[0], deferFeedbackUntilBatteryComplete: true })).toBe(true);
+  it("D14 rejects invented excerpts and phase misattribution", () => {
+    const run = completeRun(),
+      r = reviewRecord(run);
+    r.primary.evidence[0].excerpt = "Invented quotation";
+    expect(() => validateReviewRecord(r, run)).toThrow("excerpt");
+    r.primary.evidence[0].excerpt = "";
+    r.primary.evidence[0].phaseId = "A.U";
+    r.primary.evidence[0].promptId = "A.P5";
+    expect(() => validateReviewRecord(r, run)).toThrow("actual prompt");
   });
-  it('deep-copies exact responses and rejects repeat submission', () => {
-    const a = config.assessments[0]; const s = a.stages[0]; const draft = validDraft(a, s); const exact = draft.answers.response;
-    const next = submitStage(config, started(), a.id, s.id, draft); draft.answers.response = 'Retrospective change';
-    expect(next.sessions[a.id].submitted[s.id].answers.response).toBe(exact);
-    expect(() => submitStage(config, next, a.id, s.id, draft)).toThrow('no longer editable');
+  it("D10/D14 accepts relevant evidence elsewhere in the same phase, never blank-only Developing", () => {
+    const run = completeRun(""),
+      r = reviewRecord(run);
+    r.primary.judgement = "Developing";
+    r.primary.evidence[0].excerpt = "";
+    expect(() => validateReviewRecord(r, run)).toThrow("blank");
+    run.sessions.A1.submitted["A.I"].answers["A.P3"] =
+      "Comparison reasoning located in another initial prompt";
+    r.primary.evidence[0].promptId = "A.P3";
+    expect(() => validateReviewRecord(r, run)).not.toThrow();
   });
-  it('requires both episodes and both amendments before the final review', () => {
-    expect(batteryComplete(config, beforeCase(0))).toBe(false); expect(batteryComplete(config, beforeCase(1))).toBe(false);
-    expect(batteryComplete(config, throughStage(1, 5))).toBe(false);
-    const run = completedBattery(); expect(batteryComplete(config, run)).toBe(true);
-    delete run.sessions.B1_AIR_POE.submitted.B1_checks.answers.B1_check3;
-    expect(batteryComplete(config, run)).toBe(false);
+  it("D14 retains initial primary judgement alongside later supplementary evidence", () => {
+    const run = completeRun(),
+      r = reviewRecord(run);
+    r.supplementary = [
+      {
+        ...structuredClone(r.primary),
+        judgement: "Proficient",
+        evidence: [
+          {
+            phaseId: "A.U",
+            promptId: "A.P6",
+            location: "First paragraph",
+            excerpt: "",
+          },
+        ],
+        rationale:
+          "Later reasoning repairs the comparison; initial judgement remains unchanged.",
+      },
+    ];
+    validateReviewRecord(r, run);
+    expect(r.primary.judgement).toBe("Emerging");
+    expect(r.supplementary[0].judgement).toBe("Proficient");
+    const b = reviewRecord(run, "B1", "B-R1");
+    b.supplementary = r.supplementary;
+    expect(() => validateReviewRecord(b, run)).toThrow("no supplementary");
   });
-  it('accepts one word and exact maxima, retains over-limit drafts and validates choices/card order', () => {
-    expect(wordCount('  one\n two  ')).toBe(2); expect(wordCount('')).toBe(0);
-    for (const a of config.assessments) for (const s of a.stages) for (const f of fieldsFor(a, s).filter(f => f.type === 'text')) {
-      const draft = validDraft(a, s); draft.answers[f.id] = 'one'; expect(validate(a, s, draft)).toEqual({});
-      draft.answers[f.id] = Array(f.maxWords).fill('word').join(' '); expect(validate(a, s, draft)).toEqual({});
-      draft.answers[f.id] += ' extra'; expect(validate(a, s, draft)[f.id]).toContain('words or fewer');
-    }
-    const a = config.assessments[1]; const s = a.stages[4]; const draft = validDraft(a, s); draft.answers.B1_check1 = 'made-up';
-    expect(validate(a, s, draft).B1_check1).toBe('Choose a listed option.');
-    draft.cardOrder = ['prediction1', 'prediction1']; expect(validate(a, s, draft).cardOrder).toBeDefined();
-    for (const option of ['Maintain', 'Modify', 'Reverse']) {
-      const flood = config.assessments[0]; const challenge = flood.stages[3]; const response = validDraft(flood, challenge); response.answers.position = option;
-      expect(validate(flood, challenge, response)).toEqual({});
-    }
+  it("D13 distinguishes evidence statuses and Uncertain and requires further elicitation/review", () => {
+    const run = completeRun(""),
+      r = reviewRecord(run);
+    r.primary.judgement = "Insufficient evidence";
+    r.primary.evidence[0].excerpt = "";
+    expect(() => validateReviewRecord(r, run)).not.toThrow();
+    r.primary.judgement = null;
+    r.primary.reviewStatus = "Uncertain";
+    expect(() => validateReviewRecord(r, run)).toThrow("competing");
+    r.primary.competingInterpretations =
+      "One rater sees a relationship; another sees only assertion. Seek independent review.";
+    expect(() => validateReviewRecord(r, run)).not.toThrow();
+    r.primary.nextOpportunity = "";
+    expect(() => validateReviewRecord(r, run)).toThrow("further review");
   });
-});
-
-describe('version migration and saved-run validation', () => {
-  it('preserves compatible earlier progress when only a later case changes', () => {
-    const run = completedBattery(); expect(parseRun(JSON.stringify(run), config, 'learner')).toEqual(run);
-    run.sessions.B1_AIR_POE.contentVersion = 'old-version';
-    const restored = restoreRun(JSON.stringify(run), config, 'learner');
-    expect(restored.migrated).toBe(true); expect(restored.run.sessions.A1_FLOOD).toEqual(run.sessions.A1_FLOOD);
-    expect(restored.run.sessions.B1_AIR_POE.submitted).toEqual({}); expect(restored.run.intermission).toEqual(run.intermission);
-    expect(restored.run.reflection).toEqual({ draft: '', submitted: null, submittedAt: null });
+  it("B-R4 judges the supplied intervention against captured initial account/prediction", () => {
+    const run = completeRun(),
+      r = reviewRecord(run, "B2", "B-R4");
+    expect(config.criteria[9].comparisonPrompts).toEqual(["B.P1", "B.P2"]);
+    expect(config.cases[3].phases[1].prompts[1].text).toContain(
+      "proposed intervention",
+    );
+    expect(() => validateReviewRecord(r, run)).not.toThrow();
   });
-  it.each([0, 1, 2, 3, 4])('migrates an old run with %i completed cases to safe two-episode progress', count => {
-    const old = beforeCase(count, previousConfig);
-    expect(parseRun(JSON.stringify(old), previousConfig, 'learner')).toEqual(old);
-    const { run, migrated } = restoreRun(JSON.stringify(old), config, 'learner');
-    expect(migrated).toBe(true); expect(run.runId).toBe(old.runId);
-    expect(Object.keys(run.sessions)).toEqual(['A1_FLOOD', 'B1_AIR_POE']);
-    for (const a of config.assessments) expect(run.sessions[a.id]).toEqual({ contentVersion: a.contentVersion, startedAt: null, draft: null, submitted: {} });
-    expect(run.intermission).toEqual({ seenAt: null, continuedAt: null });
-    expect(resumePath(config, run)).toBe('/learner/assessment/A1_FLOOD');
-    expect(parseRun(JSON.stringify(run), config, 'learner')).toEqual(run);
-  });
-  it('resets incompatible old drafts and final reflections and accepts the pre-audit release', () => {
-    for (const oldConfig of [previousConfig, preAuditConfig]) {
-      const old = completedBattery(oldConfig); old.reflection = { draft: 'Old reflection', submitted: 'Old reflection', submittedAt: new Date().toISOString() };
-      const { run } = restoreRun(JSON.stringify(old), config, 'learner');
-      expect(run.reflection).toEqual({ draft: '', submitted: null, submittedAt: null }); expect(batteryComplete(config, run)).toBe(false);
-      const partial = throughStage(0, 1, oldConfig); partial.sessions.A1_FLOOD.draft!.answers.response = 'Old unfinished response';
-      expect(restoreRun(JSON.stringify(partial), config, 'learner').run.sessions.A1_FLOOD.draft).toBeNull();
-    }
-    expect(restoreRun(JSON.stringify({ schemaVersion: 1 }), config, 'learner').run.schemaVersion).toBe(2);
-  });
-  it('rejects out-of-order, unknown and malformed saved review state', () => {
-    const early = started(); const a = config.assessments[0]; const review = a.stages.at(-1)!;
-    early.sessions[a.id].submitted[review.id] = { ...validDraft(a, review), submittedAt: new Date().toISOString() };
-    expect(() => parseRun(JSON.stringify(early), config, 'learner')).toThrow('inconsistent');
-    const unknown = completedBattery(); unknown.sessions.A2_LPG = unknown.sessions.A1_FLOOD;
-    expect(() => parseRun(JSON.stringify(unknown), config, 'learner')).toThrow('incomplete');
-    const invalid = completedBattery(); invalid.sessions.A1_FLOOD.submitted.A1_review.answers.amendment = '';
-    expect(() => parseRun(JSON.stringify(invalid), config, 'learner')).toThrow('inconsistent');
+  it("preserves independent judgements and immutable revision histories", async () => {
+    const run = completeRun(),
+      bundle = await emptyReviewBundle(run),
+      first = reviewRecord(run),
+      second = {
+        ...structuredClone(first),
+        id: crypto.randomUUID(),
+        reviewer: "Rater 2",
+      };
+    bundle.records = mergeReviews([first], [second]);
+    expect(bundle.records).toHaveLength(2);
+    expect(mergeReviews(bundle.records, [first])).toHaveLength(2);
+    const tampered = { ...first, reviewer: "Changed rater" };
+    expect(() => mergeReviews(bundle.records, [tampered])).toThrow(
+      "overwritten",
+    );
+    const revised = {
+      ...structuredClone(first),
+      id: crypto.randomUUID(),
+      supersedes: first.id,
+    };
+    bundle.records.push(revised);
+    expect(
+      (await parseReviewBundle(JSON.stringify(bundle), run)).records,
+    ).toHaveLength(3);
+    bundle.records = [revised];
+    await expect(
+      parseReviewBundle(JSON.stringify(bundle), run),
+    ).rejects.toThrow("earlier");
   });
 });

@@ -1,3 +1,5 @@
+> Historical reference: superseded for the active diagnostic by KALP-ALIGN-04 and the six live Drive originals. These earlier tasks, limits and learning/transfer proposals do not govern current delivery. See [current verification](diagnostic-verification.md). Do not run the historical extractor to replace diagnostic content.
+
 # Provisional matched transfer tasks
 
 These two fictional tasks accompany [the pilot protocol](learning-pilot.md). They are research materials outside the application, not new learner cases or a validated assessment. A subject-matter reviewer should check their clarity and plausibility before recruitment. Counterbalance A-before/B-after and B-before/A-after. Neither task has a single required policy action. Human reviewers use the explicit reasoning criteria in the protocol and should not grade writing mechanics.

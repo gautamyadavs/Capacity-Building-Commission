@@ -1,19 +1,133 @@
-import type { ReactNode, MouseEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useSession } from '../context';
-import { stageStatus, type Assessment } from '../model';
-import styles from '../app.module.css';
-export function AppLink({to,children,className,...props}:{to:string;children:ReactNode;className?:string;'aria-current'?:'page'|'step'}) {
-  const {store}=useSession();const navigate=useNavigate();
-  const click=async(e:MouseEvent<HTMLAnchorElement>)=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();try{await store.flush();navigate(to);}catch{}};
-  return <Link to={to} className={className} onClick={click} {...props}>{children}</Link>;
+import type { ReactNode, MouseEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSession } from "../context";
+import type { Case, Phase, Snapshot } from "../model";
+import styles from "../app.module.css";
+export function AppLink({
+  to,
+  children,
+  className,
+  ...props
+}: {
+  to: string;
+  children: ReactNode;
+  className?: string;
+  "aria-current"?: "page" | "step";
+}) {
+  const { store } = useSession(),
+    navigate = useNavigate();
+  const click = async (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    try {
+      await store.flush();
+      navigate(to);
+    } catch {}
+  };
+  return (
+    <Link to={to} className={className} onClick={click} {...props}>
+      {children}
+    </Link>
+  );
 }
-export function Paragraphs({lines}:{lines:string[]}) {return <>{lines.map((line,i)=><p key={`${i}-${line}`}>{line}</p>)}</>;}
-export function ErrorBox({message}:{message:string}) {return <div className={styles.errorBox} role="alert"><h1>Unable to open this view</h1><p>{message}</p><Link to="/learner">Return to assessments</Link></div>;}
-export function StageProgress({a,current}:{a:Assessment;current:string}) {
-  const {run,mode}=useSession();return <nav aria-label="Assessment stages" className={styles.stageProgress}><ol>{a.stages.map((s,i)=>{
-    const status=stageStatus(a,run.sessions[a.id],s);const active=s.id===current;const enabled=status!=='notYetAvailable';
-    const inner=<><span className={styles.stepNumber}>{status==='submitted'?'✓':i+1}</span><span><strong>{s.title}</strong><small>{status==='submitted'?'Submitted and locked':status==='current'?'Current stage':'Locked'}</small></span></>;
-    return <li key={s.id} data-active={active} data-status={status}>{enabled?<AppLink to={`/${mode}/assessment/${a.id}/stage/${s.id}`} aria-current={active?'step':undefined}>{inner}</AppLink>:<span aria-disabled="true">{inner}</span>}</li>;
-  })}</ol></nav>;
+export function Paragraphs({ lines }: { lines: string[] }) {
+  return (
+    <>
+      {lines.map((line, i) => (
+        <p key={i}>{line}</p>
+      ))}
+    </>
+  );
+}
+export function ErrorBox({ message }: { message: string }) {
+  return (
+    <section role="alert" className={styles.gate}>
+      <h1>Unable to open this view</h1>
+      <p>{message}</p>
+      <AppLink to="/learner">Return to diagnostic home</AppLink>
+    </section>
+  );
+}
+export function CaseFacts({ phase }: { phase: Phase }) {
+  return (
+    <section
+      className={styles.briefing}
+      aria-label={`${phase.title} case information`}
+    >
+      <h2>
+        {phase.kind === "initial" ? "Case information" : "New information"}
+      </h2>
+      <Paragraphs lines={phase.facts} />
+    </section>
+  );
+}
+export function SubmittedResponsePanel({
+  phase,
+  snapshot,
+  expanded = false,
+}: {
+  phase: Phase;
+  snapshot: Snapshot;
+  expanded?: boolean;
+}) {
+  return (
+    <details className={styles.submitted} open={expanded}>
+      <summary>{phase.title} · Submitted and preserved</summary>
+      <div className={styles.submittedBody}>
+        <p className={styles.timestamp}>
+          Submitted{" "}
+          <time dateTime={snapshot.submittedAt}>
+            {new Date(snapshot.submittedAt).toLocaleString()}
+          </time>{" "}
+          · {snapshot.phaseVersion}
+        </p>
+        {phase.prompts.map((p) => (
+          <section className={styles.answer} key={p.id}>
+            <h3>
+              {p.id} · {p.label}
+            </h3>
+            <p>{p.text}</p>
+            <p>
+              {snapshot.answers[p.id] ||
+                "Blank response submitted. No performance level is inferred."}
+            </p>
+          </section>
+        ))}
+      </div>
+    </details>
+  );
+}
+export function StageProgress({ a, current }: { a: Case; current: string }) {
+  const { run } = useSession();
+  const s = run.sessions[a.id];
+  return (
+    <nav aria-label="Case phases" className={styles.stageProgress}>
+      <ol>
+        {a.phases.map((p, i) => {
+          const submitted = !!s.submitted[p.id],
+            available = !!s.revealedAt[p.id];
+          return (
+            <li key={p.id} data-active={p.id === current}>
+              <span className={styles.stepNumber}>{i + 1}</span>
+              {available ? (
+                <AppLink
+                  to={`/learner/assessment/${a.id}/stage/${p.id}`}
+                  aria-current={p.id === current ? "step" : undefined}
+                >
+                  {p.title} ·{" "}
+                  {submitted
+                    ? "Submitted"
+                    : run.end
+                      ? "Unsubmitted"
+                      : "Current phase"}
+                </AppLink>
+              ) : (
+                <span>{p.title} · Not yet available</span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
 }

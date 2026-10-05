@@ -1,199 +1,546 @@
-import { test, expect, type Page } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
-import { completedBattery, config, previousConfig, throughStage } from '../helpers';
-import { fieldsFor, type Assessment, type Stage } from '../../src/model';
-const root = '/bharat-kalp/';
-const key = 'bharat-kalp:/bharat-kalp/:v2:learner';
-const go = async (page: Page, path: string) => { await page.goto(`${root}#${path}`); await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeVisible(); };
-async function accessible(page: Page) {
-  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
-  expect(results.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => ({ target: n.target, reason: n.failureSummary })) }))).toEqual([]);
-}
-async function fillStage(page: Page, a: Assessment, stage: Stage) {
-  for (const field of fieldsFor(a, stage)) {
-    if (!field.required) continue;
-    const container = page.locator(`[data-field-id="${field.id}"]`);
-    if (field.type === 'choice') await container.getByRole('radio').first().check();
-    else await container.getByRole('textbox').fill(`  My submitted reasoning for ${field.label}.\nI will examine outcomes before changing course.  `);
-  }
+import { test, expect, type Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import { readFile } from "node:fs/promises";
+import { config, completeRun } from "../helpers";
+import { beginCase, createRun } from "../../src/model";
+const base = "/Capacity-Building-Commission/";
+const key = `bharat-kalp:${base}:v3:learner`;
+async function seed(
+  page: Page,
+  run: ReturnType<typeof createRun>,
+  route = "/learner",
+) {
+  await page.goto(`${base}#/learner`);
+  await page.evaluate(
+    ({ key, run }) => localStorage.setItem(key, JSON.stringify(run)),
+    { key, run },
+  );
+  await page.goto(`${base}#${route}`);
+  await page.reload();
 }
 async function submit(page: Page) {
-  await page.getByRole('button', { name: 'Submit and continue' }).click(); const dialog = page.getByRole('dialog'); await expect(dialog).toContainText(config.confirmation);
-  await dialog.getByRole('button', { name: 'Submit and lock', exact: true }).click(); await expect(dialog).not.toBeVisible();
+  await page.getByRole("button", { name: "Submit phase →" }).click();
+  await page
+    .getByRole("button", { name: "Submit and preserve", exact: true })
+    .click();
 }
-function stateFor(page: Page) { return page.evaluate(storageKey => {
-  const run = JSON.parse(localStorage.getItem(storageKey)!);
-  for (const [aid, session] of Object.entries(run.sessions) as [string, { draft: { stageId: string } | null }][]) {
-    const journal = JSON.parse(localStorage.getItem(`${storageKey}:draft:${run.runId}:${aid}`) || 'null');
-    if (journal && session.draft?.stageId === journal.stageId) session.draft = journal;
-  }
-  return run;
-}, key); }
-async function noFeedback(page: Page) {
-  await expect(page.locator('[data-feedback-id]')).toHaveCount(0);
-  await expect(page.getByText('Best-supported answer:', { exact: true })).toHaveCount(0);
-  for (const q of config.assessments[1].stages[4].selectedResponses) {
-    for (const text of Object.values(q.feedbackByOption)) await expect(page.getByText(text, { exact: true })).toHaveCount(0);
-  }
+async function checkAxe(page: Page) {
+  const result = await new AxeBuilder({ page }).analyze();
+  expect(result.violations).toEqual([]);
 }
-
-test('two episodes: immutable originals, review amendments, pause/resume and gated feedback', async ({ page }, testInfo) => {
-  test.setTimeout(180000);
-  await go(page, '/learner'); await expect(page.getByRole('heading', { name: 'Practise governance decisions' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: config.assessments[0].title })).toBeVisible();
-  await expect(page.getByRole('heading', { name: config.assessments[1].title })).toBeVisible();
-  await expect(page.getByRole('link', { name: /Reviewer/ })).toHaveCount(0);
-  await go(page, `/learner/assessment/${config.assessments[1].id}`); await expect(page.getByRole('heading', { name: 'This case is not available yet' })).toBeVisible();
-  for (const [index, a] of config.assessments.entries()) {
-    await go(page, `/learner/assessment/${a.id}`); await page.getByRole('button', { name: 'Begin case' }).click();
-    for (const [i, stage] of a.stages.entries()) {
-      const path = `/learner/assessment/${a.id}/stage/${stage.id}`;
-      await expect(page).toHaveURL(new RegExp(`/stage/${stage.id}$`));
-      await expect(page.getByRole('region', { name: 'Current task' })).toContainText(stage.task!);
-      // Neither future case facts, coaching nor evidence-check options scaffold an open response.
-      for (const future of a.stages.slice(i + 1)) {
-        for (const text of [...future.information, ...future.groups.flatMap(g => g.paragraphs), ...future.selectedResponses.map(q => q.prompt)]) await expect(page.getByText(text, { exact: true })).toHaveCount(0);
-        await go(page, `/learner/assessment/${a.id}/stage/${future.id}`);
-        await expect(page.getByRole('heading', { name: 'This stage is not available yet' })).toBeVisible();
-        await noFeedback(page);
-        await go(page, path);
+async function reflow(page: Page) {
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+    ),
+  ).toBe(true);
+}
+test("all four cases and eight phase submissions under the actual Pages subpath", async ({
+  page,
+}) => {
+  await page.goto(`${base}#/learner`);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Reasoning through governance decisions",
+  );
+  await checkAxe(page);
+  for (const a of config.cases) {
+    await page.goto(`${base}#/learner/assessment/${a.id}`);
+    await page.getByRole("button", { name: "Begin or resume case →" }).click();
+    for (const p of a.phases) {
+      await expect(
+        page.getByRole("heading", { name: p.title, exact: true }),
+      ).toBeVisible();
+      for (const f of p.facts)
+        await expect(page.getByText(f, { exact: true })).toBeVisible();
+      expect(await page.getByRole("textbox").count()).toBe(p.prompts.length);
+      if (p.kind === "initial") {
+        await expect(
+          page.getByText(a.phases[1].facts[0], { exact: true }),
+        ).toHaveCount(0);
       }
-      if (stage.kind === 'predict') {
-        await expect(page.getByRole('region', { name: 'Prediction 1', exact: true })).toBeVisible(); await expect(page.getByRole('region', { name: 'Prediction 2', exact: true })).toBeVisible();
-        await expect(page.getByRole('region', { name: 'Prediction 3', exact: true })).toHaveCount(0);
-        await expect(page.getByText('Simulated outcomes', { exact: true })).toHaveCount(0);
+      for (const f of p.prompts)
+        await page
+          .getByLabel(`${f.id} · ${f.label}`, { exact: true })
+          .fill(
+            `${a.id} ${f.id}: • A defensible narrative\nReasons and remaining uncertainty.`,
+          );
+      if (p.kind === "update") {
+        await expect(
+          page.getByText(a.phases[0].facts[0], { exact: true }),
+        ).toBeVisible();
+        await expect(
+          page.getByText(
+            `${a.id} ${a.phases[0].prompts[0].id}: • A defensible narrative\nReasons and remaining uncertainty.`,
+            { exact: true },
+          ),
+        ).toBeVisible();
       }
-      if (stage.kind === 'revise') {
-        await expect(page.getByRole('form', { name: 'Stage response' })).toContainText('supplied 48-hour response package');
-        const facts = page.getByRole('region', { name: 'Case information', exact: true });
-        for (const fact of a.stages[0].groups.find(g => g.title === '48-hour response package')!.paragraphs) await expect(facts.getByText(fact, { exact: true }).first()).toBeVisible();
-      }
-      if (stage.kind === 'review') {
-        await expect(page.getByRole('region', { name: 'Case commentary' })).toBeVisible();
-        await expect(page.getByRole('region', { name: 'Case commentary' })).toContainText('has not automatically evaluated your response');
-        await expect(page.getByRole('textbox')).toHaveCount(1);
-        await expect(page.getByText('0 / 100 words · maximum', { exact: true })).toBeVisible();
-        await expect(page.locator('[data-feedback-id]')).toHaveCount(index === 0 ? 0 : 3);
-        await go(page, '/learner/review'); await expect(page.getByRole('heading', { name: 'Your final review is still locked' })).toBeVisible(); await noFeedback(page);
-        if (index === 0) { await go(page, `/learner/assessment/${config.assessments[1].id}`); await expect(page.getByRole('heading', { name: 'This case is not available yet' })).toBeVisible(); }
-        await go(page, path);
-      } else await noFeedback(page);
-      await fillStage(page, a, stage); await accessible(page);
-      for (const textarea of await page.getByRole('textbox').all()) {
-        expect(await textarea.getAttribute('spellcheck')).toBeNull();
-        expect(await textarea.evaluate(el => (el as HTMLTextAreaElement).spellcheck)).toBe(true);
-      }
-      if (['predict', 'compare', 'revise', 'review'].includes(stage.kind)) await page.screenshot({ path: testInfo.outputPath(`${a.shortId}-${stage.kind}.png`), fullPage: true });
-      const before = await stateFor(page); const draft = before.sessions[a.id].draft;
-      // A refresh before the debounce retains the run-scoped draft, including amendments.
-      await page.reload(); await expect(page.getByRole('button', { name: 'Submit and continue' })).toBeVisible();
-      for (const field of fieldsFor(a, stage)) {
-        const container = page.locator(`[data-field-id="${field.id}"]`);
-        if (field.type === 'text') await expect(container.getByRole('textbox')).toHaveValue(draft.answers[field.id]);
-        else await expect(container.getByRole('radio').first()).toBeChecked();
-      }
-      await submit(page); const after = page.url(); const saved = (await stateFor(page)).sessions[a.id]; expect(saved.submitted[stage.id].answers).toEqual(draft.answers);
-      expect(Object.fromEntries(Object.entries(saved.submitted).filter(([id]) => id !== stage.id))).toEqual(before.sessions[a.id].submitted);
-      if (stage.kind === 'evidence') {
-        await expect(page).toHaveURL(/\/stage\/B1_review$/);
-        await expect(page.locator('[data-feedback-id]')).toHaveCount(3);
-      }
-      await go(page, path); await expect(page.locator('textarea,input')).toHaveCount(0); await expect(page.getByText('▣ Submitted and locked', { exact: true }).first()).toBeVisible();
-      if (stage.kind !== 'review') await noFeedback(page);
-      await page.reload(); await expect(page.locator('textarea,input')).toHaveCount(0); await page.goto(after);
+      await checkAxe(page);
+      await submit(page);
     }
-    if (index === 0) {
-      await expect(page).toHaveURL(/#\/learner\/intermission$/); await expect(page.getByRole('heading', { name: config.intermission.heading })).toBeVisible();
-      await expect(page.getByText(config.intermission.body)).toBeVisible(); await accessible(page); await page.screenshot({ path: testInfo.outputPath('intermission.png'), fullPage: true });
-      await page.getByRole('link', { name: 'Return to assessment home' }).click(); await page.reload();
-      await page.getByRole('link', { name: 'Continue assessment' }).click(); await expect(page.getByRole('heading', { name: config.intermission.heading })).toBeVisible();
-      await go(page, `/learner/assessment/${config.assessments[1].id}`); await expect(page.getByRole('heading', { name: 'This case is not available yet' })).toBeVisible();
-      await go(page, '/learner/intermission'); await page.getByRole('button', { name: 'Continue to Episode 2' }).click(); await expect(page).toHaveURL(new RegExp(`/assessment/${config.assessments[1].id}$`));
+    if (a.id !== "B2") {
+      await expect(
+        page.getByText(/Criterion judgements await human review/),
+      ).toBeVisible();
+      await expect(page.locator("[data-review-id]")).toHaveCount(0);
     }
   }
-  await expect(page).toHaveURL(/#\/learner\/review$/); await expect(page.getByRole('heading', { name: config.finalReview.heading })).toBeVisible(); await expect(page.locator('[data-feedback-id]')).toHaveCount(3);
-  for (const q of config.assessments[1].stages[4].selectedResponses) {
-    await expect(page.locator(`[data-feedback-id="${q.id}"]`)).toHaveCount(1);
-    await expect(page.getByText(q.feedbackByOption.A, { exact: true })).toHaveCount(1);
-  }
-  await expect(page.locator('[data-trail-id]')).toHaveCount(2);
-  for (const trail of await page.locator('[data-trail-id]').all()) await trail.locator(':scope > summary').click();
-  for (const detail of await page.locator('[data-trail-id] details').all()) { if (!(await detail.evaluate(el => (el as HTMLDetailsElement).open))) await detail.locator(':scope > summary').click(); }
-  await expect(page.getByRole('textbox')).toHaveCount(1); await expect(page.getByText('Your review amendment (unscored)', { exact: true })).toHaveCount(2);
-  await expect(page.getByText('Critical assumption or dependency', { exact: true })).toHaveCount(1);
-  expect(await page.locator('main').innerText()).not.toMatch(/overall score|total score|competency profile|KCM|KQF|rubric|sample answer|reviewer note|validated/i);
-  await accessible(page); await page.screenshot({ path: testInfo.outputPath('final-review.png'), fullPage: true });
-  const reflection = page.getByRole('textbox'); expect(await reflection.getAttribute('spellcheck')).toBeNull(); expect(await reflection.evaluate(el => (el as HTMLTextAreaElement).spellcheck)).toBe(true);
-  await reflection.fill('  I kept observations separate from inferences.\nI revised proportionately.  '); await page.reload(); await expect(page.getByRole('textbox')).toHaveValue('  I kept observations separate from inferences.\nI revised proportionately.  ');
-  await page.getByRole('button', { name: 'Submit optional reflection' }).click(); await page.getByRole('dialog').getByRole('button', { name: 'Save and lock reflection', exact: true }).click(); await expect(page.getByRole('textbox')).toHaveCount(0);
-  await page.reload(); await expect(page.getByText('▣ Reflection saved and locked')).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Submissions and human review",
+  );
+  await expect(page.getByText("Awaiting review", { exact: true })).toHaveCount(
+    20,
+  );
+  await expect(page.locator("[data-review-id]")).toHaveCount(0);
+  await checkAxe(page);
+  const run = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key)!),
+    key,
+  );
+  expect(run.actualSequence).toEqual(["A1", "A2", "B1", "B2"]);
+  expect(run.submissionSequence).toHaveLength(8);
+  expect(run.end.kind).toBe("complete");
+  expect(run.config.taskVersion).toBe("KALP-ALIGN-04:03");
 });
-
-test('word boundaries, keyboard modal focus, browser history and stale-tab locking', async ({ page, context }) => {
-  const a = config.assessments[0]; await go(page, `/learner/assessment/${a.id}`); await page.getByRole('button', { name: 'Begin case' }).click();
-  await page.getByRole('button', { name: 'Submit and continue' }).click(); await expect(page.getByRole('dialog')).toHaveCount(0); const input = page.getByRole('textbox'); await expect(input).toBeFocused();
-  await input.fill(Array(201).fill('word').join(' ')); await page.getByRole('button', { name: 'Submit and continue' }).click(); await expect(input).toHaveAttribute('aria-invalid', 'true'); await expect(page.getByRole('dialog')).toHaveCount(0);
-  await input.fill(Array(200).fill('word').join(' ')); await page.getByRole('button', { name: 'Submit and continue' }).click(); await expect(page.getByRole('dialog').getByRole('button', { name: 'Cancel' })).toBeFocused();
-  await page.keyboard.press('Escape'); await expect(page.getByRole('dialog')).not.toBeVisible();
-  const second = await context.newPage(); await go(second, `/learner/assessment/${a.id}/stage/${a.stages[0].id}`); await submit(page); await expect(second.locator('textarea,input')).toHaveCount(0);
-  await page.goBack(); await expect(page.locator('textarea,input')).toHaveCount(0);
-});
-
-test('review amendment limits and stale tabs preserve original reasoning', async ({ page, context }) => {
-  const a = config.assessments[1]; const run = throughStage(1, 5); const originals = run.sessions[a.id].submitted;
-  await go(page, '/learner'); await page.evaluate(({ storageKey, state }) => localStorage.setItem(storageKey, JSON.stringify(state)), { storageKey: key, state: run });
+test("keyboard cancel/confirm, exact draft recovery and direct-route reveal guard", async ({
+  page,
+}) => {
+  await seed(
+    page,
+    beginCase(createRun(config), "A1"),
+    "/learner/assessment/A1/stage/A.U",
+  );
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "not available",
+  );
+  await expect(
+    page.getByText(config.cases[0].phases[1].facts[0], { exact: true }),
+  ).toHaveCount(0);
+  await page.goto(`${base}#/learner/assessment/A1/stage/A.I`);
+  const first = page.getByLabel("A.P1 · choose and compare", { exact: true });
+  await first.focus();
+  await page.keyboard.type("Keyboard draft");
   await page.reload();
-  await go(page, `/learner/assessment/${a.id}/stage/B1_review`); await expect(page.locator('[data-feedback-id]')).toHaveCount(3);
-  const input = page.getByRole('textbox'); await input.fill(Array(101).fill('word').join(' ')); await page.getByRole('button', { name: 'Submit and continue' }).click();
-  await expect(input).toHaveAttribute('aria-invalid', 'true'); await expect(page.getByRole('dialog')).toHaveCount(0);
-  await input.fill(Array(100).fill('word').join(' '));
-  const second = await context.newPage(); await go(second, `/learner/assessment/${a.id}/stage/B1_review`);
-  await expect(second.getByRole('textbox')).toHaveValue(Array(100).fill('word').join(' '));
-  await submit(page); await expect(page).toHaveURL(/#\/learner\/review$/); await expect(second.getByRole('textbox')).toHaveCount(0);
-  const state = await stateFor(page); expect(Object.fromEntries(Object.entries(state.sessions[a.id].submitted).filter(([id]) => id !== 'B1_review'))).toEqual(originals);
-  await second.reload(); await expect(second.getByRole('textbox')).toHaveCount(0); await expect(second.locator('[data-feedback-id]')).toHaveCount(3);
-});
-
-test('hash routing, old routes, legacy state and responsive workspace accessibility', async ({ page }, testInfo) => {
-  await go(page, '/reviewer'); await expect(page).toHaveURL(/#\/learner$/); await expect(page.getByRole('link', { name: /Reviewer/ })).toHaveCount(0);
-  await go(page, '/learner/format/A/debrief'); await expect(page.getByRole('heading', { name: 'Your final review is still locked' })).toBeVisible();
-  await page.evaluate(() => localStorage.setItem('bharat-kalp:/bharat-kalp/:v1:learner', JSON.stringify({ schemaVersion: 1, sessions: { old: { submitted: {} } } })));
-  await go(page, '/learner'); await page.reload(); await expect(page.getByText(/Incompatible case progress has been restarted/)).toBeVisible();
-  for (const width of [1440, 834, 390]) {
-    await page.setViewportSize({ width, height: 1000 }); await go(page, '/learner'); expect(await page.locator('body').evaluate(el => el.scrollWidth <= window.innerWidth)).toBe(true); await accessible(page);
-    await page.screenshot({ path: testInfo.outputPath(`workspace-${width}.png`), fullPage: true });
-  }
-  const run = throughStage(1, 3);
-  await page.evaluate(({ storageKey, state }) => localStorage.setItem(storageKey, JSON.stringify(state)), { storageKey: key, state: run });
+  await expect(first).toHaveValue("Keyboard draft");
+  await first.focus();
+  for (let i = 0; i < 4; i++) await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("button", { name: "Submit phase →" }),
+  ).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByRole("button", { name: "Cancel", exact: true }),
+  ).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(
+    page.getByRole("button", { name: "Submit phase →" }),
+  ).toBeFocused();
+  await expect(first).toHaveValue("Keyboard draft");
+  await submit(page);
+  await expect(
+    page.getByRole("heading", { name: "Updated decision", exact: true }),
+  ).toBeVisible();
   await page.reload();
-  for (const width of [1440, 834, 390]) {
-    await page.setViewportSize({ width, height: 1000 }); await go(page, `/learner/assessment/${config.assessments[1].id}/stage/B1_revise`);
-    await expect(page.getByRole('region', { name: 'Current task' })).toHaveCSS('position', width > 850 ? 'sticky' : 'static');
-    await expect(page.getByRole('form', { name: 'Stage response' })).toHaveCSS('position', 'static');
-    expect(await page.locator('body').evaluate(el => el.scrollWidth <= window.innerWidth)).toBe(true); await accessible(page);
-    await page.screenshot({ path: testInfo.outputPath(`revision-${width}.png`), fullPage: true });
+  await expect(page.getByText("Keyboard draft", { exact: true })).toBeVisible();
+  await expect(page.getByRole("textbox")).toHaveCount(2);
+});
+test("wide and narrow reference access, reflow and accessible names", async ({
+  page,
+}) => {
+  const run = completeRun();
+  run.end = null;
+  delete run.sessions.B2.submitted["B.U"];
+  run.sessions.B2.draft = {
+    phaseId: "B.U",
+    answers: { "B.P3": "Narrow draft", "B.P4": "" },
+    updatedAt: new Date().toISOString(),
+  };
+  run.submissionSequence.pop();
+  await seed(page, run, "/learner/assessment/B2/stage/B.U");
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await reflow(page);
+    await expect(
+      page.getByText(config.cases[3].phases[0].facts[0], { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByLabel("B.P3 · interpret the evidence", { exact: true }),
+    ).toHaveValue("Narrow draft");
+    await checkAxe(page);
+    const snapshot = await page.locator("main").ariaSnapshot();
+    expect(snapshot).toContain('textbox "B.P3 · interpret the evidence"');
+    expect(snapshot).toContain('heading "Case information"');
   }
+  await page.screenshot({
+    path: "test-results/narrow-update.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.screenshot({
+    path: "test-results/wide-update.png",
+    fullPage: true,
+  });
+});
+test("early end retains drafts and missing opportunities without invented ratings", async ({
+  page,
+}) => {
+  await seed(
+    page,
+    beginCase(createRun(config), "A1"),
+    "/learner/assessment/A1/stage/A.I",
+  );
+  await page
+    .getByLabel("A.P1 · choose and compare", { exact: true })
+    .fill("Draft retained for recovery");
+  await page
+    .getByRole("link", { name: "Diagnostic home", exact: true })
+    .click();
+  await page.getByRole("button", { name: "End diagnostic early" }).click();
+  await page
+    .getByRole("button", { name: "End diagnostic and preserve record" })
+    .click();
+  await expect(page.getByText(/ENDED EARLY/)).toBeVisible();
+  await expect(
+    page.getByText(/Evidence availability: Not elicited/),
+  ).toHaveCount(15);
+  await expect(page.getByText("Developing", { exact: true })).toHaveCount(0);
+  const run = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key)!),
+    key,
+  );
+  expect(run.sessions.A1.draft.answers["A.P1"]).toBe(
+    "Draft retained for recovery",
+  );
+  expect(run.end.incomplete).toHaveLength(20);
+  await checkAxe(page);
+});
+test("human-review form export/import, supplementary attribution and immutable revision", async ({
+  page,
+}) => {
+  const run = completeRun("Submitted reasons for software verification");
+  await seed(page, run);
+  await page.getByRole("link", { name: "Human review", exact: true }).click();
+  await page.getByLabel("Import ended diagnostic session").setInputFiles({
+    name: "session.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(run)),
+  });
+  await page
+    .getByRole("button", { name: "Preserve workspace and import" })
+    .click();
+  await page
+    .getByText(
+      "A1 · Flood response and essential movement: responses and criteria",
+      { exact: true },
+    )
+    .click();
+  await page
+    .getByRole("button", { name: "Review A1 / A-R1", exact: true })
+    .click();
+  const form = page.getByRole("form", { name: "Criterion review" });
+  await form
+    .getByLabel("Reviewer name or identifier")
+    .fill("Test human reviewer");
+  const primary = form.getByRole("group", {
+    name: "Initial primary judgement",
+    exact: true,
+  });
+  await primary
+    .getByLabel("Descriptive judgement or evidence status")
+    .selectOption("Emerging");
+  await primary
+    .getByLabel("Precise location in response or missing opportunity")
+    .fill("Whole initial A.P1 response");
+  await primary
+    .getByLabel(
+      "Exact response excerpt (optional if precise location is given)",
+    )
+    .fill("Submitted reasons");
+  await primary
+    .getByLabel("Descriptor-based rationale")
+    .fill(
+      "The reasoning states a comparison but leaves a material trade-off unresolved.",
+    );
+  await primary
+    .getByLabel(
+      "Supported strength, unresolved reasoning link or evidence limitation",
+    )
+    .fill("The longer-horizon consequence needs explanation.");
+  await primary
+    .getByLabel("Relevant next opportunity or further review (where available)")
+    .fill(
+      "A fresh elicitation about the consequence would provide more evidence.",
+    );
+  await form
+    .getByLabel(
+      "Record later supplementary evidence; keep initial judgement visible",
+    )
+    .check();
+  const later = form.getByRole("group", {
+    name: "Later supplementary evidence",
+    exact: true,
+  });
+  await later
+    .getByLabel("Descriptive judgement or evidence status")
+    .selectOption("Proficient");
+  await later
+    .getByLabel("Precise location in response or missing opportunity")
+    .fill("Update A.P5 response");
+  await later
+    .getByLabel("Descriptor-based rationale")
+    .fill(
+      "Later evidence explains the revised preference while preserving the initial judgement.",
+    );
+  await later
+    .getByLabel(
+      "Supported strength, unresolved reasoning link or evidence limitation",
+    )
+    .fill("The consequence is explained in later evidence.");
+  await checkAxe(page);
+  await form.getByRole("button", { name: "Save human review record" }).click();
+  await page
+    .getByRole("button", { name: "Save review record", exact: true })
+    .click();
+  await expect(page.locator("[data-review-id]")).toHaveCount(1);
+  const downloadPromise = page.waitForEvent("download");
+  await page
+    .getByRole("button", { name: "Export saved human reviews" })
+    .click();
+  const download = await downloadPromise,
+    path = await download.path();
+  expect(path).toBeTruthy();
+  const bundle = JSON.parse(await readFile(path!, "utf8"));
+  expect(bundle.records[0].primary.judgement).toBe("Emerging");
+  expect(bundle.records[0].supplementary[0].judgement).toBe("Proficient");
+  await page.getByRole("link", { name: "Return to learner workspace" }).click();
+  await page.goto(`${base}#/learner/review`);
+  await page.getByLabel("Import human-review feedback").setInputFiles(path!);
+  await expect(page.locator("[data-review-id]")).toHaveCount(1);
+  await expect(
+    page.getByText("Initial primary judgement", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Later supplementary evidence — initial judgement retained",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(page.getByText("Emerging", { exact: true })).toBeVisible();
+  await expect(page.getByText("Proficient", { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.locator("[data-review-id]")).toHaveCount(1);
+  await checkAxe(page);
+  await page.screenshot({
+    path: "test-results/human-feedback-wide.png",
+    fullPage: true,
+  });
+});
+test("save failure stays truthful and retry preserves work without reveal", async ({
+  page,
+}) => {
+  await seed(
+    page,
+    beginCase(createRun(config), "A1"),
+    "/learner/assessment/A1/stage/A.I",
+  );
+  await page.evaluate(() => {
+    Storage.prototype.setItem = function () {
+      throw new Error("Simulated failure");
+    };
+  });
+  await page
+    .getByLabel("A.P1 · choose and compare", { exact: true })
+    .fill("Unsaved recovery draft");
+  await expect(
+    page.getByRole("status").filter({ hasText: "Not saved" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/could not be saved|Simulated failure/).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Download current session and drafts" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(config.cases[0].phases[1].facts[0], { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByLabel("A.P1 · choose and compare", { exact: true }),
+  ).toHaveValue("Unsaved recovery draft");
+});
+test("cross-tab submission and new-session safeguards", async ({
+  page,
+  context,
+}) => {
+  await seed(
+    page,
+    beginCase(createRun(config), "A1"),
+    "/learner/assessment/A1/stage/A.I",
+  );
+  const other = await context.newPage();
+  await other.goto(`${base}#/learner/assessment/A1/stage/A.I`);
+  await page
+    .getByLabel("A.P1 · choose and compare", { exact: true })
+    .fill("Original from first tab");
+  await page
+    .getByLabel("A.P2 · citizen impacts and duties", { exact: true })
+    .focus();
+  await expect(
+    other.getByLabel("A.P1 · choose and compare", { exact: true }),
+  ).toHaveValue("Original from first tab");
+  await submit(page);
+  await expect(
+    other.getByText("Original from first tab", { exact: true }),
+  ).toBeVisible();
+  await expect(other.getByRole("textbox")).toHaveCount(0);
+  await page.goto(`${base}#/learner/files`);
+  await page
+    .getByRole("button", { name: "Start a new diagnostic", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Preserve previous and start new" })
+    .click();
+  await expect(other.getByRole("heading", { level: 1 })).toContainText(
+    "not available",
+  );
 });
 
-test('four-case migration backs up old data, resets changed content and removes obsolete sessions and journals', async ({ page }) => {
-  const oldRun = completedBattery(previousConfig); const raw = JSON.stringify(oldRun);
-  const stale = { stageId: 'A1_initial', answers: { reasoning: 'An incompatible old draft' }, cardOrder: [], updatedAt: '2099-01-01T00:00:00.000Z' };
-  await go(page, '/learner');
-  await page.evaluate(({ storageKey, runId, value, journal }) => {
-    localStorage.setItem(storageKey, value);
-    localStorage.setItem(`${storageKey}:draft:${runId}:A1_FLOOD`, JSON.stringify(journal));
-    localStorage.setItem(`${storageKey}:draft:${runId}:A2_LPG`, JSON.stringify(journal));
-  }, { storageKey: key, runId: oldRun.runId, value: raw, journal: stale });
-  await page.reload(); await expect(page.getByText(/Incompatible case progress has been restarted/)).toBeVisible();
-  const restored = await stateFor(page); expect(Object.keys(restored.sessions)).toEqual(config.assessments.map(a => a.id));
-  for (const a of config.assessments) expect(restored.sessions[a.id]).toEqual({ contentVersion: a.contentVersion, startedAt: null, draft: null, submitted: {} });
-  expect(restored.intermission).toEqual({ seenAt: null, continuedAt: null });
-  expect(await page.evaluate(({ storageKey, runId }) => localStorage.getItem(`${storageKey}:backup:${runId}`), { storageKey: key, runId: oldRun.runId })).toBe(raw);
-  for (const aid of ['A1_FLOOD', 'A2_LPG']) {
-    expect(await page.evaluate(({ storageKey, runId, id }) => localStorage.getItem(`${storageKey}:draft:${runId}:${id}`), { storageKey: key, runId: oldRun.runId, id: aid })).toBeNull();
-    expect(await page.evaluate(({ storageKey, runId, id }) => localStorage.getItem(`${storageKey}:backup:${runId}:draft:${id}`), { storageKey: key, runId: oldRun.runId, id: aid })).toBe(JSON.stringify(stale));
-  }
-  await page.getByRole('link', { name: 'Start assessment', exact: false }).click(); await expect(page).toHaveURL(/#\/learner\/assessment\/A1_FLOOD$/);
-  await page.getByRole('button', { name: 'Begin case' }).click(); await expect(page.getByRole('textbox')).toBeEmpty();
-  await page.reload(); await expect(page.getByRole('textbox')).toBeEmpty(); await accessible(page);
+test("long response acceptance and keyboard reference disclosure", async ({
+  page,
+}) => {
+  await seed(
+    page,
+    beginCase(createRun(config), "A1"),
+    "/learner/assessment/A1/stage/A.I",
+  );
+  const long = "Reasons and uncertainty. ".repeat(2000);
+  await page
+    .getByLabel("A.P1 · choose and compare", { exact: true })
+    .fill(long);
+  await submit(page);
+  const stored = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key)!),
+    key,
+  );
+  expect(stored.sessions.A1.submitted["A.I"].answers["A.P1"]).toBe(long);
+  const reference = page
+    .locator("summary")
+    .filter({ hasText: "Initial facts and exact submitted response" });
+  await reference.focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByText(config.cases[0].phases[0].facts[0], { exact: true }),
+  ).not.toBeVisible();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByText(config.cases[0].phases[0].facts[0], { exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("A.P5 · justified update", { exact: true }).focus();
+  await page.keyboard.press("Tab");
+  expect(
+    await page
+      .getByLabel("A.P6 · consequences of the update", { exact: true })
+      .evaluate((el) => getComputedStyle(el).outlineStyle),
+  ).toBe("solid");
+});
+
+test("missing-evidence and uncertain human-review statuses with retained revision history", async ({
+  page,
+}) => {
+  const run = completeRun("");
+  await seed(page, run);
+  await page.getByRole("link", { name: "Human review", exact: true }).click();
+  await page
+    .getByLabel("Import ended diagnostic session")
+    .setInputFiles({
+      name: "blank-session.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(run)),
+    });
+  await page
+    .getByRole("button", { name: "Preserve workspace and import" })
+    .click();
+  await page
+    .getByText(
+      "A1 · Flood response and essential movement: responses and criteria",
+      { exact: true },
+    )
+    .click();
+  await page
+    .getByRole("button", { name: "Review A1 / A-R1", exact: true })
+    .click();
+  const form = page.getByRole("form", { name: "Criterion review" });
+  await form
+    .getByLabel("Reviewer name or identifier")
+    .fill("Human review software test");
+  await form
+    .getByLabel("Descriptive judgement or evidence status")
+    .selectOption("Insufficient evidence");
+  await form
+    .getByLabel("Precise location in response or missing opportunity")
+    .fill("All initial response fields are blank");
+  await form
+    .getByLabel("Descriptor-based rationale")
+    .fill(
+      "No comparative reasoning is available in any submitted initial field.",
+    );
+  await form
+    .getByLabel(
+      "Supported strength, unresolved reasoning link or evidence limitation",
+    )
+    .fill(
+      "The evidence does not reveal the criterion; no deficit is inferred.",
+    );
+  await form
+    .getByLabel("Relevant next opportunity or further review (where available)")
+    .fill(
+      "Arrange a fresh elicitation of a comparative choice under recorded support.",
+    );
+  await form.getByRole("button", { name: "Save human review record" }).click();
+  await page
+    .getByRole("button", { name: "Save review record", exact: true })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "Record a revision of A1 / A-R1",
+      exact: true,
+    })
+    .click();
+  await form
+    .getByLabel("Descriptive judgement or evidence status")
+    .selectOption("");
+  await form.getByLabel("Review status").selectOption("Uncertain");
+  await form
+    .getByLabel("Competing interpretations requiring review")
+    .fill(
+      "Raters disagree whether a technical issue prevented elicitation or an available opportunity was left blank.",
+    );
+  await form
+    .getByLabel("Relevant next opportunity or further review (where available)")
+    .fill(
+      "Seek independent review of the technical record before any interpretation.",
+    );
+  await form.getByRole("button", { name: "Save human review record" }).click();
+  await page
+    .getByRole("button", { name: "Save review record", exact: true })
+    .click();
+  await expect(page.locator("[data-review-id]")).toHaveCount(2);
+  await expect(
+    page.getByText("Insufficient evidence", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("No defensible level selected", { exact: true }),
+  ).toBeVisible();
+  const workspace = await page.evaluate(
+    (base) =>
+      JSON.parse(localStorage.getItem(`bharat-kalp:${base}:v3:reviewer`)!),
+    base,
+  );
+  expect(workspace.bundle.records[1].supersedes).toBe(
+    workspace.bundle.records[0].id,
+  );
+  expect(workspace.bundle.records[1].primary.reviewStatus).toBe("Uncertain");
+  await checkAxe(page);
+  await page.setViewportSize({ width: 320, height: 1000 });
+  await reflow(page);
+  await checkAxe(page);
 });
